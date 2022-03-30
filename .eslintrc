@@ -1,0 +1,9 @@
+{
+    "plugins": [
+        "@episerver/cms"
+    ],
+    "rules": {
+        "@episerver/cms/no-internal-episerver-apis": "error",
+        "@episerver/cms/no-deprecated-episerver-apis": "warn"
+    }
+}

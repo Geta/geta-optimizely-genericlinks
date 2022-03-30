@@ -1,0 +1,17 @@
+{
+    "eslint.format.enable": true,
+    "eslint.options": {
+        "plugins": [
+            "@episerver/cms"
+        ],
+        "resolvePluginsRelativeTo": "./",
+        "rulePaths": [
+            "@episerver/eslint-formatter-cms",
+            "@episerver/eslint-plugin-cms"
+        ],
+    },
+    "prettier.enable": false,
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": true
+    }
+}

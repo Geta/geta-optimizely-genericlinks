@@ -1,0 +1,42 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net5.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<LangVersion>9</LangVersion>
+		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+		<CodeAnalysisTreatWarningsAsErrors>true</CodeAnalysisTreatWarningsAsErrors>
+		<TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
+		<PackageId>Geta.GenericLinks</PackageId>
+		<Title>Extensible link items for Optimizely</Title>
+		<PackageVersion>1.0.0</PackageVersion>
+		<Authors>Geta Digital</Authors>
+		<Company>Geta Digital</Company>
+		<PackageIcon>icon.png</PackageIcon>
+		<PackageIconUrl>https://cdn.geta.no/opensource/icons/Geta-logo-3.png</PackageIconUrl>
+		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+		<Description>Adds an extensible alternative to the LinkItemCollection in Optimizely.</Description>
+		<PackageTags>Geta Optimizely Links LinkItemCollection</PackageTags>
+		<RepositoryType>Git</RepositoryType>
+		<RepositoryUrl>URL</RepositoryUrl>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="EPiServer.CMS.UI" Version="12.0.3" />
+	</ItemGroup>
+
+	<ImportGroup>
+		<Import Project="$(SolutionDir)\src\pack.proj" Condition="Exists('$(SolutionDir)\src\pack.proj')" />
+	</ImportGroup>
+	
+	<ItemGroup>
+		<None Include="..\..\resources\icon.png" Pack="true" PackagePath="\" />
+	</ItemGroup>
+	
+	<ItemGroup>
+		<Content Include=".\msbuild\CopyZipFiles.targets" >
+			<Pack>true</Pack>
+			<PackagePath>build\net5.0\$(MSBuildProjectName).targets</PackagePath>
+		</Content>
+	</ItemGroup>
+</Project>

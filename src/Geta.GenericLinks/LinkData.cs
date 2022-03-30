@@ -1,0 +1,143 @@
+﻿using EPiServer.DataAnnotations;
+using EPiServer.Web;
+using Geta.GenericLinks.Extensions;
+using Geta.GenericLinks.Helpers;
+using System;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+
+namespace Geta.GenericLinks
+{
+    public abstract class LinkData : ILinkData
+    {
+        private readonly IDictionary<string, string> _attributes;
+        private readonly IDictionary<string, string> _attributeKeys;
+
+        public LinkData()
+        {
+            _attributes = new Dictionary<string, string>();
+            _attributeKeys = new Dictionary<string, string>();
+        }
+
+        public virtual IDictionary<string, string> Attributes => _attributes;
+
+        public virtual string? Text { get; set; }
+
+        public virtual string? Href
+        {
+            get => GetAttribute();
+            set
+            {
+                UriHelper.CreateUri(value);
+                SetAttribute(value);
+            }
+        }
+
+        public virtual string? Target
+        {
+            get => GetAttribute();
+            set => SetAttribute(value);
+        }
+
+        public virtual string? Title
+        {
+            get => GetAttribute();
+            set => SetAttribute(value);
+        }
+
+        public virtual IDictionary<string, string> GetAttributes()
+        {
+            return Attributes;
+        }
+
+        public virtual void SetAttributes(IDictionary<string, string> attributes)
+        {
+            foreach (var attribute in attributes)
+            {
+                Attributes[attribute.Key] = attribute.Value;
+            }
+        }
+
+        public virtual void RemapPermanentLinkReferences(IDictionary<Guid, Guid> idMap)
+        {
+            var href = Href;
+            if (string.IsNullOrEmpty(href))
+                return;
+
+            var guid = PermanentLinkUtility.GetGuid(href);
+            if (guid == Guid.Empty)
+                return;
+
+            if (!idMap.TryGetValue(guid, out var value))
+                return;
+
+            if (value == Guid.Empty)
+                value = idMap[guid] = Guid.NewGuid();
+
+            Href = PermanentLinkUtility.ChangeGuid(href, value);
+        }
+
+        [Ignore]
+        public virtual IList<Guid> ReferencedPermanentLinkIds
+        {
+            get
+            {
+                var href = Href;
+
+                if (string.IsNullOrEmpty(href))
+                    return new List<Guid>(0);
+
+                var guid = PermanentLinkUtility.GetGuid(href);
+                if (guid == Guid.Empty)
+                    return new List<Guid>(0);
+
+                return new List<Guid>(1)
+                {
+                    guid
+                };
+            }
+        }
+
+        public abstract object Clone();
+
+        protected virtual string? GetAttribute([CallerMemberName] string? key = null)
+        {
+            if (key is null)
+                return null;
+
+            if (Attributes.TryGetValue(GetAttributeKey(key), out var value))
+                return value;
+
+            return null;
+        }
+
+        protected virtual void SetAttribute(string? value, [CallerMemberName] string? key = null)
+        {
+            if (key is null)
+                return;
+
+            var attributeKey = GetAttributeKey(key);
+
+            if (value is null)
+            {
+                if (Attributes.ContainsKey(attributeKey))
+                    Attributes.Remove(attributeKey);
+            }
+            else
+            {
+                Attributes[attributeKey] = value;
+            }
+        }
+
+        protected virtual string GetAttributeKey(string key)
+        {
+            if (_attributeKeys.TryGetValue(key, out var attributeKey))
+                return attributeKey;
+
+            attributeKey = key.ToCamel();
+            _attributeKeys.TryAdd(key, attributeKey);
+
+            return attributeKey;
+        }
+    }
+}
