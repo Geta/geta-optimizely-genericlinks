@@ -2,7 +2,7 @@
 
 namespace Geta.GenericLinks
 {
-    [PropertyDefinitionTypePlugIn(DisplayName = "PropertyThumbnailCollection")]
+    [PropertyDefinitionTypePlugIn(DisplayName = "Link collection with thumbnails")]
     public class PropertyThumbnailCollection : PropertyLinkDataCollection<ThumbnailLinkData>
     {
 
