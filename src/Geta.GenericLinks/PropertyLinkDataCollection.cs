@@ -33,7 +33,6 @@ namespace Geta.GenericLinks
         private static readonly IServiceProvider _serviceProvider;
 
         private readonly IUrlResolver _urlResolver;
-        private readonly Injected<IUrlResolver> _injectedUrlResolver;
         private readonly IPrincipalAccessor _principalAccessor;
         private readonly IPermanentLinkMapper _permanentLinkMapper;
         private readonly IAttributeSanitizer _attributeSanitizer;
@@ -80,7 +79,6 @@ namespace Geta.GenericLinks
             _permanentLinkMapper = permanentLinkMapper;
             _attributeSanitizer = attributeSanitizer;
             _htmlSerializer = htmlSerializer;
-            _injectedUrlResolver = new Injected<IUrlResolver>(urlResolver);
         }
 
         public PropertyLinkDataCollection(
@@ -97,7 +95,6 @@ namespace Geta.GenericLinks
             _permanentLinkMapper = permanentLinkMapper;
             _attributeSanitizer = attributeSanitizer;
             _htmlSerializer = htmlSerializer;
-            _injectedUrlResolver = new Injected<IUrlResolver>(urlResolver);
         }
 
         [XmlIgnore]

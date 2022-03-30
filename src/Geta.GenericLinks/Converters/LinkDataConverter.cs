@@ -3,7 +3,6 @@ using EPiServer.DataAbstraction;
 using EPiServer.Shell;
 using EPiServer.Web;
 using EPiServer.Web.Routing;
-using Geta.GenericLinks;
 using Geta.GenericLinks.Cms.EditorModels;
 using Geta.GenericLinks.Cms.Metadata;
 using Geta.GenericLinks.Extensions;
