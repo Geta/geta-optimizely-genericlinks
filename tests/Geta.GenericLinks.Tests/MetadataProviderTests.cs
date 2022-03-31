@@ -42,14 +42,17 @@ namespace Geta.GenericLinks.Tests
             var subject = CreateLinkModelMetadataProvider();
             var testInstance = new LinkModel<TestThumbnailLinkData>();
 
-            var metadata = subject.GetMetadataForProperties(testInstance, testInstance.GetType()).ToArray();
+            var metadata = subject.GetMetadataForProperties(testInstance, testInstance.GetType());
 
             Assert.NotNull(metadata);
-            Assert.Equal(10, metadata.Length);
 
-            var firstThumbnail = metadata[0];
-            var secondThumbnail = metadata[3];
-            var thirdThumbnail = metadata[6];
+            var metaArray = metadata.ToArray();
+
+            Assert.Equal(10, metaArray.Length);
+
+            var firstThumbnail = metaArray[0];
+            var secondThumbnail = metaArray[3];
+            var thirdThumbnail = metaArray[6];
 
             Assert.Equal(typeof(ContentReference), firstThumbnail.ModelType);
             Assert.Equal(nameof(TestThumbnailLinkData.ThumbnailOne), firstThumbnail.PropertyName);
