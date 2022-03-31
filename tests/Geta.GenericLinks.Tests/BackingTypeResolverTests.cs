@@ -1,6 +1,8 @@
 using EPiServer.Core;
 using EPiServer.DataAbstraction;
 using Geta.GenericLinks.Cms.Registration;
+using Geta.GenericLinks.Tests.Extensions;
+using Geta.GenericLinks.Tests.Models;
 using Geta.GenericLinks.Tests.Services;
 using System;
 using System.Collections.Generic;
@@ -16,18 +18,16 @@ namespace Geta.GenericLinks.Tests
             var testFailureException = new InvalidOperationException("Test failed");
             var failureResolver = new ExceptionBackingTypeResolver(testFailureException);
 
-            var propertyType = typeof(PropertyThumbnailCollection);
-            var propertyTypeName = propertyType.FullName;
-            var propertyAssemblyName = propertyType.Assembly.FullName;
+            var propertyType = typeof(PropertyTestCollection);
             var definitions = new List<PropertyDefinitionType>
             {
-                new PropertyDefinitionType(1, PropertyDataType.LinkCollection, "Thumbnail collection", propertyTypeName, propertyAssemblyName)
+                propertyType.ToDefinition(1, PropertyDataType.LinkCollection)
             };
 
             var definitionRepository = new InMemoryPropertyDefinitionTypeRepository(definitions);
             var subject = new LinkDataBackingTypeResolverInterceptor(failureResolver, definitionRepository);
 
-            var resolvedType = subject.Resolve(typeof(LinkDataCollection<ThumbnailLinkData>));
+            var resolvedType = subject.Resolve(typeof(LinkDataCollection<TestLinkData>));
 
             Assert.Equal(propertyType, resolvedType);
         }
