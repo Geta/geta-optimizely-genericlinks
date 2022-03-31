@@ -1,5 +1,7 @@
-﻿using EPiServer.Framework;
+﻿using EPiServer.DataAbstraction;
+using EPiServer.Framework;
 using EPiServer.Framework.Initialization;
+using EPiServer.Initialization.Internal;
 using EPiServer.ServiceLocation;
 using EPiServer.Shell;
 using EPiServer.Shell.ObjectEditing;
@@ -7,16 +9,35 @@ using EPiServer.Web;
 using Geta.GenericLinks.Cms.EditorModels;
 using Geta.GenericLinks.Cms.Metadata;
 using Geta.GenericLinks.Cms.Registration;
-using Geta.GenericLinks.Extensions;
+using Geta.GenericLinks.Converters;
+using Geta.GenericLinks.Html;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Newtonsoft.Json;
+using ServiceDescriptor = Microsoft.Extensions.DependencyInjection.ServiceDescriptor;
 
 namespace Geta.GenericLinks.Initialization
 {
     [ModuleDependency(typeof(InitializationModule))]
+    [ModuleDependency(typeof(CmsRuntimeInitialization))]
     internal class GenericLinkInitializationModule : IConfigurableModule
     {
         public void ConfigureContainer(ServiceConfigurationContext context)
         {
-            context.Services.AddGenericLinkItems();
+            var services = context.Services;
+
+            services.AddSingleton<PropertyLinkDataDefinitionsLoader>();
+            services.TryAddEnumerable(ServiceDescriptor.Singleton<JsonConverter, LinkDataConverter>());
+            services.TryAddTransient<ILinkModelMetadataProvider, DefaultLinkModelMetadataProvider>();
+            services.TryAddSingleton<IPropertyReflector, DefaultPropertyReflector>();
+            services.TryAddTransient<IAttributeSanitizer, DefaultAttributeSanitizer>();
+            services.TryAddTransient<ILinkHtmlSerializer, DefaultLinkHtmlSerializer>();
+
+            context.ConfigurationComplete += (o, e) =>
+            {
+                services.Intercept<IBackingTypeResolver>((provider, typeResolver) =>
+                    new LinkDataBackingTypeResolverInterceptor(typeResolver, provider.GetRequiredService<IPropertyDefinitionTypeRepository>()));
+            };
         }
 
         public void Initialize(InitializationEngine context)
