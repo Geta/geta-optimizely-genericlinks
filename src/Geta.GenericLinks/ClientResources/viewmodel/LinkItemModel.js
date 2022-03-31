@@ -35,6 +35,7 @@ define("genericLinks/viewmodel/LinkItemModel", [
         target,
         title,
         publicUrl,
+        previewUrl,
         permanentUrl,
         typeIdentifier,
         referencedPermanentLinkIds,
