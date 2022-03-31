@@ -14,7 +14,7 @@ namespace Geta.GenericLinks.Cms.Metadata
         private readonly Type _extenderType;
         private readonly string _customIdentifier;
         private readonly string _modelTypeIdentifier;
-        private string[] _allowedDragAndDropTypes;
+        private readonly string[] _allowedDragAndDropTypes;
 
         public LinkDataMetadataExtender(Type extenderType, IEnumerable<IContentRepositoryDescriptor> contentRepositoryDescriptors)
         {
