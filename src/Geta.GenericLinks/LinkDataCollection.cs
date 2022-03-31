@@ -7,7 +7,12 @@ using System.Collections.Generic;
 
 namespace Geta.GenericLinks
 {
-    public class LinkDataCollection<TLinkData> : IList<TLinkData>, IEnumerable<TLinkData>, IEnumerable, IReadOnly<LinkDataCollection<TLinkData>>, IReadOnly, ICloneable, IReferenceMap
+    public abstract class LinkDataCollection
+    {
+
+    }
+
+    public class LinkDataCollection<TLinkData> : LinkDataCollection, IList<TLinkData>, IEnumerable<TLinkData>, IEnumerable, IReadOnly<LinkDataCollection<TLinkData>>, IReadOnly, ICloneable, IReferenceMap
         where TLinkData : ILinkData
     {
         private readonly List<TLinkData> _linkCollection;

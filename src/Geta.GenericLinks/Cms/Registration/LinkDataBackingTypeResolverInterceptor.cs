@@ -16,7 +16,7 @@ namespace Geta.GenericLinks.Cms.Registration
         {
             _interceptedResolver = interceptedResolver;
             _propertyDefinitionRepository = propertyDefinitionRepository;
-            _collectionBaseType = typeof(LinkDataCollection<>);
+            _collectionBaseType = typeof(LinkDataCollection);
             _propertyBaseType = typeof(PropertyLinkDataCollection<>);
             _resolvedTypes = new Dictionary<Type, Type>();
         }
