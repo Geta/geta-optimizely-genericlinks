@@ -2,12 +2,7 @@
 
 ## What is does
 
-This module handles catalog import (categories and products) from Microsoft Retail Server into Optimizely (v14). Import is handled in a two step process.
-
-- Extraction of catalog changes from Dynamics api. Each set is stored as serialized json in databsse tables.
-- Import of changes into Optimizely commerce.
-
-For more details on each step, see Documentation section below.
+Provides a new property type `LinkDataCollection` which is an alternative to `LinkItemCollection` which can be extended with additional propertes.
 
 ## How to get started?
 
