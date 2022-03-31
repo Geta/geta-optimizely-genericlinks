@@ -37,6 +37,7 @@ define("genericLinks/viewmodel/LinkItemModel", [
         publicUrl,
         permanentUrl,
         typeIdentifier,
+        referencedPermanentLinkIds,
         attributes,
         ...rest
       } = this;
