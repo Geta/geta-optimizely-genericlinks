@@ -1,4 +1,5 @@
-﻿using Geta.GenericLinks.Cms.Metadata;
+﻿using EPiServer.DataAbstraction;
+using Geta.GenericLinks.Cms.Metadata;
 using Geta.GenericLinks.Cms.Registration;
 using Geta.GenericLinks.Converters;
 using Geta.GenericLinks.Html;
@@ -13,6 +14,10 @@ namespace Geta.GenericLinks.Extensions
         public static void AddGenericLinkItems(this IServiceCollection services)
         {
             services.AddSingleton<PropertyLinkDataDefinitionsLoader>();
+
+            services.Intercept<IBackingTypeResolver>((provider, typeResolver) => 
+                new LinkDataBackingTypeResolverInterceptor(typeResolver, provider.GetRequiredService<IPropertyDefinitionTypeRepository>()));
+
             services.TryAddEnumerable(ServiceDescriptor.Singleton<JsonConverter, LinkDataConverter>());
             services.TryAddTransient<ILinkModelMetadataProvider, DefaultLinkModelMetadataProvider>();
             services.TryAddSingleton<IPropertyReflector, DefaultPropertyReflector>();

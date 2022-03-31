@@ -22,7 +22,7 @@
 
   <PropertyGroup>
     <SolutionDir Condition="$(SolutionDir) == ''">$(MSBuildProjectDirectory)\..\</SolutionDir>
-    <TmpOutDir>$(SolutionDir)\tmp</TmpOutDir>
+    <TmpOutDir>$(SolutionDir)\tmp\$(TargetFramework)</TmpOutDir>
   </PropertyGroup>
 
   <Target Name="CreateZip" AfterTargets="Build">
@@ -35,13 +35,13 @@
     <XmlPoke XmlInputPath="$(TmpOutDir)\content\module.config" Query="/module/@clientResourceRelativePath" Value="$(Version)" />
     <ZipDirectory
       InputPath="$(TmpOutDir)\content"
-      OutputFileName="$(OutDir)\$(MSBuildProjectName).zip"
+      OutputFileName="$(OutputPath)\$(MSBuildProjectName).zip"
       OverwriteExistingFile="true" />
      <RemoveDir Directories="$(TmpOutDir)" />
   </Target>
 
   <ItemGroup>
-    <Content Include="$(OutDir)\$(MSBuildProjectName).zip" >
+    <Content Include="$(OutputPath)\$(MSBuildProjectName).zip" >
       <Pack>true</Pack>
       <PackagePath>content\modules\_protected\$(MSBuildProjectName)\;contentFiles\any\any\modules\_protected\$(MSBuildProjectName)\</PackagePath>
       <PackageCopyToOutput>true</PackageCopyToOutput>
@@ -53,6 +53,12 @@
       <PackageCopyToOutput>true</PackageCopyToOutput>
       <BuildAction>None</BuildAction>
     </Content>
+	<Content Include="$(SolutionDir)\src\$(MSBuildProjectName)\msbuild\CopyZipFiles.targets" >
+		<Pack>true</Pack>
+		<PackagePath>build\net6.0\$(MSBuildProjectName).targets</PackagePath>
+		<PackageCopyToOutput>true</PackageCopyToOutput>
+		<BuildAction>None</BuildAction>
+	</Content>
   </ItemGroup>
 </Project>
 

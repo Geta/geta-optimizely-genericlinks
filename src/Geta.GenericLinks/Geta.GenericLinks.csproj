@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net5.0</TargetFramework>
+		<TargetFrameworks>net5.0;net6.0</TargetFrameworks>
 		<Nullable>enable</Nullable>
 		<LangVersion>9</LangVersion>
 		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
@@ -21,9 +21,14 @@
 		<RepositoryUrl>URL</RepositoryUrl>
 	</PropertyGroup>
 
-	<ItemGroup>
+	<ItemGroup Condition="'$(TargetFramework)' == 'net5.0'">
 		<PackageReference Include="EPiServer.CMS.UI" Version="12.0.3" />
 	</ItemGroup>
+
+	<ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
+		<PackageReference Include="EPiServer.CMS.UI" Version="12.4.0" />
+	</ItemGroup>
+
 
 	<ImportGroup>
 		<Import Project="$(SolutionDir)\src\pack.proj" Condition="Exists('$(SolutionDir)\src\pack.proj')" />
@@ -32,11 +37,11 @@
 	<ItemGroup>
 		<None Include="..\..\resources\icon.png" Pack="true" PackagePath="\" />
 	</ItemGroup>
-	
+
 	<ItemGroup>
-		<Content Include=".\msbuild\CopyZipFiles.targets" >
+		<Content Include=".\msbuild\CopyZipFiles.targets">
 			<Pack>true</Pack>
-			<PackagePath>build\net5.0\$(MSBuildProjectName).targets</PackagePath>
+			<PackagePath>build\$(TargetFramework)\$(MSBuildProjectName).targets</PackagePath>
 		</Content>
 	</ItemGroup>
 </Project>

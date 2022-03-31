@@ -12,11 +12,14 @@ Requires using .NET 5.0 or higher and Optimizely 12
 
 First, implement `LinkData` on a derived type.
 
+Note that you can use `DataAnnotation` attributes like `Display` and `UIHint`, data validation attributes also work.
+
 ```
 public class ThumbnailLinkData : LinkData
 {
     [Display(Name = "Thumbnail image", Order = 0)]
     [UIHint(UIHint.Image)]
+    [Required]
     public virtual ContentReference? Thumbnail
     {
         get
@@ -38,7 +41,7 @@ public class ThumbnailLinkData : LinkData
 }
 ```
 
-Then create a property definition
+Then create a property definition that inherits from `PropertyLinkDataCollection` with your `LinkData` implementation.
 
 ```
 [PropertyDefinitionTypePlugIn(DisplayName = "PropertyThumbnailCollection")]
@@ -48,12 +51,11 @@ public class PropertyThumbnailCollection : PropertyLinkDataCollection<ThumbnailL
 }
 ```
 
-Then register the property on a content model
+Then define a new property with `LinkDataCollection<ThumbnailLinkData>` on content. Backing types will resolve automatically by default via `LinkDataBackingTypeResolverInterceptor`.
 
 ```
 [CultureSpecific]
 [Display(Name = "Thumbnail links", GroupName = SystemTabNames.Content, Order = 230)]
-[BackingType(typeof(PropertyThumbnailCollection))]
 public virtual LinkDataCollection<ThumbnailLinkData> Thumbnails { get; set; }
 ```
 
