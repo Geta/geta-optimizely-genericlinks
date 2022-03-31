@@ -2,7 +2,7 @@
 
 ## What is does
 
-Provides a new property type `LinkDataCollection` which is an alternative to `LinkItemCollection` which can be extended with additional propertes.
+Provides a new property type `LinkDataCollection` which is an alternative to `LinkItemCollection`. It can be extended with additional propertes.
 
 ## How to get started?
 
