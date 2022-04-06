@@ -6,29 +6,27 @@ using EPiServer.ServiceLocation;
 using EPiServer.Web;
 using EPiServer.Web.Routing;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Serialization;
 using Geta.GenericLinks.Html;
-using Geta.GenericLinks.Extensions;
 
 namespace Geta.GenericLinks
 {
-    public abstract class PropertyLinkDataCollection : PropertyLinkBase
+    public abstract class PropertyLinkData : PropertyLinkBase
     {
-        protected PropertyLinkDataCollection()
+        protected PropertyLinkData()
         {
         }
 
-        protected PropertyLinkDataCollection(string value) : base(value)
+        protected PropertyLinkData(string value) : base(value)
         {
         }
     }
 
-    public abstract class PropertyLinkDataCollection<TLinkData> : PropertyLinkDataCollection, IReferenceMap, IEnumerable<TLinkData>, IEnumerable
-        where TLinkData : ILinkData, new()
+    public abstract class PropertyLinkData<TLinkData> : PropertyLinkData, IReferenceMap
+        where TLinkData : LinkData, new()
     {
         private static readonly IServiceProvider _serviceProvider;
 
@@ -38,14 +36,14 @@ namespace Geta.GenericLinks
         private readonly IAttributeSanitizer _attributeSanitizer;
         private readonly ILinkHtmlSerializer _htmlSerializer;
 
-        private LinkDataCollection<TLinkData>? _linkItemCollection;
+        private TLinkData? _linkItem;
 
-        static PropertyLinkDataCollection()
+        static PropertyLinkData()
         {
             _serviceProvider = ServiceLocator.Current;
         }
 
-        public PropertyLinkDataCollection()
+        public PropertyLinkData()
             : this(
                    _serviceProvider.GetInstance<IUrlResolver>(),
                    _serviceProvider.GetInstance<IPrincipalAccessor>(),
@@ -55,9 +53,9 @@ namespace Geta.GenericLinks
         {
         }
 
-        public PropertyLinkDataCollection(LinkDataCollection<TLinkData> linkItemCollection)
+        public PropertyLinkData(TLinkData linkItem)
             : this(
-                  linkItemCollection,
+                  linkItem,
                    _serviceProvider.GetInstance<IUrlResolver>(),
                    _serviceProvider.GetInstance<IPrincipalAccessor>(),
                    _serviceProvider.GetInstance<IPermanentLinkMapper>(),
@@ -66,7 +64,7 @@ namespace Geta.GenericLinks
         {
         }
 
-        public PropertyLinkDataCollection(
+        public PropertyLinkData(
             IUrlResolver urlResolver,
             IPrincipalAccessor principalAccessor,
             IPermanentLinkMapper permanentLinkMapper,
@@ -81,15 +79,15 @@ namespace Geta.GenericLinks
             _htmlSerializer = htmlSerializer;
         }
 
-        public PropertyLinkDataCollection(
-            LinkDataCollection<TLinkData> linkItemCollection,
+        public PropertyLinkData(
+            TLinkData linkItem,
             IUrlResolver urlResolver,
             IPrincipalAccessor principalAccessor,
             IPermanentLinkMapper permanentLinkMapper,
             IAttributeSanitizer attributeSanitizer,
             ILinkHtmlSerializer htmlSerializer)
         {
-            _linkItemCollection = linkItemCollection;
+            _linkItem = linkItem;
             _urlResolver = urlResolver;
             _principalAccessor = principalAccessor;
             _permanentLinkMapper = permanentLinkMapper;
@@ -98,9 +96,9 @@ namespace Geta.GenericLinks
         }
 
         [XmlIgnore]
-        public virtual LinkDataCollection<TLinkData>? Links
+        public virtual TLinkData? Link
         {
-            get => _linkItemCollection;
+            get => _linkItem;
             set
             {
                 ThrowIfReadOnly();
@@ -108,12 +106,11 @@ namespace Geta.GenericLinks
                 if (value is null)
                 {
                     Clear();
+                    return;
                 }
-                else if (_linkItemCollection != value)
-                {
-                    _linkItemCollection = value;
-                    ModifiedNoCheck();
-                }
+
+                _linkItem = value;
+                ModifiedNoCheck();
             }
         }
 
@@ -124,19 +121,20 @@ namespace Geta.GenericLinks
                 if (base.IsModified)
                     return true;
 
-                if (_linkItemCollection is not null)
-                    return _linkItemCollection.IsModified;
+                if (_linkItem is not null)
+                    return _linkItem.IsModified;
 
                 return false;
             }
             set => base.IsModified = value;
         }
 
+
         public override bool IsNull
         {
             get
             {
-                if (_linkItemCollection is not null && _linkItemCollection.Count > 0)
+                if (_linkItem is not null && !string.IsNullOrEmpty(_linkItem.Href))
                     return false;
 
                 return !((ILazyProperty)this).HasLazyValue;
@@ -144,24 +142,24 @@ namespace Geta.GenericLinks
         }
 
         public override PropertyDataType Type => PropertyDataType.LinkCollection;
-        public override Type PropertyValueType => typeof(LinkDataCollection<TLinkData>);
+        public override Type PropertyValueType => typeof(TLinkData);
 
         public override object? Value
         {
-            get => _linkItemCollection;
+            get => _linkItem;
             set
             {
                 SetPropertyValue(value, delegate
                 {
-                    var collection = value as LinkDataCollection<TLinkData>;
-                    if (collection is not null || value is null)
+                    var linkData = value as TLinkData;
+                    if (linkData is not null || value is null)
                     {
-                        _linkItemCollection = collection;
+                        _linkItem = linkData;
                     }
                     else
                     {
                         if (value is not string text)
-                            throw new ArgumentNullException("Passed object must be of type LinkItemCollection<TLinkData> or string.");
+                            throw new ArgumentNullException("Passed object must be of type TLinkData or string.");
 
                         ParseToSelf(text);
                     }
@@ -170,7 +168,7 @@ namespace Geta.GenericLinks
         }
         protected override string LongString
         {
-            get => _htmlSerializer.Serialize(_linkItemCollection, StringMode.InternalMode);
+            get => _htmlSerializer.Serialize(_linkItem, StringMode.InternalMode);
             set => base.LongString = value;
         }
 
@@ -180,11 +178,11 @@ namespace Geta.GenericLinks
 
             if (QualifyAsNullString(value))
             {
-                _linkItemCollection = null;
+                _linkItem = null;
                 return;
             }
 
-            _linkItemCollection = ParseToLinkCollection(value);
+            _linkItem = ParseToLink(value);
             ModifiedNoCheck();
         }
 
@@ -193,22 +191,9 @@ namespace Geta.GenericLinks
             return ToLongString();
         }
 
-        public override void MakeReadOnly()
-        {
-            base.MakeReadOnly();
-
-            if (_linkItemCollection is null)
-                return;
-
-            if (_linkItemCollection.IsReadOnly)
-                return;
-
-            _linkItemCollection.MakeReadOnly();
-        }
-
         public override string ToWebString()
         {
-            return _htmlSerializer.Serialize(_linkItemCollection, StringMode.ViewMode);
+            return _htmlSerializer.Serialize(_linkItem, StringMode.ViewMode);
         }
 
         public virtual IList<Guid>? ReferencedPermanentLinkIds
@@ -218,136 +203,117 @@ namespace Geta.GenericLinks
                 if (IsNull)
                     return Array.Empty<Guid>();
 
-                return _linkItemCollection?.ReferencedPermanentLinkIds;
+                return _linkItem?.ReferencedPermanentLinkIds;
             }
         }
 
         public override PropertyData CreateWritableClone()
         {
-            var clone = (PropertyLinkDataCollection<TLinkData>)base.CreateWritableClone();
+            var clone = (PropertyLinkData<TLinkData>)base.CreateWritableClone();
 
-            if (_linkItemCollection is not null)
-                clone.SetLinkItems(_linkItemCollection.CreateWritableClone());
+            if (_linkItem is not null)
+                clone.SetLinkItem((TLinkData)_linkItem.Clone());
 
             return clone;
         }
 
         public override PropertyData Copy()
         {
-            var collection = (PropertyLinkDataCollection<TLinkData>)base.Copy();
+            var property = (PropertyLinkData<TLinkData>)base.Copy();
 
-            LinkDataCollection<TLinkData> links;
+            TLinkData? link;
 
-            if (_linkItemCollection is null)
+            if (_linkItem is null)
             {
-                links = new LinkDataCollection<TLinkData>();
+                link = null;
             }
             else
             {
-                links = new LinkDataCollection<TLinkData>(_linkItemCollection);
+                link = (TLinkData)_linkItem.Clone();
             }
 
-            collection.SetLinkItems(links);
+            property.SetLinkItem(link);
 
             if (IsReadOnly)
             {
-                links.MakeReadOnly();
+                property.MakeReadOnly();
             }
 
-            return collection;
+            return property;
         }
 
         public override void LoadData(object value)
         {
-            if (value is LinkDataCollection<TLinkData>)
+            if (value is null)
+            {
+                _linkItem = null;
+            }
+            else if (value is TLinkData)
             {
                 Value = value;
             }
             else
             {
-                _linkItemCollection = ParseToLinkCollection((string)value);
+                _linkItem = ParseToLink((string)value);
             }
         }
 
         public virtual void RemapPermanentLinkReferences(IDictionary<Guid, Guid> idMap)
         {
-            if (_linkItemCollection is null)
+            if (_linkItem is null)
                 return;
 
-            _linkItemCollection.RemapPermanentLinkReferences(idMap);
-        }
-
-        public virtual IEnumerator<TLinkData> GetEnumerator()
-        {
-            if (_linkItemCollection is null)
-                return Enumerator.Empty<TLinkData>();
-
-            return _linkItemCollection.GetEnumerator();
+            _linkItem.RemapPermanentLinkReferences(idMap);
         }
 
         protected override void SetDefaultValue()
         {
             base.SetDefaultValue();
-            _linkItemCollection = null;
+            _linkItem = null;
         }
 
-        protected virtual LinkDataCollection<TLinkData>? ParseToLinkCollection(string value)
+        protected virtual TLinkData? ParseToLink(string value)
         {
             if (string.IsNullOrEmpty(value))
                 return null;
 
-            var linkItemCollection = new LinkDataCollection<TLinkData>();
-
             try
             {
-                var linkElements = GetLinkElements(value);
-
-                foreach (var element in linkElements)
+                var element = GetLinkElement(value);
+                var linkItem = new TLinkData
                 {
-                    var linkItem = new TLinkData
-                    {
-                        Text = element.Value
-                    };
+                    Text = element.Value
+                };
 
-                    var attributes = GetDefinedAttributes(element);
+                var attributes = GetDefinedAttributes(element);
 
-                    foreach (var attribute in attributes)
-                    {
-                        linkItem.Attributes.Add(attribute.Key, attribute.Value);
-                    }
-
-                    linkItem.SetAttributes(attributes);
-                    linkItemCollection.Add(linkItem);
+                foreach (var attribute in attributes)
+                {
+                    linkItem.Attributes.Add(attribute.Key, attribute.Value);
                 }
 
-                return linkItemCollection;
+                linkItem.SetAttributes(attributes);
+
+                return linkItem;
             }
             catch (XmlException xmlException)
             {
-                throw new InvalidPropertyValueException(nameof(PropertyLinkDataCollection<TLinkData>), value, xmlException);
+                throw new InvalidPropertyValueException(nameof(PropertyLinkData<TLinkData>), value, xmlException);
             }
             catch (ArgumentException argumentException)
             {
-                throw new InvalidPropertyValueException(nameof(PropertyLinkDataCollection<TLinkData>), value, argumentException);
+                throw new InvalidPropertyValueException(nameof(PropertyLinkData<TLinkData>), value, argumentException);
             }
         }
 
         protected virtual string? ToLongString()
         {
-            if (_linkItemCollection is null)
+            if (_linkItem is null)
                 return null;
 
-            if (_linkItemCollection.Count == 0)
-                return null;
+            var element = GetElement(_linkItem);
 
-            var elements = new List<XElement>(_linkItemCollection.Count);
-
-            foreach (var linkItem in _linkItemCollection)
-            {
-                elements.Add(GetElement(linkItem));
-            }
-
-            return new XElement("links", elements).ToString(SaveOptions.DisableFormatting);
+            return new XElement("links", element).ToString(SaveOptions.DisableFormatting);
         }
 
         protected override string GetPermanentUrl(string href)
@@ -359,17 +325,10 @@ namespace Geta.GenericLinks
         {
             return _attributeSanitizer.Sanitize(value);
         }
-        internal void SetLinkItems(LinkDataCollection<TLinkData> linkItems)
-        {
-            _linkItemCollection = linkItems;
-        }
 
-        IEnumerator IEnumerable.GetEnumerator()
+        internal void SetLinkItem(TLinkData? linkItem)
         {
-            if (_linkItemCollection is null)
-                return Enumerator.Empty<TLinkData>();
-
-            return _linkItemCollection.GetEnumerator();
+            _linkItem = linkItem;
         }
     }
 }

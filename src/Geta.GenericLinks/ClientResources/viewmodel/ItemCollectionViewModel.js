@@ -67,7 +67,6 @@ define("genericLinks/viewmodel/ItemCollectionViewModel", [
       if (!newItem) {
         return false;
       }
-
       if (this.getItemIndex(newItem) >= 0) {
         this.moveTo(newItem, null, false);
         this.emit("changed");
@@ -85,7 +84,6 @@ define("genericLinks/viewmodel/ItemCollectionViewModel", [
         });
       }
     },
-
     moveTo: function (selectedItem, item, before) {
       if (!selectedItem && !this._selectedItem) {
         return false;
@@ -103,7 +101,17 @@ define("genericLinks/viewmodel/ItemCollectionViewModel", [
 
       this.emit("changed");
     },
+    selectFirstItem: function () {
+      if (this._data.length < 1) return;
+      this._selectedItem = this._data[0];
+    },
+    clear: function () {
+      this._data = [];
 
+      this.set("selectedItem", null);
+
+      this.emit("changed");
+    },
     updateItemData: function (item) {
       var index = this.getItemIndex(this._selectedItem);
       if (index < 0) {

@@ -27,7 +27,7 @@ namespace Geta.GenericLinks.Tests
             };
 
             var definitionRepository = new InMemoryPropertyDefinitionTypeRepository(definitions);
-            var subject = new PropertyLinkDataDefinitionsLoader(definitionRepository);
+            var subject = new PropertyLinkDataCollectionDefinitionsLoader(definitionRepository);
 
             var result = subject.Load();
 

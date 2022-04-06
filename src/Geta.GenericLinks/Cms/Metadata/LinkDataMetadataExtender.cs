@@ -12,14 +12,19 @@ namespace Geta.GenericLinks.Cms.Metadata
     public class LinkDataMetadataExtender : IMetadataExtender
     {
         private readonly Type _extenderType;
+        private readonly bool _singleItem;
         private readonly string _customIdentifier;
         private readonly string _modelTypeIdentifier;
         private readonly string[] _allowedDragAndDropTypes;
 
-        public LinkDataMetadataExtender(Type extenderType, IEnumerable<IContentRepositoryDescriptor> contentRepositoryDescriptors)
+        public LinkDataMetadataExtender(Type extenderType, bool singleItem, IEnumerable<IContentRepositoryDescriptor> contentRepositoryDescriptors)
         {
             _extenderType = extenderType;
-            _customIdentifier = _extenderType.FullName!.ToLower();
+            _singleItem = singleItem;
+            _customIdentifier = _extenderType.FullName!.ToLower() ?? string.Empty;
+            if (!singleItem)
+                _customIdentifier += "collection";
+
             _modelTypeIdentifier = typeof(LinkModel<>).MakeGenericType(extenderType).FullName!.ToLower();
             _allowedDragAndDropTypes = contentRepositoryDescriptors.Where(d => d.LinkableTypes != null)
                                                                    .SelectMany(d => d.LinkableTypes)
@@ -31,6 +36,9 @@ namespace Geta.GenericLinks.Cms.Metadata
 
         public virtual void ModifyMetadata(ExtendedMetadata metadata, IEnumerable<Attribute> attributes)
         {
+            if (metadata is LinkDataMetadata)
+                return;
+
             var collectionOptions = new CollectionEditorOptions
             {
                 ItemModelType = "genericLinks/viewmodel/LinkItemModel",
@@ -45,7 +53,10 @@ namespace Geta.GenericLinks.Cms.Metadata
                 }
             };
 
-            metadata.ClientEditingClass = "genericLinks/editors/GenericCollectionEditor";
+            var editingClass = _singleItem ? "genericLinks/editors/GenericItemEditor"
+                                           : "genericLinks/editors/GenericCollectionEditor";
+
+            metadata.ClientEditingClass = editingClass;
             metadata.OverlayConfiguration["modelParams"] = collectionOptions;
             metadata.OverlayConfiguration[EditorDescriptorConstants.AllowedDndTypesKey] = _allowedDragAndDropTypes;
             metadata.EditorConfiguration["itemModelType"] = collectionOptions.ItemModelType;

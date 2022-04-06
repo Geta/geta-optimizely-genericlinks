@@ -125,12 +125,6 @@ namespace Geta.GenericLinks
 
         public virtual IEnumerator<TLinkData> GetEnumerator() => _linkCollection.GetEnumerator();
 
-
-        public override int GetHashCode()
-        {
-            return base.GetHashCode();
-        }
-
         public virtual LinkDataCollection<TLinkData> CreateWritableClone()
         {
             return Clone(false);

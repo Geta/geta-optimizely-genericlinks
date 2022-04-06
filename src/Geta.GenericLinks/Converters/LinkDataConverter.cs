@@ -36,7 +36,25 @@ namespace Geta.GenericLinks.Converters
 
         public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
         {
-            var clientModel = serializer.Deserialize<LinkModel>(reader);
+            LinkModel? clientModel;
+
+            if (reader.TokenType == JsonToken.StartArray)
+            {
+                var array = serializer.Deserialize<LinkModel[]>(reader);
+                if (array is not null && array.Length > 0)
+                {
+                    clientModel = array[0];
+                }
+                else
+                {
+                    clientModel = null;
+                }                
+            }
+            else
+            {
+                clientModel = serializer.Deserialize<LinkModel>(reader);
+            }
+
             if (clientModel is null)
                 return null;
 

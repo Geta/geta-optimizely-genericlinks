@@ -13,6 +13,8 @@ namespace Geta.GenericLinks
         private readonly IDictionary<string, string> _attributes;
         private readonly IDictionary<string, string> _attributeKeys;
 
+        private bool _isModified;
+
         public LinkData()
         {
             _attributes = new Dictionary<string, string>();
@@ -45,6 +47,12 @@ namespace Geta.GenericLinks
             set => SetAttribute(value);
         }
 
+        [Ignore]
+        public virtual bool IsModified
+        {
+            get => _isModified;
+        }
+
         public virtual IDictionary<string, string> GetAttributes()
         {
             return Attributes;
@@ -54,8 +62,17 @@ namespace Geta.GenericLinks
         {
             foreach (var attribute in attributes)
             {
+                Attributes.TryGetValue(attribute.Key, out var existingValue);
+                if (existingValue == attribute.Value)
+                    continue;
+
                 Attributes[attribute.Key] = attribute.Value;
             }
+        }
+
+        public virtual void SetModified(bool isModified)
+        {
+            _isModified = isModified;
         }
 
         public virtual void RemapPermanentLinkReferences(IDictionary<Guid, Guid> idMap)
@@ -98,7 +115,10 @@ namespace Geta.GenericLinks
             }
         }
 
-        public abstract object Clone();
+        public virtual object Clone()
+        {
+            return MemberwiseClone();
+        }
 
         protected virtual string? GetAttribute([CallerMemberName] string? key = null)
         {
@@ -120,12 +140,20 @@ namespace Geta.GenericLinks
 
             if (value is null)
             {
-                if (Attributes.ContainsKey(attributeKey))
-                    Attributes.Remove(attributeKey);
+                if (!Attributes.ContainsKey(attributeKey))
+                    return;
+
+                Attributes.Remove(attributeKey);
+                _isModified = true;
             }
             else
             {
+                Attributes.TryGetValue(attributeKey, out var existingValue);
+                if (existingValue == value)
+                    return;
+
                 Attributes[attributeKey] = value;
+                _isModified = true;
             }
         }
 

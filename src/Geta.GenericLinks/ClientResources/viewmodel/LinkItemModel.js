@@ -54,7 +54,7 @@ define("genericLinks/viewmodel/LinkItemModel", [
       return serialized;
     },
 
-    _buildPublicUrl: function (/*String*/ url) {
+    _buildPublicUrl: function (url) {
       var returnUrl = new Url(url);
       if (!returnUrl.scheme) {
         returnUrl = new Url("", {
@@ -70,7 +70,7 @@ define("genericLinks/viewmodel/LinkItemModel", [
       return this._buildPublicUrl(this.publicUrl || this.url || this.href);
     },
 
-    _permanentUrlSetter: function (/*String*/ value) {
+    _permanentUrlSetter: function (value) {
       this.href = this.permanentUrl = value;
     },
 

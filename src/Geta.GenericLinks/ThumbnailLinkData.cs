@@ -49,6 +49,7 @@ namespace Geta.GenericLinks
             };
 
             item.SetAttributes(Attributes);
+            item.SetModified(IsModified);
 
             return item;
         }

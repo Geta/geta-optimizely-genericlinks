@@ -2,6 +2,9 @@
 using System.Text;
 using EPiServer.Web;
 using EPiServer.Web.Routing;
+using System.Collections.Generic;
+using System.Linq;
+using Geta.GenericLinks.Extensions;
 
 namespace Geta.GenericLinks.Html
 {
@@ -16,13 +19,27 @@ namespace Geta.GenericLinks.Html
             _urlResolver = urlResolver;
         }
 
-        public string Serialize<TLinkData>(LinkDataCollection<TLinkData>? links, StringMode mode)
+        public virtual string Serialize<TLinkData>(TLinkData? link, StringMode mode) where TLinkData : ILinkData
+        {
+            if (link is null)
+                return string.Empty;
+
+            return SerializeLinks(link.Yield(), mode);
+        }
+
+        public virtual string Serialize<TLinkData>(LinkDataCollection<TLinkData>? links, StringMode mode)
             where TLinkData : ILinkData
         {
             if (links is null)
                 return string.Empty;
 
-            if (links.Count == 0)
+            return SerializeLinks(links, mode);
+        }
+
+        protected virtual string SerializeLinks<TLinkData>(IEnumerable<TLinkData> links, StringMode mode)
+            where TLinkData : ILinkData
+        {
+            if (!links.Any())
                 return string.Empty;
 
             if (StringMode.EditMode == mode)
@@ -34,26 +51,31 @@ namespace Geta.GenericLinks.Html
 
             foreach (ILinkData link in links)
             {
-                stringBuilder.Append("<li>");
-
-                string href;
-
-                if (mode == StringMode.ViewMode)
-                {
-                    href = _virtualPathResolver.ToAbsoluteOrSame(link.Href);
-                }
-                else
-                {
-                    href = _urlResolver.GetPermanent(link.Href, enableFallback: true);
-                }
-
-                stringBuilder.Append(CreateLink(href, link));
-                stringBuilder.Append("</li>");
+                WriteLink(mode, stringBuilder, link);
             }
 
             stringBuilder.Append("</ul>");
 
             return stringBuilder.ToString();
+        }
+
+        protected virtual void WriteLink(StringMode mode, StringBuilder stringBuilder, ILinkData link)
+        {
+            stringBuilder.Append("<li>");
+
+            string href;
+
+            if (mode == StringMode.ViewMode)
+            {
+                href = _virtualPathResolver.ToAbsoluteOrSame(link.Href);
+            }
+            else
+            {
+                href = _urlResolver.GetPermanent(link.Href, enableFallback: true);
+            }
+
+            stringBuilder.Append(CreateLink(href, link));
+            stringBuilder.Append("</li>");
         }
 
         protected virtual string? CreateLink(string hrefValue, ILinkData linkData)

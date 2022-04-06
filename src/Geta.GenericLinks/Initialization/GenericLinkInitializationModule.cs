@@ -1,4 +1,5 @@
 ﻿using EPiServer.DataAbstraction;
+using EPiServer.DataAbstraction.RuntimeModel;
 using EPiServer.Framework;
 using EPiServer.Framework.Initialization;
 using EPiServer.Initialization.Internal;
@@ -14,6 +15,8 @@ using Geta.GenericLinks.Html;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
 using ServiceDescriptor = Microsoft.Extensions.DependencyInjection.ServiceDescriptor;
 
 namespace Geta.GenericLinks.Initialization
@@ -26,7 +29,9 @@ namespace Geta.GenericLinks.Initialization
         {
             var services = context.Services;
 
+            services.AddSingleton<PropertyLinkDataCollectionDefinitionsLoader>();
             services.AddSingleton<PropertyLinkDataDefinitionsLoader>();
+            services.TryAddEnumerable(ServiceDescriptor.Singleton<ContentScannerExtension, GenericLinkContentScannerExtension>());
             services.TryAddEnumerable(ServiceDescriptor.Singleton<JsonConverter, LinkDataConverter>());
             services.TryAddTransient<ILinkModelMetadataProvider, DefaultLinkModelMetadataProvider>();
             services.TryAddSingleton<IPropertyReflector, DefaultPropertyReflector>();
@@ -44,18 +49,35 @@ namespace Geta.GenericLinks.Initialization
         {
             var provider = context.Locate.Advanced;
             var metadataHandlerRegistry = provider.GetInstance<MetadataHandlerRegistry>();
-            var definitionLoader = provider.GetInstance<PropertyLinkDataDefinitionsLoader>();
+            var collectionDefinitionLoader = provider.GetInstance<PropertyLinkDataCollectionDefinitionsLoader>();
+            var propertyDefinitionLoader = provider.GetInstance<PropertyLinkDataDefinitionsLoader>();
 
             var editorType = typeof(LinkModel<>);
             var collectionType = typeof(LinkDataCollection<>);
+            var editModelTypes = new HashSet<Type>();
 
-            foreach (var type in definitionLoader.Load())
+            foreach (var resolvedType in collectionDefinitionLoader.Load())
             {
-                var editModelType = editorType.MakeGenericType(type);
-                var propertyModelType = collectionType.MakeGenericType(type);
-                var linkExtender = new LinkDataMetadataExtender(type, provider.GetAllInstances<IContentRepositoryDescriptor>());
+                var editModelType = editorType.MakeGenericType(resolvedType);
+                var collectionModelType = collectionType.MakeGenericType(resolvedType);
+                var collectionExtender = new LinkDataMetadataExtender(resolvedType, false, provider.GetAllInstances<IContentRepositoryDescriptor>());
 
-                metadataHandlerRegistry.RegisterMetadataHandler(propertyModelType, linkExtender);
+                metadataHandlerRegistry.RegisterMetadataHandler(collectionModelType, collectionExtender);
+                metadataHandlerRegistry.RegisterMetadataHandler(editModelType, provider.GetInstance<ILinkModelMetadataProvider>());
+
+                editModelTypes.Add(editModelType);
+            }
+
+            foreach (var resolvedType in propertyDefinitionLoader.Load())
+            {
+                var editModelType = editorType.MakeGenericType(resolvedType);
+                var singleItemExtender = new LinkDataMetadataExtender(resolvedType, true, provider.GetAllInstances<IContentRepositoryDescriptor>());
+
+                metadataHandlerRegistry.RegisterMetadataHandler(resolvedType, singleItemExtender);
+
+                if (editModelTypes.Contains(editModelType))
+                    continue;
+
                 metadataHandlerRegistry.RegisterMetadataHandler(editModelType, provider.GetInstance<ILinkModelMetadataProvider>());
             }
         }
