@@ -186,11 +186,6 @@ namespace Geta.GenericLinks
             ModifiedNoCheck();
         }
 
-        public override object? SaveData(PropertyDataCollection properties)
-        {
-            return ToLongString();
-        }
-
         public override string ToWebString()
         {
             return _htmlSerializer.Serialize(_linkItem, StringMode.ViewMode);
@@ -285,15 +280,7 @@ namespace Geta.GenericLinks
                     Text = element.Value
                 };
 
-                var attributes = GetDefinedAttributes(element);
-
-                foreach (var attribute in attributes)
-                {
-                    linkItem.Attributes.Add(attribute.Key, attribute.Value);
-                }
-
-                linkItem.SetAttributes(attributes);
-
+                ParseAttributes(element, linkItem);
                 return linkItem;
             }
             catch (XmlException xmlException)
@@ -306,12 +293,12 @@ namespace Geta.GenericLinks
             }
         }
 
-        protected virtual string? ToLongString()
+        protected override string? ToLongString()
         {
             if (_linkItem is null)
                 return null;
 
-            var element = GetElement(_linkItem);
+            var element = CreateLinkElement(_linkItem);
 
             return new XElement("links", element).ToString(SaveOptions.DisableFormatting);
         }

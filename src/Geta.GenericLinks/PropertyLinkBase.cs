@@ -15,7 +15,44 @@ namespace Geta.GenericLinks
         {
         }
 
-        protected virtual IEnumerable<XAttribute> GetElementAttributes(IDictionary<string, string> attributes)
+        public override object? SaveData(PropertyDataCollection properties)
+        {
+            return ToLongString();
+        }
+
+        protected abstract string? ToLongString();
+
+        protected abstract string SanitizeValue(string value);
+
+        protected abstract string GetPermanentUrl(string href);
+
+        protected virtual void ParseAttributes(XElement element, ILinkData linkItem)
+        {
+            var attributes = GetDefinedAttributes(element);
+
+            foreach (var attribute in attributes)
+            {
+                linkItem.Attributes.Add(attribute.Key, attribute.Value);
+            }
+
+            linkItem.SetAttributes(attributes);
+        }      
+
+        protected virtual XElement CreateLinkElement(ILinkData linkItem)
+        {
+            var attributes = linkItem.GetAttributes();
+            var element = new XElement("a", CreateElementAttributes(attributes));
+
+            if (!string.IsNullOrWhiteSpace(linkItem.Href))
+                element.SetAttributeValue("href", GetPermanentUrl(linkItem.Href));
+
+            if (!string.IsNullOrWhiteSpace(linkItem.Text))
+                element.SetValue(SanitizeValue(linkItem.Text));
+
+            return element;
+        }
+
+        protected virtual IEnumerable<XAttribute> CreateElementAttributes(IDictionary<string, string> attributes)
         {
             foreach (var attribute in attributes)
             {
@@ -27,35 +64,10 @@ namespace Geta.GenericLinks
             }
         }
 
-        protected abstract string SanitizeValue(string value);
-
-        protected abstract string GetPermanentUrl(string href);
-
-        protected virtual XElement GetElement(ILinkData linkItem)
-        {
-            var attributes = linkItem.GetAttributes();
-            var element = new XElement("a", GetElementAttributes(attributes));
-
-            if (!string.IsNullOrWhiteSpace(linkItem.Href))
-                element.SetAttributeValue("href", GetPermanentUrl(linkItem.Href));
-
-            if (!string.IsNullOrWhiteSpace(linkItem.Text))
-                element.SetValue(SanitizeValue(linkItem.Text));
-
-            return element;
-        }
-
         protected virtual XElement GetLinkElement(string value)
         {
-            var rootElement = XElement.Parse(value);
-
-            foreach (var element in rootElement.Descendants())
-            {
-                if (element.Name != "a")
-                    continue;
-
+            foreach (var element in GetLinkElements(value))
                 return element;
-            }
 
             throw new InvalidOperationException("Malformed data");
         }
