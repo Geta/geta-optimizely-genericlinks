@@ -29,7 +29,9 @@
 		<PackageReference Include="EPiServer.CMS.UI" Version="12.4.0" />
 	</ItemGroup>
 
-
+	<PropertyGroup>
+		<SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
+	</PropertyGroup>
 	<ImportGroup>
 		<Import Project="$(SolutionDir)\src\pack.proj" Condition="Exists('$(SolutionDir)\src\pack.proj')" />
 	</ImportGroup>
