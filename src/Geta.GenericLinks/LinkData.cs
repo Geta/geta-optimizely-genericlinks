@@ -129,7 +129,7 @@ namespace Geta.GenericLinks
             return MemberwiseClone();
         }
 
-        public virtual string? GetAttribute([CallerMemberName] string? key = null)
+        protected virtual string? GetAttribute([CallerMemberName] string? key = null)
         {
             if (key is null)
                 return null;
@@ -140,7 +140,7 @@ namespace Geta.GenericLinks
             return null;
         }
 
-        public virtual void SetAttribute(string? value, [CallerMemberName] string? key = null)
+        protected virtual void SetAttribute(string? value, [CallerMemberName] string? key = null)
         {
             if (key is null)
                 return;
