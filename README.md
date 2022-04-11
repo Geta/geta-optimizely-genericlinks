@@ -14,6 +14,10 @@ Requires using .NET 5.0 or higher and Optimizely 12
 
 - [Example link collection with thumbnails](./docs/example-link-data-collection.md)
 - [Example single link item](./docs/example-single-link.md)
+
+### Documentation
+
+- [Advanced property handling](./docs/advanced-property-handling.md)
 - [Adding support for additional property types](./docs/adding-support-for-new-properties.md)
 
 ## Package maintainer
