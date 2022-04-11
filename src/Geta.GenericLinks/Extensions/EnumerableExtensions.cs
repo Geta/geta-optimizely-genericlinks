@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Geta.GenericLinks.Extensions
 {
@@ -7,6 +9,11 @@ namespace Geta.GenericLinks.Extensions
         public static IEnumerable<T> Yield<T>(this T item)
         {
             yield return item;
+        }
+
+        public static TType? FirstOfType<TType>(this IEnumerable list)
+        {
+            return list.OfType<TType>().FirstOrDefault();
         }
     }
 }

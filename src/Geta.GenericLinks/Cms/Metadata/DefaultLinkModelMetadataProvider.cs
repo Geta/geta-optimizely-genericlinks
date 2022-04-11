@@ -78,7 +78,7 @@ namespace Geta.GenericLinks.Cms.Metadata
                 return Enumerable.Empty<ExtendedMetadata>();
 
             var properties = _propertyReflector.GetProperties(containerType);
-            var baseProperties = new HashSet<string>();
+            var baseMetadata = new Dictionary<string, ExtendedMetadata>();
             var extentedMetadata = new List<ExtendedMetadata>();
 
             foreach (var property in properties)
@@ -87,19 +87,22 @@ namespace Geta.GenericLinks.Cms.Metadata
                 if (metadata is null)
                     continue;
 
-                baseProperties.Add(property.Name);
+                baseMetadata.Add(property.Name, metadata);
                 extentedMetadata.Add(metadata);
             }
 
             var modelType = containerType.GetGenericArguments()[0];
-            properties = _propertyReflector.GetProperties(modelType, inherited: false);
+            properties = _propertyReflector.GetProperties(modelType);
 
             foreach (var property in properties)
             {
-                if (baseProperties.Contains(property.Name))
+                if (baseMetadata.TryGetValue(property.Name, out ExtendedMetadata? metadata))
+                {
+                    TryAppendMetadataFromAttributes(metadata, property.GetCustomAttributes());
                     continue;
+                }
 
-                var metadata = CreateMetadataForProperty(modelType, property);
+                metadata = CreateMetadataForProperty(modelType, property);
                 if (metadata is null)
                     continue;
 
@@ -109,6 +112,12 @@ namespace Geta.GenericLinks.Cms.Metadata
             extentedMetadata.Sort((x, y) => x.Order.CompareTo(y.Order));
 
             return extentedMetadata;
+        }
+
+        protected virtual void TryAppendMetadataFromAttributes(ExtendedMetadata metadata, IEnumerable<Attribute> attributes)
+        {
+            if (metadata is LinkDataMetadata linkMetadata)
+                linkMetadata.ExtendFromAttributes(attributes);
         }
 
         protected virtual void ExtractSettingsFromAttributes(LinkDataMetadata metadata, IEnumerable<Attribute> attributes)
@@ -158,12 +167,14 @@ namespace Geta.GenericLinks.Cms.Metadata
                 return null;
 
             var metadata = CreateMetadata(attributes, containerType, null, property.PropertyType, property.Name);
+            if (metadata is null)
+                return null;
 
             IEnumerable<IMetadataHandler> metadataHandlers;
 
             if (string.IsNullOrEmpty(metadata.TemplateHint))
             {
-                metadataHandlers = _metadataHandlerRegistry.GetMetadataHandlers(property.PropertyType);
+                metadataHandlers = _metadataHandlerRegistry.GetMetadataHandlers(metadata.ModelType);
             }
             else
             {

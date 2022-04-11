@@ -5,12 +5,16 @@ using EPiServer.Framework.Initialization;
 using EPiServer.Initialization.Internal;
 using EPiServer.ServiceLocation;
 using EPiServer.Shell;
+using EPiServer.Shell.Json;
 using EPiServer.Shell.ObjectEditing;
 using EPiServer.Web;
 using Geta.GenericLinks.Cms.EditorModels;
 using Geta.GenericLinks.Cms.Metadata;
 using Geta.GenericLinks.Cms.Registration;
 using Geta.GenericLinks.Converters;
+using Geta.GenericLinks.Converters.Attributes;
+using Geta.GenericLinks.Converters.Json;
+using Geta.GenericLinks.Converters.Values;
 using Geta.GenericLinks.Html;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -32,11 +36,16 @@ namespace Geta.GenericLinks.Initialization
             services.AddSingleton<PropertyLinkDataCollectionDefinitionsLoader>();
             services.AddSingleton<PropertyLinkDataDefinitionsLoader>();
             services.TryAddEnumerable(ServiceDescriptor.Singleton<ContentScannerExtension, GenericLinkContentScannerExtension>());
-            services.TryAddEnumerable(ServiceDescriptor.Singleton<JsonConverter, LinkDataConverter>());
+            services.TryAddEnumerable(ServiceDescriptor.Singleton<JsonConverter, NewtonsoftLinkDataConverter>());
+            services.TryAddEnumerable(ServiceDescriptor.Singleton<IJsonConverter, SystemTextLinkDataJsonConverterFactory>());
+            services.TryAddTransient<ILinkModelConverter, DefaultLinkModelConverter>();
             services.TryAddTransient<ILinkModelMetadataProvider, DefaultLinkModelMetadataProvider>();
             services.TryAddSingleton<IPropertyReflector, DefaultPropertyReflector>();
             services.TryAddTransient<IAttributeSanitizer, DefaultAttributeSanitizer>();
             services.TryAddTransient<ILinkHtmlSerializer, DefaultLinkHtmlSerializer>();
+
+            TryAddAttributeConverters(services);
+            TryAddJsonValueWriters(services);
 
             context.ConfigurationComplete += (o, e) =>
             {
@@ -44,7 +53,7 @@ namespace Geta.GenericLinks.Initialization
                     new LinkDataBackingTypeResolverInterceptor(typeResolver, provider.GetRequiredService<IPropertyDefinitionTypeRepository>()));
             };
         }
-
+        
         public void Initialize(InitializationEngine context)
         {
             var provider = context.Locate.Advanced;
@@ -86,5 +95,22 @@ namespace Geta.GenericLinks.Initialization
         {
 
         }
+
+        private static void TryAddAttributeConverters(IServiceCollection services)
+        {
+            services.TryAddEnumerable(ServiceDescriptor.Singleton<ILinkDataAttibuteConverter, StringAttributeConverter>());
+            services.TryAddEnumerable(ServiceDescriptor.Singleton<ILinkDataAttibuteConverter, ConvertibleAttributeConverter>());
+            services.TryAddEnumerable(ServiceDescriptor.Singleton<ILinkDataAttibuteConverter, JsonAttributeConverter>());
+        }
+
+        private static void TryAddJsonValueWriters(IServiceCollection services)
+        {
+            services.TryAddEnumerable(ServiceDescriptor.Singleton<ILinkDataValueWriter, StringValueWriter>());
+            services.TryAddEnumerable(ServiceDescriptor.Singleton<ILinkDataValueWriter, ContentReferenceValueWriter>());
+            services.TryAddEnumerable(ServiceDescriptor.Singleton<ILinkDataValueWriter, Int32ValueWriter>());
+            services.TryAddEnumerable(ServiceDescriptor.Singleton<ILinkDataValueWriter, DoubleValueWriter>());
+            services.TryAddEnumerable(ServiceDescriptor.Singleton<ILinkDataValueWriter, DecimalValueWriter>());
+            services.TryAddEnumerable(ServiceDescriptor.Singleton<ILinkDataValueWriter, DateTimeValueWriter>());
+        }       
     }
 }

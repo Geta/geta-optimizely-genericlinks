@@ -10,54 +10,11 @@ Requires using .NET 5.0 or higher and Optimizely 12
 
 - `install-package Geta.GenericLinks`
 
-First, implement `LinkData` on a derived type.
+### Examples
 
-Note that you can use `DataAnnotation` attributes like `Display` and `UIHint`, data validation attributes also work.
-
-```
-public class ThumbnailLinkData : LinkData
-{
-    [Display(Name = "Thumbnail image", Order = 0)]
-    [UIHint(UIHint.Image)]
-    [Required]
-    public virtual ContentReference? Thumbnail
-    {
-        get
-        {
-            var attribute = GetAttribute();
-
-            if (ContentReference.TryParse(attribute, out var reference))
-                return reference;
-
-            return null;
-        }
-        set
-        {
-            SetAttribute(value);
-        }
-    }
-
-    ...
-}
-```
-
-Then create a property definition that inherits from `PropertyLinkDataCollection` with your `LinkData` implementation.
-
-```
-[PropertyDefinitionTypePlugIn(DisplayName = "PropertyThumbnailCollection")]
-public class PropertyThumbnailCollection : PropertyLinkDataCollection<ThumbnailLinkData>
-{
-
-}
-```
-
-Then define a new property with `LinkDataCollection<ThumbnailLinkData>` on content. Backing types will resolve automatically by default via `LinkDataBackingTypeResolverInterceptor`.
-
-```
-[CultureSpecific]
-[Display(Name = "Thumbnail links", GroupName = SystemTabNames.Content, Order = 230)]
-public virtual LinkDataCollection<ThumbnailLinkData> Thumbnails { get; set; }
-```
+- [Example link collection with thumbnails](./docs/example-link-data-collection.md)
+- [Example single link item](./docs/example-single-link.md)
+- [Adding support for additional property types](./docs/adding-support-for-new-properties.md)
 
 ## Package maintainer
 

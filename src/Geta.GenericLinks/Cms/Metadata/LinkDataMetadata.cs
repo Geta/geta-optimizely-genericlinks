@@ -1,9 +1,12 @@
 ﻿using EPiServer.Framework.Localization;
 using EPiServer.Shell.ObjectEditing;
+using Geta.GenericLinks.Extensions;
 using Microsoft.AspNetCore.Mvc.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace Geta.GenericLinks.Cms.Metadata
 {
@@ -22,6 +25,19 @@ namespace Geta.GenericLinks.Cms.Metadata
 
         protected override void ReadSettingsFromDataTypeAttribute(DataTypeAttribute? attribute)
         {
+
         }
+
+        public virtual void ExtendFromAttributes(IEnumerable<Attribute> attributes)
+        {
+            ReadSettingsFromUIHintAttributes(attributes.OfType<UIHintAttribute>());
+            ReadSettingsFromEditableAttributes(attributes);
+            ReadSettingsFromScaffoldColumnAttribute(attributes.FirstOfType<ScaffoldColumnAttribute>());
+            ReadSettingsFromDisplayAttributes(attributes);
+            ReadSettingsFromRequiredAttribute(attributes.FirstOfType<RequiredAttribute>());
+            ReadSettingsFromGroupSettingsAttribute(attributes.FirstOfType<GroupSettingsAttribute>());
+            ReadSettingsFromHintAttributes(attributes);
+        }
+
     }
 }

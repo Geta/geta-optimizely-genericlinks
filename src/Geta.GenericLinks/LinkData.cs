@@ -4,6 +4,7 @@ using Geta.GenericLinks.Extensions;
 using Geta.GenericLinks.Helpers;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.CompilerServices;
 
 namespace Geta.GenericLinks
@@ -17,14 +18,30 @@ namespace Geta.GenericLinks
 
         public LinkData()
         {
-            _attributes = new Dictionary<string, string>();
-            _attributeKeys = new Dictionary<string, string>();
+            _attributes = new Dictionary<string, string>(4);
+            _attributeKeys = new Dictionary<string, string>(4);
         }
 
-        public virtual IDictionary<string, string> Attributes => _attributes;
-
+        [Required]
+        [Display(Order = 100)]
         public virtual string? Text { get; set; }
 
+        [Display(Order = 200)]
+        public virtual string? Title
+        {
+            get => GetAttribute();
+            set => SetAttribute(value);
+        }
+
+        [Display(Order = 300)]
+        public virtual string? Target
+        {
+            get => GetAttribute();
+            set => SetAttribute(value);
+        }
+
+        [Required]
+        [Display(Order = 400)]
         public virtual string? Href
         {
             get => GetAttribute();
@@ -35,22 +52,35 @@ namespace Geta.GenericLinks
             }
         }
 
-        public virtual string? Target
-        {
-            get => GetAttribute();
-            set => SetAttribute(value);
-        }
-
-        public virtual string? Title
-        {
-            get => GetAttribute();
-            set => SetAttribute(value);
-        }
+        [ScaffoldColumn(false)]
+        public virtual IDictionary<string, string> Attributes => _attributes;
 
         [Ignore]
         public virtual bool IsModified
         {
             get => _isModified;
+        }
+
+        [Ignore]
+        [ScaffoldColumn(false)]
+        public virtual IList<Guid> ReferencedPermanentLinkIds
+        {
+            get
+            {
+                var href = Href;
+
+                if (string.IsNullOrEmpty(href))
+                    return new List<Guid>(0);
+
+                var guid = PermanentLinkUtility.GetGuid(href);
+                if (guid == Guid.Empty)
+                    return new List<Guid>(0);
+
+                return new List<Guid>(1)
+                {
+                    guid
+                };
+            }
         }
 
         public virtual IDictionary<string, string> GetAttributes()
@@ -92,32 +122,17 @@ namespace Geta.GenericLinks
                 value = idMap[guid] = Guid.NewGuid();
 
             Href = PermanentLinkUtility.ChangeGuid(href, value);
-        }
-
-        [Ignore]
-        public virtual IList<Guid> ReferencedPermanentLinkIds
-        {
-            get
-            {
-                var href = Href;
-
-                if (string.IsNullOrEmpty(href))
-                    return new List<Guid>(0);
-
-                var guid = PermanentLinkUtility.GetGuid(href);
-                if (guid == Guid.Empty)
-                    return new List<Guid>(0);
-
-                return new List<Guid>(1)
-                {
-                    guid
-                };
-            }
-        }
+        }       
 
         public virtual object Clone()
         {
-            return MemberwiseClone();
+            if (Activator.CreateInstance(GetType()) is not LinkData item)
+                throw new InvalidOperationException("Cloned instance must inherit from LinkData");
+
+            item.SetAttributes(Attributes);
+            item.SetModified(IsModified);
+
+            return item;
         }
 
         protected virtual string? GetAttribute([CallerMemberName] string? key = null)
@@ -130,6 +145,17 @@ namespace Geta.GenericLinks
 
             return null;
         }
+
+        protected virtual T? GetAttribute<T>(Func<string, T> conversion, [CallerMemberName] string? key = null)
+        {
+            if (key is null)
+                return default;
+
+            if (!Attributes.TryGetValue(GetAttributeKey(key), out var value))
+                return default;
+
+            return conversion(value);
+        }        
 
         protected virtual void SetAttribute(string? value, [CallerMemberName] string? key = null)
         {
@@ -154,6 +180,25 @@ namespace Geta.GenericLinks
 
                 Attributes[attributeKey] = value;
                 _isModified = true;
+            }
+        }
+
+        protected virtual void SetAttribute<T>(T? value, Func<T?, string> conversion, [CallerMemberName] string? key = null)
+        {
+            if (conversion is null)
+                return;
+
+            if (key is null)
+                return;
+
+            if (value is null)
+            {
+                SetAttribute(null, key);
+            }
+            else
+            {
+                var stringValue = conversion(value);
+                SetAttribute(stringValue, key);
             }
         }
 
