@@ -3,7 +3,7 @@ using System;
 
 namespace Geta.GenericLinks.Converters.Attributes
 {
-    public class JsonAttributeConverter : IAttributeConverter
+    public class JsonAttributeConverter : ILinkDataAttibuteConverter
     {
         public bool CanConvert(Type type)
         {

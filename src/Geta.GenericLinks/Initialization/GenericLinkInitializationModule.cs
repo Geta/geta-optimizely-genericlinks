@@ -98,9 +98,9 @@ namespace Geta.GenericLinks.Initialization
 
         private static void TryAddAttributeConverters(IServiceCollection services)
         {
-            services.TryAddEnumerable(ServiceDescriptor.Singleton<IAttributeConverter, StringAttributeConverter>());
-            services.TryAddEnumerable(ServiceDescriptor.Singleton<IAttributeConverter, ConvertibleAttributeConverter>());
-            services.TryAddEnumerable(ServiceDescriptor.Singleton<IAttributeConverter, JsonAttributeConverter>());
+            services.TryAddEnumerable(ServiceDescriptor.Singleton<ILinkDataAttibuteConverter, StringAttributeConverter>());
+            services.TryAddEnumerable(ServiceDescriptor.Singleton<ILinkDataAttibuteConverter, ConvertibleAttributeConverter>());
+            services.TryAddEnumerable(ServiceDescriptor.Singleton<ILinkDataAttibuteConverter, JsonAttributeConverter>());
         }
 
         private static void TryAddJsonValueWriters(IServiceCollection services)

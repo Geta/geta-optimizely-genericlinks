@@ -2,7 +2,7 @@
 
 namespace Geta.GenericLinks.Converters.Attributes
 {
-    public class StringAttributeConverter : IAttributeConverter
+    public class StringAttributeConverter : ILinkDataAttibuteConverter
     {
         public bool CanConvert(Type type)
         {

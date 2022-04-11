@@ -3,7 +3,7 @@ using System.Globalization;
 
 namespace Geta.GenericLinks.Converters.Attributes
 {
-    public class ConvertibleAttributeConverter : IAttributeConverter
+    public class ConvertibleAttributeConverter : ILinkDataAttibuteConverter
     {
         public bool CanConvert(Type type)
         {

@@ -126,7 +126,13 @@ namespace Geta.GenericLinks
 
         public virtual object Clone()
         {
-            return MemberwiseClone();
+            if (Activator.CreateInstance(GetType()) is not LinkData item)
+                throw new InvalidOperationException("Cloned instance must inherit from LinkData");
+
+            item.SetAttributes(Attributes);
+            item.SetModified(IsModified);
+
+            return item;
         }
 
         protected virtual string? GetAttribute([CallerMemberName] string? key = null)
@@ -140,7 +146,7 @@ namespace Geta.GenericLinks
             return null;
         }
 
-        protected virtual T? GetConvertedAttribute<T>(Func<string, T> conversion, [CallerMemberName] string? key = null)
+        protected virtual T? GetAttribute<T>(Func<string, T> conversion, [CallerMemberName] string? key = null)
         {
             if (key is null)
                 return default;
@@ -177,7 +183,7 @@ namespace Geta.GenericLinks
             }
         }
 
-        protected virtual void SetConvertedAttribute<T>(T? value, Func<T?, string> conversion, [CallerMemberName] string? key = null)
+        protected virtual void SetAttribute<T>(T? value, Func<T?, string> conversion, [CallerMemberName] string? key = null)
         {
             if (conversion is null)
                 return;

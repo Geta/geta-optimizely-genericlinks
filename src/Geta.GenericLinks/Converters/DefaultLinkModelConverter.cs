@@ -16,22 +16,22 @@ namespace Geta.GenericLinks.Converters
         private readonly IUrlResolver _urlResolver;
         private readonly IFrameRepository _frameRepository;
         private readonly IVirtualPathResolver _virtualPathResolver;
-        private readonly IEnumerable<IAttributeConverter> _attibuteConverters;
-        private readonly IDictionary<Type, IAttributeConverter> _resolvedAttributeConverters;
+        private readonly IEnumerable<ILinkDataAttibuteConverter> _attibuteConverters;
+        private readonly IDictionary<Type, ILinkDataAttibuteConverter> _resolvedAttributeConverters;
         private readonly UIDescriptorRegistry _uiDescriptors;
 
         public DefaultLinkModelConverter(
             IUrlResolver urlResolver,
             IFrameRepository frameRepository,
             IVirtualPathResolver virtualPathResolver,
-            IEnumerable<IAttributeConverter> attibuteConverters,
+            IEnumerable<ILinkDataAttibuteConverter> attibuteConverters,
             UIDescriptorRegistry uiDescriptors)
         {
             _urlResolver = urlResolver;
             _frameRepository = frameRepository;
             _virtualPathResolver = virtualPathResolver;
             _attibuteConverters = attibuteConverters;
-            _resolvedAttributeConverters = new Dictionary<Type, IAttributeConverter>();
+            _resolvedAttributeConverters = new Dictionary<Type, ILinkDataAttibuteConverter>();
             _uiDescriptors = uiDescriptors;
         }
 
@@ -145,7 +145,7 @@ namespace Geta.GenericLinks.Converters
             return serverAttributes;
         }
 
-        protected virtual IAttributeConverter? FindAttributeConverter(Type type)
+        protected virtual ILinkDataAttibuteConverter? FindAttributeConverter(Type type)
         {
             if (_resolvedAttributeConverters.TryGetValue(type, out var converter))
                 return converter;
