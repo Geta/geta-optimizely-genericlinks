@@ -140,6 +140,17 @@ namespace Geta.GenericLinks
             return null;
         }
 
+        protected virtual T? GetConvertedAttribute<T>(Func<string, T> conversion, [CallerMemberName] string? key = null)
+        {
+            if (key is null)
+                return default;
+
+            if (!Attributes.TryGetValue(GetAttributeKey(key), out var value))
+                return default;
+
+            return conversion(value);
+        }        
+
         protected virtual void SetAttribute(string? value, [CallerMemberName] string? key = null)
         {
             if (key is null)
@@ -163,6 +174,25 @@ namespace Geta.GenericLinks
 
                 Attributes[attributeKey] = value;
                 _isModified = true;
+            }
+        }
+
+        protected virtual void SetConvertedAttribute<T>(T? value, Func<T?, string> conversion, [CallerMemberName] string? key = null)
+        {
+            if (conversion is null)
+                return;
+
+            if (key is null)
+                return;
+
+            if (value is null)
+            {
+                SetAttribute(null, key);
+            }
+            else
+            {
+                var stringValue = conversion(value);
+                SetAttribute(stringValue, key);
             }
         }
 

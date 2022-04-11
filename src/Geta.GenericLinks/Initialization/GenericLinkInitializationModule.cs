@@ -35,12 +35,6 @@ namespace Geta.GenericLinks.Initialization
 
             services.AddSingleton<PropertyLinkDataCollectionDefinitionsLoader>();
             services.AddSingleton<PropertyLinkDataDefinitionsLoader>();
-            services.TryAddEnumerable(ServiceDescriptor.Singleton<IAttributeConverter, StringAttributeConverter>());
-            services.TryAddEnumerable(ServiceDescriptor.Singleton<IAttributeConverter, ConvertibleAttributeConverter>());
-            services.TryAddEnumerable(ServiceDescriptor.Singleton<IAttributeConverter, JsonAttributeConverter>());
-            services.TryAddEnumerable(ServiceDescriptor.Singleton<ILinkDataValueWriter, StringValueWriter>());
-            services.TryAddEnumerable(ServiceDescriptor.Singleton<ILinkDataValueWriter, ContentReferenceValueWriter>());
-            services.TryAddEnumerable(ServiceDescriptor.Singleton<ILinkDataValueWriter, JsonValueWriter>());
             services.TryAddEnumerable(ServiceDescriptor.Singleton<ContentScannerExtension, GenericLinkContentScannerExtension>());
             services.TryAddEnumerable(ServiceDescriptor.Singleton<JsonConverter, NewtonsoftLinkDataConverter>());
             services.TryAddEnumerable(ServiceDescriptor.Singleton<IJsonConverter, SystemTextLinkDataJsonConverterFactory>());
@@ -50,13 +44,16 @@ namespace Geta.GenericLinks.Initialization
             services.TryAddTransient<IAttributeSanitizer, DefaultAttributeSanitizer>();
             services.TryAddTransient<ILinkHtmlSerializer, DefaultLinkHtmlSerializer>();
 
+            TryAddAttributeConverters(services);
+            TryAddJsonValueWriters(services);
+
             context.ConfigurationComplete += (o, e) =>
             {
                 services.Intercept<IBackingTypeResolver>((provider, typeResolver) =>
                     new LinkDataBackingTypeResolverInterceptor(typeResolver, provider.GetRequiredService<IPropertyDefinitionTypeRepository>()));
             };
         }
-
+        
         public void Initialize(InitializationEngine context)
         {
             var provider = context.Locate.Advanced;
@@ -98,5 +95,22 @@ namespace Geta.GenericLinks.Initialization
         {
 
         }
+
+        private static void TryAddAttributeConverters(IServiceCollection services)
+        {
+            services.TryAddEnumerable(ServiceDescriptor.Singleton<IAttributeConverter, StringAttributeConverter>());
+            services.TryAddEnumerable(ServiceDescriptor.Singleton<IAttributeConverter, ConvertibleAttributeConverter>());
+            services.TryAddEnumerable(ServiceDescriptor.Singleton<IAttributeConverter, JsonAttributeConverter>());
+        }
+
+        private static void TryAddJsonValueWriters(IServiceCollection services)
+        {
+            services.TryAddEnumerable(ServiceDescriptor.Singleton<ILinkDataValueWriter, StringValueWriter>());
+            services.TryAddEnumerable(ServiceDescriptor.Singleton<ILinkDataValueWriter, ContentReferenceValueWriter>());
+            services.TryAddEnumerable(ServiceDescriptor.Singleton<ILinkDataValueWriter, Int32ValueWriter>());
+            services.TryAddEnumerable(ServiceDescriptor.Singleton<ILinkDataValueWriter, DoubleValueWriter>());
+            services.TryAddEnumerable(ServiceDescriptor.Singleton<ILinkDataValueWriter, DecimalValueWriter>());
+            services.TryAddEnumerable(ServiceDescriptor.Singleton<ILinkDataValueWriter, DateTimeValueWriter>());
+        }       
     }
 }
