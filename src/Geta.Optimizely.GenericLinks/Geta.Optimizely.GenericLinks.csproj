@@ -7,7 +7,7 @@
 		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
 		<CodeAnalysisTreatWarningsAsErrors>true</CodeAnalysisTreatWarningsAsErrors>
 		<TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
-		<PackageId>Geta.GenericLinks</PackageId>
+		<PackageId>Geta.Optimizely.GenericLinks</PackageId>
 		<Title>Extensible link items for Optimizely</Title>
 		<PackageVersion>1.0.0</PackageVersion>
 		<Authors>Geta Digital</Authors>
