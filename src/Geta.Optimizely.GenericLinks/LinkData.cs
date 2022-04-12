@@ -1,4 +1,4 @@
-﻿using EPiServer.DataAnnotations;
+using EPiServer.DataAnnotations;
 using EPiServer.Web;
 using Geta.Optimizely.GenericLinks.Extensions;
 using Geta.Optimizely.GenericLinks.Helpers;
@@ -16,7 +16,7 @@ namespace Geta.Optimizely.GenericLinks
 
         private bool _isModified;
 
-        public LinkData()
+        protected LinkData()
         {
             _attributes = new Dictionary<string, string>(4);
             _attributeKeys = new Dictionary<string, string>(4);

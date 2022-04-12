@@ -11,7 +11,6 @@ using EPiServer.Shell;
 using EPiServer.Shell.Json;
 using EPiServer.Shell.ObjectEditing;
 using EPiServer.Web;
-using Geta.Optimizely.GenericLinks;
 using Geta.Optimizely.GenericLinks.Cms.EditorModels;
 using Geta.Optimizely.GenericLinks.Cms.Metadata;
 using Geta.Optimizely.GenericLinks.Cms.Registration;
@@ -97,7 +96,7 @@ namespace Geta.Optimizely.GenericLinks.Initialization
 
         public void Uninitialize(InitializationEngine context)
         {
-
+            // No logic needed inside Uninitialize
         }
 
         private static void TryAddAttributeConverters(IServiceCollection services)

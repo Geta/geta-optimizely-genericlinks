@@ -1,9 +1,7 @@
 using EPiServer.Core;
 using EPiServer.Core.Internal;
 using EPiServer.Core.Transfer;
-using EPiServer.Security;
 using EPiServer.ServiceLocation;
-using EPiServer.Web;
 using EPiServer.Web.Routing;
 using System;
 using System.Collections;
@@ -27,7 +25,7 @@ namespace Geta.Optimizely.GenericLinks
         }
     }
 
-    public abstract class PropertyLinkDataCollection<TLinkData> : PropertyLinkDataCollection, IReferenceMap, IEnumerable<TLinkData>, IEnumerable
+    public abstract class PropertyLinkDataCollection<TLinkData> : PropertyLinkDataCollection, IReferenceMap, IEnumerable<TLinkData>
         where TLinkData : ILinkData, new()
     {
         private readonly IUrlResolver _urlResolver;
@@ -140,7 +138,7 @@ namespace Geta.Optimizely.GenericLinks
                     else
                     {
                         if (value is not string text)
-                            throw new ArgumentNullException("Passed object must be of type LinkItemCollection<TLinkData> or string.");
+                            throw new ArgumentException("Passed object must be of type LinkItemCollection<TLinkData> or string.", nameof(value));
 
                         ParseToSelf(text);
                     }
@@ -267,10 +265,10 @@ namespace Geta.Optimizely.GenericLinks
 
         protected virtual LinkDataCollection<TLinkData>? ParseToLinkCollection(string value)
         {
-            if (string.IsNullOrEmpty(value))
-                return null;
-
             var linkItemCollection = new LinkDataCollection<TLinkData>();
+
+            if (string.IsNullOrEmpty(value))
+                return linkItemCollection;
 
             try
             {

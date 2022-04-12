@@ -138,7 +138,7 @@ namespace Geta.Optimizely.GenericLinks
                     else
                     {
                         if (value is not string text)
-                            throw new ArgumentNullException("Passed object must be of type TLinkData or string.");
+                            throw new ArgumentException("Passed object must be of type TLinkData or string.", nameof(value));
 
                         ParseToSelf(text);
                     }
