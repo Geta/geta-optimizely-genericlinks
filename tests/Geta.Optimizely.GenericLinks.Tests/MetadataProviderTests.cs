@@ -73,7 +73,7 @@ namespace Geta.Optimizely.GenericLinks.Tests
             var metadataHandlerRegistry = GetMetadataHandlerRegistry();
             var compositeDetailsProvider = new NullCompositeMetadataDetailsProvider();
             var propertyReflector = new DefaultPropertyReflector();
-            var validationAttributeAdapter = new NullValidationAttributeAdapterProvider();
+            var validationAttributeAdapter = new FakeValidationAttributeAdapterProvider();
             var metadataProvider = new TestModelMetadataProvider(compositeDetailsProvider, propertyReflector);
             var extensibleMetaProvider = new ExtensibleMetadataProvider(metadataHandlerRegistry, localizationService, metadataProvider, validationAttributeAdapter);
 

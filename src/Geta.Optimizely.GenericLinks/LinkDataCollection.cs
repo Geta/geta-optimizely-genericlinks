@@ -1,4 +1,4 @@
-﻿using EPiServer.Core.Transfer;
+using EPiServer.Core.Transfer;
 using EPiServer.Data;
 using EPiServer.Data.Entity;
 using System;
@@ -12,7 +12,7 @@ namespace Geta.Optimizely.GenericLinks
 
     }
 
-    public class LinkDataCollection<TLinkData> : LinkDataCollection, IList<TLinkData>, IEnumerable<TLinkData>, IEnumerable, IReadOnly<LinkDataCollection<TLinkData>>, IReadOnly, ICloneable, IReferenceMap
+    public class LinkDataCollection<TLinkData> : LinkDataCollection, IList<TLinkData>, IReadOnly<LinkDataCollection<TLinkData>>, ICloneable, IReferenceMap
         where TLinkData : ILinkData
     {
         private readonly List<TLinkData> _linkCollection;

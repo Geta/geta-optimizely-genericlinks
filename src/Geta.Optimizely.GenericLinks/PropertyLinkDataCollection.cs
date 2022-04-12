@@ -1,4 +1,4 @@
-﻿using EPiServer.Core;
+using EPiServer.Core;
 using EPiServer.Core.Internal;
 using EPiServer.Core.Transfer;
 using EPiServer.Security;
@@ -30,69 +30,48 @@ namespace Geta.Optimizely.GenericLinks
     public abstract class PropertyLinkDataCollection<TLinkData> : PropertyLinkDataCollection, IReferenceMap, IEnumerable<TLinkData>, IEnumerable
         where TLinkData : ILinkData, new()
     {
-        private static readonly IServiceProvider _serviceProvider;
-
         private readonly IUrlResolver _urlResolver;
-        private readonly IPrincipalAccessor _principalAccessor;
-        private readonly IPermanentLinkMapper _permanentLinkMapper;
         private readonly IAttributeSanitizer _attributeSanitizer;
         private readonly ILinkHtmlSerializer _htmlSerializer;
 
         private LinkDataCollection<TLinkData>? _linkItemCollection;
 
-        static PropertyLinkDataCollection()
-        {
-            _serviceProvider = ServiceLocator.Current;
-        }
-
-        public PropertyLinkDataCollection()
+        protected PropertyLinkDataCollection()
             : this(
-                   _serviceProvider.GetInstance<IUrlResolver>(),
-                   _serviceProvider.GetInstance<IPrincipalAccessor>(),
-                   _serviceProvider.GetInstance<IPermanentLinkMapper>(),
-                   _serviceProvider.GetInstance<IAttributeSanitizer>(),
-                   _serviceProvider.GetInstance<ILinkHtmlSerializer>())
+                   ServiceLocator.Current.GetInstance<IUrlResolver>(),
+                   ServiceLocator.Current.GetInstance<IAttributeSanitizer>(),
+                   ServiceLocator.Current.GetInstance<ILinkHtmlSerializer>())
         {
         }
 
-        public PropertyLinkDataCollection(LinkDataCollection<TLinkData> linkItemCollection)
+        protected PropertyLinkDataCollection(LinkDataCollection<TLinkData> linkItemCollection)
             : this(
                   linkItemCollection,
-                   _serviceProvider.GetInstance<IUrlResolver>(),
-                   _serviceProvider.GetInstance<IPrincipalAccessor>(),
-                   _serviceProvider.GetInstance<IPermanentLinkMapper>(),
-                   _serviceProvider.GetInstance<IAttributeSanitizer>(),
-                   _serviceProvider.GetInstance<ILinkHtmlSerializer>())
+                   ServiceLocator.Current.GetInstance<IUrlResolver>(),
+                   ServiceLocator.Current.GetInstance<IAttributeSanitizer>(),
+                   ServiceLocator.Current.GetInstance<ILinkHtmlSerializer>())
         {
         }
 
-        public PropertyLinkDataCollection(
+        protected PropertyLinkDataCollection(
             IUrlResolver urlResolver,
-            IPrincipalAccessor principalAccessor,
-            IPermanentLinkMapper permanentLinkMapper,
             IAttributeSanitizer attributeSanitizer,
             ILinkHtmlSerializer htmlSerializer)
             : base(string.Empty)
         {
             _urlResolver = urlResolver;
-            _principalAccessor = principalAccessor;
-            _permanentLinkMapper = permanentLinkMapper;
             _attributeSanitizer = attributeSanitizer;
             _htmlSerializer = htmlSerializer;
         }
 
-        public PropertyLinkDataCollection(
+        protected PropertyLinkDataCollection(
             LinkDataCollection<TLinkData> linkItemCollection,
             IUrlResolver urlResolver,
-            IPrincipalAccessor principalAccessor,
-            IPermanentLinkMapper permanentLinkMapper,
             IAttributeSanitizer attributeSanitizer,
             ILinkHtmlSerializer htmlSerializer)
         {
             _linkItemCollection = linkItemCollection;
             _urlResolver = urlResolver;
-            _principalAccessor = principalAccessor;
-            _permanentLinkMapper = permanentLinkMapper;
             _attributeSanitizer = attributeSanitizer;
             _htmlSerializer = htmlSerializer;
         }

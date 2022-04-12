@@ -1,4 +1,4 @@
-﻿using EPiServer.Core;
+using EPiServer.Core;
 using EPiServer.Core.Internal;
 using EPiServer.Core.Transfer;
 using EPiServer.Security;
@@ -10,16 +10,6 @@ using System.Collections.Generic;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Serialization;
-
-/* Unmerged change from project 'Geta.Optimizely.GenericLinks (net6.0)'
-Before:
-using Geta.GenericLinks.Html;
-After:
-using Geta.GenericLinks.Html;
-using Geta.Optimizely.GenericLinks;
-using Geta;
-using Geta.GenericLinks;
-*/
 using Geta.Optimizely.GenericLinks.Html;
 
 namespace Geta.Optimizely.GenericLinks
@@ -38,69 +28,48 @@ namespace Geta.Optimizely.GenericLinks
     public abstract class PropertyLinkData<TLinkData> : PropertyLinkData, IReferenceMap
         where TLinkData : LinkData, new()
     {
-        private static readonly IServiceProvider _serviceProvider;
-
         private readonly IUrlResolver _urlResolver;
-        private readonly IPrincipalAccessor _principalAccessor;
-        private readonly IPermanentLinkMapper _permanentLinkMapper;
         private readonly IAttributeSanitizer _attributeSanitizer;
         private readonly ILinkHtmlSerializer _htmlSerializer;
 
         private TLinkData? _linkItem;
 
-        static PropertyLinkData()
-        {
-            _serviceProvider = ServiceLocator.Current;
-        }
-
-        public PropertyLinkData()
+        protected PropertyLinkData()
             : this(
-                   _serviceProvider.GetInstance<IUrlResolver>(),
-                   _serviceProvider.GetInstance<IPrincipalAccessor>(),
-                   _serviceProvider.GetInstance<IPermanentLinkMapper>(),
-                   _serviceProvider.GetInstance<IAttributeSanitizer>(),
-                   _serviceProvider.GetInstance<ILinkHtmlSerializer>())
+                   ServiceLocator.Current.GetInstance<IUrlResolver>(),
+                   ServiceLocator.Current.GetInstance<IAttributeSanitizer>(),
+                   ServiceLocator.Current.GetInstance<ILinkHtmlSerializer>())
         {
         }
 
-        public PropertyLinkData(TLinkData linkItem)
+        protected PropertyLinkData(TLinkData linkItem)
             : this(
                   linkItem,
-                   _serviceProvider.GetInstance<IUrlResolver>(),
-                   _serviceProvider.GetInstance<IPrincipalAccessor>(),
-                   _serviceProvider.GetInstance<IPermanentLinkMapper>(),
-                   _serviceProvider.GetInstance<IAttributeSanitizer>(),
-                   _serviceProvider.GetInstance<ILinkHtmlSerializer>())
+                   ServiceLocator.Current.GetInstance<IUrlResolver>(),
+                   ServiceLocator.Current.GetInstance<IAttributeSanitizer>(),
+                   ServiceLocator.Current.GetInstance<ILinkHtmlSerializer>())
         {
         }
 
-        public PropertyLinkData(
+        protected PropertyLinkData(
             IUrlResolver urlResolver,
-            IPrincipalAccessor principalAccessor,
-            IPermanentLinkMapper permanentLinkMapper,
             IAttributeSanitizer attributeSanitizer,
             ILinkHtmlSerializer htmlSerializer)
             : base(string.Empty)
         {
             _urlResolver = urlResolver;
-            _principalAccessor = principalAccessor;
-            _permanentLinkMapper = permanentLinkMapper;
             _attributeSanitizer = attributeSanitizer;
             _htmlSerializer = htmlSerializer;
         }
 
-        public PropertyLinkData(
+        protected PropertyLinkData(
             TLinkData linkItem,
             IUrlResolver urlResolver,
-            IPrincipalAccessor principalAccessor,
-            IPermanentLinkMapper permanentLinkMapper,
             IAttributeSanitizer attributeSanitizer,
             ILinkHtmlSerializer htmlSerializer)
         {
             _linkItem = linkItem;
             _urlResolver = urlResolver;
-            _principalAccessor = principalAccessor;
-            _permanentLinkMapper = permanentLinkMapper;
             _attributeSanitizer = attributeSanitizer;
             _htmlSerializer = htmlSerializer;
         }
