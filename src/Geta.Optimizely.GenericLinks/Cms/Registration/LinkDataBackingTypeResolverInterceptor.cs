@@ -4,6 +4,7 @@
 using EPiServer.DataAbstraction;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Geta.Optimizely.GenericLinks.Cms.Registration
 {
@@ -56,15 +57,16 @@ namespace Geta.Optimizely.GenericLinks.Cms.Registration
             var propertyType = baseType.MakeGenericType(linkDataType);
 
             var definitions = _propertyDefinitionRepository.List();
+            var definitionTypes = definitions.Select(d => d.DefinitionType);
 
-            foreach (var definition in definitions)
+            foreach (var definitionType in definitionTypes)
             {
-                if (!propertyType.IsAssignableFrom(definition.DefinitionType))
+                if (!propertyType.IsAssignableFrom(definitionType))
                     continue;
 
-                _resolvedTypes.Add(type, definition.DefinitionType);
+                _resolvedTypes.Add(type, definitionType);
 
-                return definition.DefinitionType;
+                return definitionType;
             }
 
             return null;

@@ -1,10 +1,8 @@
 // Copyright (c) Geta Digital. All rights reserved.
 // Licensed under Apache-2.0. See the LICENSE file in the project root for more information
 
-using Geta.Optimizely.GenericLinks;
 using Geta.Optimizely.GenericLinks.Cms.EditorModels;
 using Geta.Optimizely.GenericLinks.Cms.Metadata;
-using Geta.Optimizely.GenericLinks.Converters;
 using Geta.Optimizely.GenericLinks.Converters.Values;
 using Geta.Optimizely.GenericLinks.Extensions;
 using System;
@@ -38,7 +36,7 @@ namespace Geta.Optimizely.GenericLinks.Converters.Json
             PopulatePropertyFilter();
         }
 
-        public override bool CanConvert(Type objectType) => typeof(TLinkData).IsAssignableFrom(objectType);
+        public override bool CanConvert(Type typeToConvert) => typeof(TLinkData).IsAssignableFrom(typeToConvert);
 
         public override TLinkData? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {

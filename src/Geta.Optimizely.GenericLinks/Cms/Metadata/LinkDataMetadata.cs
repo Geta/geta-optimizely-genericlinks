@@ -26,11 +26,6 @@ namespace Geta.Optimizely.GenericLinks.Cms.Metadata
         {
         }
 
-        protected override void ReadSettingsFromDataTypeAttribute(DataTypeAttribute? attribute)
-        {
-
-        }
-
         public virtual void ExtendFromAttributes(IEnumerable<Attribute> attributes)
         {
             ReadSettingsFromUIHintAttributes(attributes.OfType<UIHintAttribute>());

@@ -14,7 +14,6 @@ namespace Geta.Optimizely.GenericLinks.Cms.Metadata
 {
     public class LinkDataMetadataExtender : IMetadataExtender
     {
-        private readonly Type _extenderType;
         private readonly bool _singleItem;
         private readonly string _customIdentifier;
         private readonly string _modelTypeIdentifier;
@@ -22,9 +21,8 @@ namespace Geta.Optimizely.GenericLinks.Cms.Metadata
 
         public LinkDataMetadataExtender(Type extenderType, bool singleItem, IEnumerable<IContentRepositoryDescriptor> contentRepositoryDescriptors)
         {
-            _extenderType = extenderType;
             _singleItem = singleItem;
-            _customIdentifier = _extenderType.FullName!.ToLower() ?? string.Empty;
+            _customIdentifier = extenderType.FullName!.ToLower() ?? string.Empty;
             if (!singleItem)
                 _customIdentifier += "collection";
 

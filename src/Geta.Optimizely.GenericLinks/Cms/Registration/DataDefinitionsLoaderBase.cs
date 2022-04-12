@@ -13,7 +13,7 @@ namespace Geta.Optimizely.GenericLinks.Cms.Registration
         private readonly Type _baseType;
         private readonly IPropertyDefinitionTypeRepository _propertyDefinitionTypeRepository;
 
-        public DataDefinitionsLoaderBase(Type baseType, IPropertyDefinitionTypeRepository propertyDefinitionTypeRepository)
+        protected DataDefinitionsLoaderBase(Type baseType, IPropertyDefinitionTypeRepository propertyDefinitionTypeRepository)
         {
             _baseType = baseType;
             _propertyDefinitionTypeRepository = propertyDefinitionTypeRepository;
