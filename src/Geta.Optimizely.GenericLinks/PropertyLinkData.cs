@@ -1,9 +1,10 @@
+// Copyright (c) Geta Digital. All rights reserved.
+// Licensed under Apache-2.0. See the LICENSE file in the project root for more information
+
 using EPiServer.Core;
 using EPiServer.Core.Internal;
 using EPiServer.Core.Transfer;
-using EPiServer.Security;
 using EPiServer.ServiceLocation;
-using EPiServer.Web;
 using EPiServer.Web.Routing;
 using System;
 using System.Collections.Generic;
