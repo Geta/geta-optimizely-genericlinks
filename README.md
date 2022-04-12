@@ -13,7 +13,7 @@ Provides a new property type `LinkDataCollection` which is an alternative to `Li
 
 Requires using .NET 5.0 or higher and Optimizely 12
 
-- `install-package Geta.Optimizely.GenericLinks`
+- `dotnet add package Geta.Optimizely.GenericLinks`
 
 ### Examples
 
