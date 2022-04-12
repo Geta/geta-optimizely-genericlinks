@@ -1,6 +1,6 @@
-﻿using EPiServer.Core;
-using System;
+using EPiServer.Core;
 using System.Collections.Generic;
+using System.Linq;
 using System.Xml.Linq;
 
 namespace Geta.Optimizely.GenericLinks
@@ -66,10 +66,7 @@ namespace Geta.Optimizely.GenericLinks
 
         protected virtual XElement GetLinkElement(string value)
         {
-            foreach (var element in GetLinkElements(value))
-                return element;
-
-            throw new InvalidOperationException("Malformed data");
+            return GetLinkElements(value).First();
         }
 
         protected virtual IEnumerable<XElement> GetLinkElements(string value)

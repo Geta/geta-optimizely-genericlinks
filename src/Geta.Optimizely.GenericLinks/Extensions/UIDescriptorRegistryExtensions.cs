@@ -3,6 +3,7 @@
 
 using EPiServer.Shell;
 using System;
+using System.Linq;
 
 namespace Geta.Optimizely.GenericLinks.Extensions
 {
@@ -10,10 +11,8 @@ namespace Geta.Optimizely.GenericLinks.Extensions
     {
         public static string? GetTypeIdentifier(this UIDescriptorRegistry descriptorRegistry, Type type)
         {
-            foreach (var identifier in descriptorRegistry.GetTypeIdentifiers(type))
-                return identifier;
-
-            return null;
+            return descriptorRegistry.GetTypeIdentifiers(type)
+                                     .FirstOrDefault();
         }
     }
 }
