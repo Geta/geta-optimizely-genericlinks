@@ -9,6 +9,7 @@ using EPiServer.Initialization.Internal;
 using EPiServer.ServiceLocation;
 using EPiServer.Shell;
 using EPiServer.Shell.Json;
+using EPiServer.Shell.Modules;
 using EPiServer.Shell.ObjectEditing;
 using EPiServer.Web;
 using Geta.Optimizely.GenericLinks.Cms.EditorModels;
@@ -24,6 +25,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using ServiceDescriptor = Microsoft.Extensions.DependencyInjection.ServiceDescriptor;
 
 namespace Geta.Optimizely.GenericLinks.Initialization
@@ -49,6 +51,14 @@ namespace Geta.Optimizely.GenericLinks.Initialization
 
             TryAddAttributeConverters(services);
             TryAddJsonValueWriters(services);
+
+            services.Configure<ProtectedModuleOptions>(module =>
+            {
+                if (!module.Items.Any(i => i.Name.Equals(Constants.ModuleName, StringComparison.OrdinalIgnoreCase)))
+                {
+                    module.Items.Add(new ModuleDetails { Name = Constants.ModuleName });
+                }
+            });
 
             context.ConfigurationComplete += (o, e) =>
             {

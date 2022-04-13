@@ -1,5 +1,5 @@
-**/wwwroot/
-**/modules/
+**/modules
+!sandbox/**/modules/_protected/Geta.Optimizely.GenericLinks
 
 .npm-cache/
 
@@ -191,12 +191,7 @@ FakesAssemblies/
 
 # Ignore .vs folder
 .vs/
-
-# Deploy folder license
-!Sources/Skeidar.Web/Deploy/*
 .idea/
 
 # Local Configuration
 *.local.json
-
-**/Geta.Dynamics.Optimizely.Admin/wwwroot/

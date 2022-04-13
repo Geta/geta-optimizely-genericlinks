@@ -17,6 +17,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sandbox", "Sandbox", "{6A1996C8-B9B8-4DE9-A2AE-40C10FF1FAE7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AlloyMvcTemplates", "sandbox\Alloy\AlloyMvcTemplates.csproj", "{DB5EA34C-7A62-42B0-9EE0-AA3B52E0AC94}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,12 +35,17 @@ Global
 		{92079DBE-DA35-45F0-879A-4CCE7DAA05C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{92079DBE-DA35-45F0-879A-4CCE7DAA05C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{92079DBE-DA35-45F0-879A-4CCE7DAA05C5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DB5EA34C-7A62-42B0-9EE0-AA3B52E0AC94}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DB5EA34C-7A62-42B0-9EE0-AA3B52E0AC94}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DB5EA34C-7A62-42B0-9EE0-AA3B52E0AC94}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DB5EA34C-7A62-42B0-9EE0-AA3B52E0AC94}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{92079DBE-DA35-45F0-879A-4CCE7DAA05C5} = {017A6F0A-A55A-4533-AF01-8E69A615F49C}
+		{DB5EA34C-7A62-42B0-9EE0-AA3B52E0AC94} = {6A1996C8-B9B8-4DE9-A2AE-40C10FF1FAE7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BC18AFB9-C474-4D96-BFD1-6BBC19C0761C}
