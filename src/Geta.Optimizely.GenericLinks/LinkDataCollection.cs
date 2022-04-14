@@ -59,7 +59,28 @@ namespace Geta.Optimizely.GenericLinks
 
         public virtual int Count => _linkCollection.Count;
         public virtual bool IsReadOnly => _isReadOnly;
-        public virtual bool IsModified => _isModified;
+        public virtual bool IsModified
+        {
+            get
+            {
+                if (_isModified)
+                    return true;
+
+                if (_linkCollection is null)
+                    return false;
+
+                foreach (var item in _linkCollection)
+                {
+                    if (item is not LinkData linkData)
+                        continue;
+
+                    if (linkData.IsModified)
+                        return true;
+                }
+
+                return false;
+            }
+        }
 
         public virtual IList<Guid> ReferencedPermanentLinkIds
         {
@@ -101,6 +122,18 @@ namespace Geta.Optimizely.GenericLinks
         {
             _isReadOnly = true;
             _isModified = false;
+
+            if (_linkCollection is null)
+                return;
+
+            foreach (var item in _linkCollection)
+            {
+                if (item is not LinkData linkData)
+                    continue;
+
+                if (linkData.IsModified)
+                    linkData.SetModified(false);
+            }
         }
 
         public virtual bool Remove(TLinkData item)

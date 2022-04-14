@@ -18,6 +18,7 @@ namespace Geta.Optimizely.GenericLinks
         private readonly IDictionary<string, string> _attributeKeys;
 
         private bool _isModified;
+        private string? _text;
 
         protected LinkData()
         {
@@ -27,7 +28,18 @@ namespace Geta.Optimizely.GenericLinks
 
         [Required]
         [Display(Order = 100)]
-        public virtual string? Text { get; set; }
+        public virtual string? Text 
+        {
+            get => _text;
+            set
+            {
+                if (value == _text)
+                    return;
+
+                SetModified(true);
+                _text = value;
+            }
+        }
 
         [Display(Order = 200)]
         public virtual string? Title
@@ -132,6 +144,7 @@ namespace Geta.Optimizely.GenericLinks
             if (Activator.CreateInstance(GetType()) is not LinkData item)
                 throw new InvalidOperationException("Cloned instance must inherit from LinkData");
 
+            item.Text = Text;
             item.SetAttributes(Attributes);
             item.SetModified(IsModified);
 
