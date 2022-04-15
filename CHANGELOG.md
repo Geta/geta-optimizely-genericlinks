@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.2]
+
+### Fixed
+
+- Bug PropertyLinkData would not reset `IsModified` correctly when calling `MakeReadonly`.
+
 ## [1.1.1]
 
 ### Fixed
