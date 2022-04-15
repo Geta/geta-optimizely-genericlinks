@@ -24,5 +24,10 @@ namespace Geta.Optimizely.GenericLinks.Tests.Models
             : base(linkItemCollection, urlResolver, attributeSanitizer, htmlSerializer)
         {
         }
+
+        public string GetBackingValue()
+        {
+            return LongString;
+        }
     }
 }

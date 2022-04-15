@@ -32,6 +32,36 @@ namespace Geta.Optimizely.GenericLinks.Tests
         }
 
         [Fact]
+        public void PropertyLinkData_can_Load()
+        {
+            var link = CreateLinkData("1", "http://localhost/1");
+            var subject = CreatePropertyLinkData(null);
+
+            subject.LoadData(link);
+
+            Assert.NotNull(subject);
+            Assert.NotNull(subject.Link);
+
+            if (subject.Link is null)
+                throw new InvalidOperationException("subject link cannot be null here");
+
+            Assert.Equal(link.Text, subject.Link.Text);
+            Assert.Equal(link.Href, subject.Link.Href);
+            Assert.Equal(link.Target, subject.Link.Target);
+            Assert.Equal(link.Title, subject.Link.Title);
+
+            var serialized = subject.GetBackingValue();
+            Assert.NotNull(serialized);
+
+            subject.LoadData(serialized);
+
+            Assert.Equal(link.Text, subject.Link.Text);
+            Assert.Equal(link.Href, subject.Link.Href);
+            Assert.Equal(link.Target, subject.Link.Target);
+            Assert.Equal(link.Title, subject.Link.Title);
+        }
+
+        [Fact]
         public void PropertyLinkDataCollection_can_Clone()
         {
             var firstLink = CreateLinkData("1", "http://localhost/1");
@@ -46,6 +76,53 @@ namespace Geta.Optimizely.GenericLinks.Tests
             
             if (subject.Links is null)
                 throw new InvalidOperationException("subject links cannot be null here");
+
+            Assert.Equal(2, subject.Links.Count);
+
+            Assert.Equal(firstLink.Text, subject.Links[0].Text);
+            Assert.Equal(firstLink.Href, subject.Links[0].Href);
+            Assert.Equal(firstLink.Target, subject.Links[0].Target);
+            Assert.Equal(firstLink.Title, subject.Links[0].Title);
+
+            Assert.Equal(secondLink.Text, subject.Links[1].Text);
+            Assert.Equal(secondLink.Href, subject.Links[1].Href);
+            Assert.Equal(secondLink.Target, subject.Links[1].Target);
+            Assert.Equal(secondLink.Title, subject.Links[1].Title);
+        }
+
+        [Fact]
+        public void PropertyLinkDataCollection_can_Load()
+        {
+            var firstLink = CreateLinkData("1", "http://localhost/1");
+            var secondLink = CreateLinkData("2", "http://localhost/2");
+
+            var links = CreateTestLinkDataCollection(firstLink, secondLink);
+            var subject = CreatePropertyLinkDataCollection();
+
+            subject.LoadData(links);
+
+            Assert.NotNull(subject);
+            Assert.NotNull(subject.Links);
+
+            if (subject.Links is null)
+                throw new InvalidOperationException("subject links cannot be null here");
+
+            Assert.Equal(2, subject.Links.Count);
+
+            Assert.Equal(firstLink.Text, subject.Links[0].Text);
+            Assert.Equal(firstLink.Href, subject.Links[0].Href);
+            Assert.Equal(firstLink.Target, subject.Links[0].Target);
+            Assert.Equal(firstLink.Title, subject.Links[0].Title);
+
+            Assert.Equal(secondLink.Text, subject.Links[1].Text);
+            Assert.Equal(secondLink.Href, subject.Links[1].Href);
+            Assert.Equal(secondLink.Target, subject.Links[1].Target);
+            Assert.Equal(secondLink.Title, subject.Links[1].Title);
+
+            var serialized = subject.GetBackingValue();
+            Assert.NotNull(serialized);
+
+            subject.LoadData(serialized);
 
             Assert.Equal(2, subject.Links.Count);
 
@@ -124,12 +201,15 @@ namespace Geta.Optimizely.GenericLinks.Tests
             Assert.True(subject.IsModified);
         }
 
-        private static PropertyTestLinkData CreatePropertyLinkData(TestLinkData linkData)
+        private static PropertyTestLinkData CreatePropertyLinkData(TestLinkData? linkData)
         {
             var urlResolver = new FakeUrlResolver();
             var attributeSanitizer = new DefaultAttributeSanitizer();
             var virtualPathResolver = new FakeVirtualPathResolver();
             var linkSerializer = new DefaultLinkHtmlSerializer(virtualPathResolver, urlResolver);
+
+            if (linkData is null)
+                return new PropertyTestLinkData(urlResolver, attributeSanitizer, linkSerializer);
 
             return new PropertyTestLinkData(linkData, urlResolver, attributeSanitizer, linkSerializer);
         }
