@@ -6,9 +6,9 @@ using Geta.Optimizely.GenericLinks.Html;
 
 namespace Geta.Optimizely.GenericLinks.Tests.Models
 {
-    public class PropertyTestCollection : PropertyLinkDataCollection<TestLinkData>
+    public class PropertyTestLinkData : PropertyLinkData<TestLinkData>
     {
-        public PropertyTestCollection(
+        public PropertyTestLinkData(
             IUrlResolver urlResolver,
             IAttributeSanitizer attributeSanitizer,
             ILinkHtmlSerializer htmlSerializer)
@@ -16,12 +16,12 @@ namespace Geta.Optimizely.GenericLinks.Tests.Models
         {
         }
 
-        public PropertyTestCollection(
-            LinkDataCollection<TestLinkData> linkItemCollection,
+        public PropertyTestLinkData(
+            TestLinkData linkItem,
             IUrlResolver urlResolver,
             IAttributeSanitizer attributeSanitizer,
             ILinkHtmlSerializer htmlSerializer)
-            : base(linkItemCollection, urlResolver, attributeSanitizer, htmlSerializer)
+            : base(linkItem, urlResolver, attributeSanitizer, htmlSerializer)
         {
         }
     }

@@ -192,6 +192,14 @@ namespace Geta.Optimizely.GenericLinks
             return clone;
         }
 
+        public override void MakeReadOnly()
+        {
+            if (!IsReadOnly)
+                _linkItem?.SetModified(false);
+
+            base.MakeReadOnly();            
+        }
+
         public override PropertyData Copy()
         {
             var property = (PropertyLinkData<TLinkData>)base.Copy();
