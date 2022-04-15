@@ -3,6 +3,7 @@
 
 using EPiServer.Core;
 using EPiServer.Framework.Localization;
+using EPiServer.Shell;
 using EPiServer.Shell.ObjectEditing;
 using EPiServer.Shell.ObjectEditing.EditorDescriptors;
 using Geta.Optimizely.GenericLinks.Cms.Metadata;
@@ -67,6 +68,54 @@ namespace Geta.Optimizely.GenericLinks.Tests
             Assert.Equal(nameof(TestThumbnailLinkData.ThumbnailThree), thirdThumbnail.PropertyName);
         }
 
+        [Fact]
+        public void LinkModelMetadataExtender_extends_single()
+        {
+            var provider = CreateExtensibleModelMetadataProvider();
+            var attributes = Enumerable.Empty<Attribute>();
+            var testType = typeof(TestLinkData);
+
+            var metadata = provider.GetExtendedMetadataForType(testType, () => null);
+            var subject = CreateLinkDataMetadataExtender(testType, true);
+            
+            subject.ModifyMetadata(metadata, attributes);
+
+            Assert.NotNull(metadata);
+            Assert.NotNull(metadata.ClientEditingClass);
+            Assert.StartsWith("genericLinks", metadata.ClientEditingClass);
+            Assert.EndsWith("GenericItemEditor", metadata.ClientEditingClass);
+
+            Assert.NotNull(metadata.OverlayConfiguration);
+            Assert.NotNull(metadata.EditorConfiguration);
+        }
+
+        [Fact]
+        public void LinkModelMetadataExtender_extends_collection()
+        {
+            var provider = CreateExtensibleModelMetadataProvider();
+            var attributes = Enumerable.Empty<Attribute>();
+            var testType = typeof(TestLinkData);
+
+            var metadata = provider.GetExtendedMetadataForType(testType, () => null);
+            var subject = CreateLinkDataMetadataExtender(testType, false);
+
+            subject.ModifyMetadata(metadata, attributes);
+
+            Assert.NotNull(metadata);
+            Assert.NotNull(metadata.ClientEditingClass);
+            Assert.StartsWith("genericLinks", metadata.ClientEditingClass);
+            Assert.EndsWith("GenericCollectionEditor", metadata.ClientEditingClass);
+
+            Assert.NotNull(metadata.OverlayConfiguration);
+            Assert.NotNull(metadata.EditorConfiguration);
+        }
+
+        private static LinkDataMetadataExtender CreateLinkDataMetadataExtender(Type extenderType, bool singleItem)
+        {
+            var descriptors = Enumerable.Empty<IContentRepositoryDescriptor>();
+            return new LinkDataMetadataExtender(extenderType, singleItem, descriptors);
+        }
+
         private static DefaultLinkModelMetadataProvider CreateLinkModelMetadataProvider()
         {
             var localizationService = LocalizationService.Current;
@@ -78,6 +127,17 @@ namespace Geta.Optimizely.GenericLinks.Tests
             var extensibleMetaProvider = new ExtensibleMetadataProvider(metadataHandlerRegistry, localizationService, metadataProvider, validationAttributeAdapter);
 
             return new DefaultLinkModelMetadataProvider(extensibleMetaProvider, localizationService, metadataHandlerRegistry, compositeDetailsProvider, validationAttributeAdapter, propertyReflector);
+        }
+
+        private static ExtensibleMetadataProvider CreateExtensibleModelMetadataProvider()
+        {
+            var localizationService = LocalizationService.Current;
+            var metadataHandlerRegistry = GetMetadataHandlerRegistry();
+            var compositeDetailsProvider = new NullCompositeMetadataDetailsProvider();
+            var propertyReflector = new DefaultPropertyReflector();
+            var validationAttributeAdapter = new FakeValidationAttributeAdapterProvider();
+            var metadataProvider = new TestModelMetadataProvider(compositeDetailsProvider, propertyReflector);
+            return new ExtensibleMetadataProvider(metadataHandlerRegistry, localizationService, metadataProvider, validationAttributeAdapter);
         }
 
         private static MetadataHandlerRegistry GetMetadataHandlerRegistry()
