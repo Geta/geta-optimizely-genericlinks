@@ -2,8 +2,18 @@
 // Licensed under Apache-2.0. See the LICENSE file in the project root for more information
 
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text.Json;
 using System.Xml.Linq;
+using EPiServer.DataAbstraction;
+using EPiServer.Shell;
+using Geta.Optimizely.GenericLinks.Cms.Metadata;
+using Geta.Optimizely.GenericLinks.Converters;
+using Geta.Optimizely.GenericLinks.Converters.Attributes;
+using Geta.Optimizely.GenericLinks.Converters.Json;
+using Geta.Optimizely.GenericLinks.Converters.Values;
 using Geta.Optimizely.GenericLinks.Html;
 using Geta.Optimizely.GenericLinks.Tests.Models;
 using Geta.Optimizely.GenericLinks.Tests.Services;
@@ -13,6 +23,32 @@ namespace Geta.Optimizely.GenericLinks.Tests
 {
     public class SerializationTests
     {
+        [Fact]
+        public void SystemTextLinkDataConverter_can_Write()
+        {
+            var model = CreateLinkData("test", "http://localhost/1");
+            var subject = CreateSystemTextLinkDataConverter<TestLinkData>();
+            var options = new JsonSerializerOptions
+            {
+                WriteIndented = false
+            };
+
+            using var memoryStream = new MemoryStream();
+            using var jsonWriter = new Utf8JsonWriter(memoryStream);
+
+            subject.Write(jsonWriter, model, options);
+            jsonWriter.Flush();
+            memoryStream.Flush();
+            memoryStream.Seek(0, SeekOrigin.Begin);
+            
+            using var reader = new StreamReader(memoryStream, leaveOpen: true);
+            var json = reader.ReadToEnd();
+
+            Assert.NotNull(json);
+            Assert.Contains(model.Text, json);
+            Assert.Contains(model.Href, json);
+        }
+
         [Fact]
         public void LinkHtmlSerializer_can_Serialize()
         {
@@ -83,6 +119,61 @@ namespace Geta.Optimizely.GenericLinks.Tests
             var virtualPathResolver = new FakeVirtualPathResolver();
 
             return new DefaultLinkHtmlSerializer(virtualPathResolver, urlResolver);
+        }
+
+        private static SystemTextLinkDataConverter<TestLinkData> CreateSystemTextLinkDataConverter<TLinkData>()
+            where TLinkData : LinkData, new()
+        {
+            var propertyReflector = new DefaultPropertyReflector();
+            var linkModelConverter = CreateLinkModelConverter();
+            var valueWriters = CreateValueWriters();
+
+            return new SystemTextLinkDataConverter<TestLinkData>(propertyReflector, linkModelConverter, valueWriters);
+        }
+
+        private static DefaultLinkModelConverter CreateLinkModelConverter()
+        {
+            var attributeConverters = CreateAttributeConverters();
+            var urlResolver = new FakeUrlResolver();
+            var virtualPathResolver = new FakeVirtualPathResolver();
+            var frameRepository = new InMemoryFrameRepository(CreateSystemFrames());
+            var uiDescriptorRepository = CreateUiDescriptorRegistry();
+
+            return new DefaultLinkModelConverter(urlResolver, frameRepository, virtualPathResolver, attributeConverters, uiDescriptorRepository);
+        }
+
+        private static UIDescriptorRegistry CreateUiDescriptorRegistry()
+        {
+            var descriptors = Enumerable.Empty<UIDescriptor>();
+#pragma warning disable CS0618 // Type or member is obsolete
+            var initializers = Enumerable.Empty<IUIDescriptorInitializer>();
+#pragma warning restore CS0618 // Type or member is obsolete
+            var providers = Enumerable.Empty<UIDescriptorProvider>();
+
+            return new UIDescriptorRegistry(descriptors, initializers, providers);
+        }
+
+        private static IEnumerable<Frame> CreateSystemFrames()
+        {
+            yield return new Frame(1, "_blank", "Open in new window", true);
+            yield return new Frame(2, "_top", "Open in full body", true);
+        }
+
+        private static IEnumerable<ILinkDataAttibuteConverter> CreateAttributeConverters()
+        {
+            yield return new StringAttributeConverter();
+            yield return new ConvertibleAttributeConverter();
+            yield return new JsonAttributeConverter();
+        }
+
+        private static IEnumerable<ILinkDataValueWriter> CreateValueWriters()
+        {
+            yield return new StringValueWriter();
+            yield return new ContentReferenceValueWriter();
+            yield return new Int32ValueWriter();
+            yield return new DoubleValueWriter();
+            yield return new DecimalValueWriter();
+            yield return new DateTimeValueWriter();
         }
     }
 }
