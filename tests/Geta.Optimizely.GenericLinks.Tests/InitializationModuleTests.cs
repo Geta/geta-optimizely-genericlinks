@@ -1,3 +1,7 @@
+// Copyright (c) Geta Digital. All rights reserved.
+// Licensed under Apache-2.0. See the LICENSE file in the project root for more information
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using EPiServer.Core;
@@ -65,6 +69,19 @@ namespace Geta.Optimizely.GenericLinks.Tests
             var engine = CreateInitializationEngine(serviceCollection);
 
             subject.Initialize(engine);
+
+            var handlerRegistry = engine.Locate.Advanced.GetService<MetadataHandlerRegistry>();
+            
+            Assert.NotNull(handlerRegistry);
+
+            if (handlerRegistry is null)
+                throw new InvalidOperationException("handler registry cannot be null");
+
+            var singleHandler = handlerRegistry.GetMetadataHandlers(typeof(TestLinkData));
+            Assert.NotEmpty(singleHandler);
+
+            var collectionHandler = handlerRegistry.GetMetadataHandlers(typeof(LinkDataCollection<TestLinkData>));
+            Assert.NotEmpty(collectionHandler);
         }
 
         [Fact]
@@ -79,6 +96,8 @@ namespace Geta.Optimizely.GenericLinks.Tests
             var engine = CreateInitializationEngine(serviceCollection);
             
             subject.Uninitialize(engine);
+
+            Assert.NotEmpty(serviceCollection);
         }
 
         private static InitializationEngine CreateInitializationEngine(IServiceCollection services)
