@@ -3,12 +3,15 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Xml.Linq;
+using EPiServer.Core;
 using EPiServer.DataAbstraction;
 using EPiServer.Shell;
+using Geta.Optimizely.GenericLinks.Cms.EditorDescriptors;
 using Geta.Optimizely.GenericLinks.Cms.Metadata;
 using Geta.Optimizely.GenericLinks.Converters;
 using Geta.Optimizely.GenericLinks.Converters.Attributes;
@@ -24,10 +27,66 @@ namespace Geta.Optimizely.GenericLinks.Tests
     public class SerializationTests
     {
         [Fact]
+        public void AttributeConverters_can_Convert()
+        {
+            ILinkDataAttibuteConverter subject = new StringAttributeConverter();
+
+            Assert.True(subject.CanConvert(typeof(string)));
+            Assert.Equal("test", subject.Convert("test"));
+
+            subject = new ConvertibleAttributeConverter();
+
+            Assert.True(subject.CanConvert(typeof(int)));
+            Assert.Equal("1", subject.Convert(1));
+            Assert.True(subject.CanConvert(typeof(double)));
+            Assert.Equal("1.1", subject.Convert(1.1));
+            Assert.True(subject.CanConvert(typeof(DateTime)));
+            Assert.Equal("01/01/2000 00:00:00", subject.Convert(new DateTime(2000, 1, 1)));
+
+            subject = new JsonAttributeConverter();
+
+            Assert.True(subject.CanConvert(typeof(DialogContentOptions)));
+            Assert.Contains("test", subject.Convert(new DialogContentOptions { BaseClass = "test" }));           
+        }
+
+
+        [Fact]
+        public void ValueWriters_can_Write()
+        {
+            ILinkDataAttibuteConverter subject = new StringAttributeConverter();
+
+            Assert.True(subject.CanConvert(typeof(string)));
+            Assert.Equal("test", subject.Convert("test"));
+
+            subject = new ConvertibleAttributeConverter();
+
+            Assert.True(subject.CanConvert(typeof(int)));
+            Assert.Equal("1", subject.Convert(1));
+            Assert.True(subject.CanConvert(typeof(double)));
+            Assert.Equal("1.1", subject.Convert(1.1));
+            Assert.True(subject.CanConvert(typeof(DateTime)));
+            Assert.Equal("01/01/2000 00:00:00", subject.Convert(new DateTime(2000, 1, 1)));
+
+            subject = new JsonAttributeConverter();
+
+            Assert.True(subject.CanConvert(typeof(DialogContentOptions)));
+            Assert.Contains("test", subject.Convert(new DialogContentOptions { BaseClass = "test" }));
+        }
+
+        [Fact]
         public void SystemTextLinkDataConverter_can_Write()
         {
-            var model = CreateLinkData("test", "http://localhost/1");
-            var subject = CreateSystemTextLinkDataConverter<TestLinkData>();
+            var model = new TestThumbnailLinkData
+            {
+                Text = "1",
+                Href = "http://localhost/1",
+                Thumbnail = new ContentReference(1),
+                ThumbnailModified = new DateTime(2000, 1, 1),
+                ThumbnailWidth = 256,
+                ThumbnailHeight = 256,
+            };
+
+            var subject = CreateSystemTextLinkDataConverter<TestThumbnailLinkData>();
             var options = new JsonSerializerOptions
             {
                 WriteIndented = false
@@ -121,14 +180,14 @@ namespace Geta.Optimizely.GenericLinks.Tests
             return new DefaultLinkHtmlSerializer(virtualPathResolver, urlResolver);
         }
 
-        private static SystemTextLinkDataConverter<TestLinkData> CreateSystemTextLinkDataConverter<TLinkData>()
+        private static SystemTextLinkDataConverter<TLinkData> CreateSystemTextLinkDataConverter<TLinkData>()
             where TLinkData : LinkData, new()
         {
             var propertyReflector = new DefaultPropertyReflector();
             var linkModelConverter = CreateLinkModelConverter();
             var valueWriters = CreateValueWriters();
 
-            return new SystemTextLinkDataConverter<TestLinkData>(propertyReflector, linkModelConverter, valueWriters);
+            return new SystemTextLinkDataConverter<TLinkData>(propertyReflector, linkModelConverter, valueWriters);
         }
 
         private static DefaultLinkModelConverter CreateLinkModelConverter()

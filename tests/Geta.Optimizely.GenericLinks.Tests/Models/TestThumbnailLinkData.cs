@@ -3,96 +3,47 @@
 
 using EPiServer.Core;
 using EPiServer.Web;
-using Geta.Optimizely.GenericLinks;
+using System;
 using System.ComponentModel.DataAnnotations;
-using System.Runtime.CompilerServices;
+using System.Globalization;
 
 namespace Geta.Optimizely.GenericLinks.Tests.Models
 {
     public class TestThumbnailLinkData : LinkData
     {
-        [Display(Name = "Thumbnail image 1", Order = 0)]
+        [Display(Name = "Thumbnail image", Order = 0)]
         [UIHint(UIHint.Image)]
-        public virtual ContentReference? ThumbnailOne
+        public virtual ContentReference? Thumbnail
         {
-            get
-            {
-                var attribute = GetAttribute();
-
-                if (ContentReference.TryParse(attribute, out var reference))
-                    return reference;
-
-                return null;
-            }
-            set
-            {
-                SetAttribute(value);
-            }
+            get => GetAttribute((v) => ContentReference.Parse(v));
+            set => SetAttribute(value, (v) => v.ToString());
         }
 
-        [Display(Name = "Thumbnail image 2", Order = 210)]
+        [Display(Name = "Thumbnail modified", Order = 1000)]
         [UIHint(UIHint.Image)]
-        public virtual ContentReference? ThumbnailTwo
+        public virtual DateTime? ThumbnailModified
         {
-            get
-            {
-                var attribute = GetAttribute();
-
-                if (ContentReference.TryParse(attribute, out var reference))
-                    return reference;
-
-                return null;
-            }
-            set
-            {
-                SetAttribute(value);
-            }
+            get => GetAttribute((v) => DateTime.Parse(v, CultureInfo.InvariantCulture));
+            set => SetAttribute(value, (v) => v?.ToString(CultureInfo.InvariantCulture) 
+                ?? throw new InvalidOperationException("value cannot be null"));
         }
 
-        [Display(Name = "Thumbnail image 3", Order = 1000)]
+        [Display(Name = "Thumbnail width", Order = 150)]
         [UIHint(UIHint.Image)]
-        public virtual ContentReference? ThumbnailThree
+        public virtual int? ThumbnailWidth
         {
-            get
-            {
-                var attribute = GetAttribute();
-
-                if (ContentReference.TryParse(attribute, out var reference))
-                    return reference;
-
-                return null;
-            }
-            set
-            {
-                SetAttribute(value);
-            }
+            get => GetAttribute((v) => int.Parse(v, CultureInfo.InvariantCulture));
+            set => SetAttribute(value, (v) => v?.ToString(CultureInfo.InvariantCulture)
+                ?? throw new InvalidOperationException("value cannot be null"));
         }
 
-        protected virtual void SetAttribute(ContentReference? value, [CallerMemberName] string? key = null)
+        [Display(Name = "Thumbnail height", Order = 250)]
+        [UIHint(UIHint.Image)]
+        public virtual int? ThumbnailHeight
         {
-            if (key is null)
-                return;
-
-            if (value is null)
-            {
-                SetAttribute((string?)null, key);
-            }
-            else
-            {
-                SetAttribute(value.ToString(), key);
-            }
-        }
-
-        public override object Clone()
-        {
-            var item = new TestThumbnailLinkData
-            {
-                Text = Text,
-            };
-
-            item.SetAttributes(Attributes);
-
-            return item;
+            get => GetAttribute((v) => int.Parse(v, CultureInfo.InvariantCulture));
+            set => SetAttribute(value, (v) => v?.ToString(CultureInfo.InvariantCulture)
+                ?? throw new InvalidOperationException("value cannot be null"));
         }
     }
 }
