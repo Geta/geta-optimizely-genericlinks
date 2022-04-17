@@ -19,6 +19,7 @@ using Geta.Optimizely.GenericLinks.Converters.Values;
 using Geta.Optimizely.GenericLinks.Html;
 using Geta.Optimizely.GenericLinks.Tests.Models;
 using Geta.Optimizely.GenericLinks.Tests.Services;
+using Newtonsoft.Json;
 using Xunit;
 
 namespace Geta.Optimizely.GenericLinks.Tests
@@ -70,6 +71,33 @@ namespace Geta.Optimizely.GenericLinks.Tests
 
             Assert.True(subject.CanConvert(typeof(DialogContentOptions)));
             Assert.Contains("test", subject.Convert(new DialogContentOptions { BaseClass = "test" }));
+        }
+
+        [Fact]
+        public void NewtonsoftLinkDataConverter_can_Read()
+        {
+            var subject = CreateNewtonsoftLinkDataConverter();
+            var text = "Test 1";
+            var href = "http://localhost/1";
+
+            var rawJson = $"{{ \"text\": \"{text}\", \"href\": \"{href}\" }}";
+
+            var valueType = typeof(TestLinkData);
+            var serializer = Newtonsoft.Json.JsonSerializer.CreateDefault();
+            using var reader = new StringReader(rawJson);
+            using var jsonReader = new JsonTextReader(reader);
+
+            Assert.True(subject.CanConvert(valueType));
+            
+            var linkData = subject.ReadJson(jsonReader, valueType, null, serializer) as TestLinkData;
+
+            Assert.NotNull(linkData);
+
+            if (linkData is null)
+                throw new InvalidOperationException("linkData cannot be null");
+
+            Assert.Equal(text, linkData.Text);
+            Assert.Equal(href, linkData.Href);
         }
 
         [Fact]
@@ -177,6 +205,13 @@ namespace Geta.Optimizely.GenericLinks.Tests
             var virtualPathResolver = new FakeVirtualPathResolver();
 
             return new DefaultLinkHtmlSerializer(virtualPathResolver, urlResolver);
+        }
+
+        private static NewtonsoftLinkDataConverter CreateNewtonsoftLinkDataConverter()
+        {
+            var linkModelConverter = CreateLinkModelConverter();
+
+            return new NewtonsoftLinkDataConverter(linkModelConverter);
         }
 
         private static SystemTextLinkDataConverter<TLinkData> CreateSystemTextLinkDataConverter<TLinkData>()

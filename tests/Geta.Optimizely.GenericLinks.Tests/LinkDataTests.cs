@@ -1,6 +1,9 @@
 // Copyright (c) Geta Digital. All rights reserved.
 // Licensed under Apache-2.0. See the LICENSE file in the project root for more information
 
+using System;
+using System.Collections.Generic;
+using EPiServer.Web;
 using Geta.Optimizely.GenericLinks.Tests.Models;
 using Xunit;
 
@@ -34,6 +37,30 @@ namespace Geta.Optimizely.GenericLinks.Tests
 
             var hiddenAttribute = subject.Attributes["aria-hidden"];
             Assert.Equal(ariaHidden, hiddenAttribute);
+        }
+
+        [Fact]
+        public void LinkData_can_RemapPermanentLinkReferences()
+        {
+            var initialLinkGuid = Guid.NewGuid();
+            var subject = CreateLinkData("Test", initialLinkGuid);
+
+            var remappedLinkGuid = Guid.NewGuid();
+            var mappings = new Dictionary<Guid, Guid>
+            {
+                { initialLinkGuid, remappedLinkGuid }
+            };
+
+            subject.RemapPermanentLinkReferences(mappings);
+
+            Assert.NotNull(subject);
+            Assert.NotNull(subject.Href);
+
+            var mappedGuid = PermanentLinkUtility.GetGuid(subject.Href);
+
+            Assert.Equal(remappedLinkGuid, mappedGuid);
+            Assert.Equal(1, subject.ReferencedPermanentLinkIds.Count);
+            Assert.Equal(remappedLinkGuid, subject.ReferencedPermanentLinkIds[0]);
         }
 
         [Fact]
@@ -100,6 +127,48 @@ namespace Geta.Optimizely.GenericLinks.Tests
         }
 
         [Fact]
+        public void LinkDataCollection_can_RemapPermanentLinkReferences()
+        {
+            var firstGuid = Guid.NewGuid();
+            var secondGuid = Guid.NewGuid();
+
+            var firstLinkData = CreateLinkData("Test 1", firstGuid);
+            var secondLinkData = CreateLinkData("Test 2", secondGuid);
+
+            var subject = new LinkDataCollection<TestLinkData>
+            {
+                firstLinkData, secondLinkData
+            };
+
+            var remappedGuids = new List<Guid>
+            {
+                Guid.NewGuid(), Guid.NewGuid()
+            };
+
+            var mappings = new Dictionary<Guid, Guid>
+            {
+                { firstGuid, remappedGuids[0] },
+                { secondGuid, remappedGuids[1] }
+            };
+
+            subject.RemapPermanentLinkReferences(mappings);
+
+            Assert.NotNull(subject);
+
+            for (var i = 0; i < subject.Count; i++)
+            {
+                var subjectLinkItem = subject[i];
+                Assert.NotNull(subjectLinkItem.Href);
+
+                var mappedGuid = PermanentLinkUtility.GetGuid(subjectLinkItem.Href);
+                Assert.Equal(remappedGuids[i], mappedGuid);
+
+                mappedGuid = subject.ReferencedPermanentLinkIds[i];
+                Assert.Equal(remappedGuids[i], mappedGuid);
+            }
+        }
+
+        [Fact]
         public void LinkDataCollection_updates_IsModified()
         {
             var firstLink = CreateLinkData("1", "http://localhost/1");
@@ -145,6 +214,18 @@ namespace Geta.Optimizely.GenericLinks.Tests
             subject.Clear();
             Assert.Empty(subject);
             Assert.True(subject.IsModified);
+        }
+
+        private static TestLinkData CreateLinkData(string text, Guid contentGuid, string extension = ".aspx", string? target = null, string? title = null)
+        {
+            var linkUri = PermanentLinkUtility.GetPermanentLinkUrl(contentGuid, extension);
+            return new TestLinkData
+            {
+                Text = text,
+                Href = linkUri.ToString(),
+                Target = target,
+                Title = title
+            };
         }
 
         private static TestLinkData CreateLinkData(string text, string href, string? target = null, string? title = null)
