@@ -16,7 +16,8 @@ namespace Geta.Optimizely.GenericLinks.Tests.Models
         public virtual ContentReference? Thumbnail
         {
             get => GetAttribute((v) => ContentReference.Parse(v));
-            set => SetAttribute(value, (v) => v.ToString());
+            set => SetAttribute(value, (v) => v?.ToString()
+                ?? throw new InvalidOperationException("value cannot be null"));
         }
 
         [Display(Name = "Thumbnail modified", Order = 1000)]
