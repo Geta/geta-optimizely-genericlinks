@@ -1,7 +1,6 @@
 // Copyright (c) Geta Digital. All rights reserved.
 // Licensed under Apache-2.0. See the LICENSE file in the project root for more information
 
-using Geta.Optimizely.GenericLinks.Cms.EditorModels;
 using Geta.Optimizely.GenericLinks.Cms.Metadata;
 using Geta.Optimizely.GenericLinks.Converters.Values;
 using Geta.Optimizely.GenericLinks.Extensions;
@@ -40,11 +39,7 @@ namespace Geta.Optimizely.GenericLinks.Converters.Json
 
         public override TLinkData? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            var clientModel = JsonSerializer.Deserialize<LinkModel>(ref reader, options);
-            if (clientModel is null)
-                return null;
-
-            return _linkModelConverter.ToServerModel<TLinkData>(clientModel);
+            throw new NotSupportedException();
         }
 
         public override void Write(Utf8JsonWriter writer, TLinkData value, JsonSerializerOptions options)

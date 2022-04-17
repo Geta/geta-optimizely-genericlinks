@@ -2,6 +2,8 @@
 // Licensed under Apache-2.0. See the LICENSE file in the project root for more information
 
 using System;
+using System.Collections.Generic;
+using EPiServer.Web;
 using Geta.Optimizely.GenericLinks.Html;
 using Geta.Optimizely.GenericLinks.Tests.Models;
 using Geta.Optimizely.GenericLinks.Tests.Services;
@@ -235,7 +237,7 @@ namespace Geta.Optimizely.GenericLinks.Tests
         }
 
         [Fact]
-        public void PropertyLinkData_handles_Null()
+        public void PropertyLinkData_handles_null()
         {
             var link = CreateLinkData("1", "http://localhost/1");
             var subject = CreatePropertyLinkData(link);
@@ -261,7 +263,7 @@ namespace Geta.Optimizely.GenericLinks.Tests
         }
 
         [Fact]
-        public void PropertyLinkDataCollection_handles_Null()
+        public void PropertyLinkDataCollection_handles_null()
         {
             var link = CreateLinkData("1", "http://localhost/1");
             var subject = CreatePropertyLinkDataCollection(link);
@@ -292,6 +294,84 @@ namespace Geta.Optimizely.GenericLinks.Tests
             Assert.True(subject.IsNull);
         }
 
+        [Fact]
+        public void PropertyLinkData_can_RemapPermanentLinkReferences()
+        {
+            var initialLinkGuid = Guid.NewGuid();
+            var linkData = CreateLinkData("Test", initialLinkGuid);
+            var subject = CreatePropertyLinkData(linkData);
+
+            var remappedLinkGuid = Guid.NewGuid();
+            var mappings = new Dictionary<Guid, Guid>
+            {
+                { initialLinkGuid, remappedLinkGuid }
+            };
+
+            subject.RemapPermanentLinkReferences(mappings);
+
+            Assert.NotNull(subject);
+            Assert.NotNull(subject.Link);
+            Assert.NotNull(subject.ReferencedPermanentLinkIds);
+
+            if (subject.Link is null)
+                throw new InvalidOperationException("Link cannot be null");
+
+            if (subject.ReferencedPermanentLinkIds is null)
+                throw new InvalidOperationException("ReferencedPermanentLinkIds cannot be null");
+            
+            var mappedGuid = PermanentLinkUtility.GetGuid(subject.Link.Href);
+
+            Assert.Equal(remappedLinkGuid, mappedGuid);
+            Assert.Equal(1, subject.ReferencedPermanentLinkIds.Count);
+            Assert.Equal(remappedLinkGuid, subject.ReferencedPermanentLinkIds[0]);
+        }
+
+        [Fact]
+        public void PropertyLinkDataCollection_can_RemapPermanentLinkReferences()
+        {
+            var firstGuid = Guid.NewGuid();
+            var secondGuid = Guid.NewGuid();
+
+            var firstLinkData = CreateLinkData("Test 1", firstGuid);
+            var secondLinkData = CreateLinkData("Test 2", secondGuid);
+
+            var subject = CreatePropertyLinkDataCollection(firstLinkData, secondLinkData);
+
+            var remappedGuids = new List<Guid>
+            {
+                Guid.NewGuid(), Guid.NewGuid()
+            };
+
+            var mappings = new Dictionary<Guid, Guid>
+            {
+                { firstGuid, remappedGuids[0] },
+                { secondGuid, remappedGuids[1] }
+            };
+
+            subject.RemapPermanentLinkReferences(mappings);
+
+            Assert.NotNull(subject);
+            Assert.NotNull(subject.Links);
+
+            if (subject.Links is null)
+                throw new InvalidOperationException("Links cannot be null");
+
+            if (subject.ReferencedPermanentLinkIds is null)
+                throw new InvalidOperationException("ReferencedPermanentLinkIds cannot be null");
+
+            for (var i = 0; i < subject.Links.Count; i++)
+            {
+                var subjectLinkItem = subject.Links[i];
+                Assert.NotNull(subjectLinkItem.Href);
+
+                var mappedGuid = PermanentLinkUtility.GetGuid(subjectLinkItem.Href);
+                Assert.Equal(remappedGuids[i], mappedGuid);
+
+                mappedGuid = subject.ReferencedPermanentLinkIds[i];
+                Assert.Equal(remappedGuids[i], mappedGuid);
+            }
+        }
+
         private static PropertyTestLinkData CreatePropertyLinkData(TestLinkData? linkData)
         {
             var urlResolver = new FakeUrlResolver();
@@ -319,6 +399,18 @@ namespace Geta.Optimizely.GenericLinks.Tests
         private static LinkDataCollection<TestLinkData> CreateLinkDataCollection(params TestLinkData[] linkData)
         {
             return new LinkDataCollection<TestLinkData>(linkData);
+        }
+
+        private static TestLinkData CreateLinkData(string text, Guid contentGuid, string extension = ".aspx", string? target = null, string? title = null)
+        {
+            var linkUri = PermanentLinkUtility.GetPermanentLinkUrl(contentGuid, extension);
+            return new TestLinkData
+            {
+                Text = text,
+                Href = linkUri.ToString(),
+                Target = target,
+                Title = title
+            };
         }
 
         private static TestLinkData CreateLinkData(string text, string href, string? target = null, string? title = null)

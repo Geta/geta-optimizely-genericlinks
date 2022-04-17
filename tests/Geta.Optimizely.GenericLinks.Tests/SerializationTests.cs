@@ -5,12 +5,14 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.Json;
 using System.Xml.Linq;
 using EPiServer.Core;
 using EPiServer.DataAbstraction;
 using EPiServer.Shell;
 using Geta.Optimizely.GenericLinks.Cms.EditorDescriptors;
+using Geta.Optimizely.GenericLinks.Cms.EditorModels;
 using Geta.Optimizely.GenericLinks.Cms.Metadata;
 using Geta.Optimizely.GenericLinks.Converters;
 using Geta.Optimizely.GenericLinks.Converters.Attributes;
@@ -79,25 +81,105 @@ namespace Geta.Optimizely.GenericLinks.Tests
             var subject = CreateNewtonsoftLinkDataConverter();
             var text = "Test 1";
             var href = "http://localhost/1";
+            var width = 256;
+            var height = 256;
+            var thumbnail = new ContentReference(320);
+            var modfied = new DateTime(2000, 1, 1);
 
-            var rawJson = $"{{ \"text\": \"{text}\", \"href\": \"{href}\" }}";
+            Assert.True(subject.CanConvert(typeof(TestThumbnailLinkData)));
 
-            var valueType = typeof(TestLinkData);
             var serializer = Newtonsoft.Json.JsonSerializer.CreateDefault();
-            using var reader = new StringReader(rawJson);
-            using var jsonReader = new JsonTextReader(reader);
+            var readableJson = new[]
+            {
+                $"{{ text: \"{text}\", href: \"{href}\", attributes: {{ thumbnail: \"{thumbnail}\", thumbnailWidth: {width}, thumbnailHeight: {height}, thumbnailModified: \"{modfied}\" }} }}",
+                $"[{{ text: \"{text}\", href: \"{href}\", attributes: {{ thumbnail: \"{thumbnail}\", thumbnailWidth: {width}, thumbnailHeight: {height}, thumbnailModified: \"{modfied}\" }} }}]"
+            };
 
+            foreach (var jsonString in readableJson)
+            {
+                using var reader = new StringReader(jsonString);
+                using var jsonReader = new JsonTextReader(reader);
+
+                jsonReader.Read();
+
+                var linkData = subject.ReadJson(jsonReader, typeof(TestThumbnailLinkData), null, serializer) as TestThumbnailLinkData;
+
+                Assert.NotNull(linkData);
+
+                if (linkData is null)
+                    throw new InvalidOperationException("linkData cannot be null");
+
+                Assert.Equal(text, linkData.Text);
+                Assert.Equal(href, linkData.Href);
+                Assert.Equal(thumbnail, linkData.Thumbnail);
+                Assert.Equal(modfied, linkData.ThumbnailModified);
+                Assert.Equal(width, linkData.ThumbnailWidth);
+                Assert.Equal(width, linkData.ThumbnailHeight);
+            }
+        }
+
+        [Fact]
+        public void NewtonsoftLinkDataConverter_cant_Write()
+        {
+            var subject = CreateNewtonsoftLinkDataConverter();
+            var serializer = Newtonsoft.Json.JsonSerializer.CreateDefault();
+
+            using var writer = new StringWriter();
+            using var jsonWriter = new JsonTextWriter(writer);
+
+            var linkModel = new LinkModel
+            {
+                Text = "Test",
+                Href = "http://localhost/1"
+            };
+
+            Assert.Throws<NotSupportedException>(() => subject.WriteJson(jsonWriter, linkModel, serializer));
+        }
+
+        [Fact]
+        public void NewtonsoftLinkDataConverter_can_Read_null()
+        {
+            var subject = CreateNewtonsoftLinkDataConverter();
+            var valueType = typeof(TestLinkData);
             Assert.True(subject.CanConvert(valueType));
-            
-            var linkData = subject.ReadJson(jsonReader, valueType, null, serializer) as TestLinkData;
 
-            Assert.NotNull(linkData);
+            var serializer = Newtonsoft.Json.JsonSerializer.CreateDefault();
+            var unreadableJson = new[]
+            {
+                $"",
+                $"[]"
+            };
 
-            if (linkData is null)
-                throw new InvalidOperationException("linkData cannot be null");
+            foreach (var jsonString in unreadableJson)
+            {
+                using var reader = new StringReader(jsonString);
+                using var jsonReader = new JsonTextReader(reader);
 
-            Assert.Equal(text, linkData.Text);
-            Assert.Equal(href, linkData.Href);
+                jsonReader.Read();
+
+                var linkData = subject.ReadJson(jsonReader, valueType, null, serializer) as TestLinkData;
+
+                Assert.Null(linkData);
+            }
+        }
+
+        [Fact]
+        public void SystemTextLinkDataConverter_cant_Read()
+        {
+            var readableJson = $"{{ \"text\": \"x\", \"href\": \"http://localhost\" }}";
+            var jsonData = Encoding.UTF8.GetBytes(readableJson);
+
+            var subject = CreateSystemTextLinkDataConverter<TestThumbnailLinkData>();
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+            };
+
+            Assert.Throws<NotSupportedException>(() => 
+            {
+                var reader = new Utf8JsonReader(jsonData);
+                subject.Read(ref reader, typeof(TestThumbnailLinkData), options);
+            });
         }
 
         [Fact]
