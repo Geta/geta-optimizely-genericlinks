@@ -152,7 +152,7 @@ namespace Geta.Optimizely.GenericLinks
             set => base.LongString = value;
         }
 
-        public override void ParseToSelf(string value)
+        public override void ParseToSelf(string? value)
         {
             ThrowIfReadOnly();
 
@@ -161,6 +161,9 @@ namespace Geta.Optimizely.GenericLinks
                 _linkItem = null;
                 return;
             }
+
+            if (value is null)
+                throw new InvalidOperationException("value cannot be null");
 
             _linkItem = ParseToLink(value);
             ModifiedNoCheck();
@@ -225,7 +228,7 @@ namespace Geta.Optimizely.GenericLinks
             return property;
         }
 
-        public override void LoadData(object value)
+        public override void LoadData(object? value)
         {
             if (value is null)
             {

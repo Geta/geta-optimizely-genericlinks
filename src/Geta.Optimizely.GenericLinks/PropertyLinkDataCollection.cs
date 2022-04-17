@@ -154,7 +154,7 @@ namespace Geta.Optimizely.GenericLinks
             set => base.LongString = value;
         }
 
-        public override void ParseToSelf(string value)
+        public override void ParseToSelf(string? value)
         {
             ThrowIfReadOnly();
 
@@ -163,6 +163,9 @@ namespace Geta.Optimizely.GenericLinks
                 _linkItemCollection = null;
                 return;
             }
+
+            if (value is null)
+                throw new InvalidOperationException("value cannot be null");
 
             _linkItemCollection = ParseToLinkCollection(value);
             ModifiedNoCheck();
@@ -232,9 +235,13 @@ namespace Geta.Optimizely.GenericLinks
             return collection;
         }
 
-        public override void LoadData(object value)
+        public override void LoadData(object? value)
         {
-            if (value is LinkDataCollection<TLinkData>)
+            if (value is null)
+            {
+                _linkItemCollection = null;
+            }
+            else if (value is LinkDataCollection<TLinkData>)
             {
                 Value = value;
             }
@@ -266,7 +273,7 @@ namespace Geta.Optimizely.GenericLinks
             _linkItemCollection = null;
         }
 
-        protected virtual LinkDataCollection<TLinkData>? ParseToLinkCollection(string value)
+        protected virtual LinkDataCollection<TLinkData>? ParseToLinkCollection(string? value)
         {
             var linkItemCollection = new LinkDataCollection<TLinkData>();
 

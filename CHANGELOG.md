@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.3]
+
+### Changed
+
+- Adjusted nullability for methods `LoadData` and `ParseToSelf` in property implementations.
+
 ## [1.1.2]
 
 ### Fixed

@@ -89,15 +89,14 @@ namespace Geta.Optimizely.GenericLinks.Tests
             Assert.NotNull(subject);
             Assert.Equal(collection.Count, subject.Count);
 
-            var subjectFirstLink = subject[0];
+            void AssertEqual(TestLinkData expected, TestLinkData actual)
+            {
+                Assert.Equal(expected.Text, actual.Text);
+                Assert.Equal(expected.Href, actual.Href);
+            }
 
-            Assert.Equal(firstLink.Text, subjectFirstLink.Text);
-            Assert.Equal(firstLink.Href, subjectFirstLink.Href);
-
-            var subjectSecondLink = subject[1];
-
-            Assert.Equal(secondLink.Text, subjectSecondLink.Text);
-            Assert.Equal(secondLink.Href, subjectSecondLink.Href);
+            AssertEqual(firstLink, subject[0]);
+            AssertEqual(secondLink, subject[1]);
         }
 
         [Fact]
@@ -112,9 +111,13 @@ namespace Geta.Optimizely.GenericLinks.Tests
                 firstLink, secondLink
             };
 
-            collection.MakeReadOnly();
+            LinkDataCollection<TestLinkData> Reset(LinkDataCollection<TestLinkData> collection)
+            {
+                collection.MakeReadOnly();
+                return collection.CreateWritableClone();
+            }
 
-            var subject = collection.CreateWritableClone();
+            var subject = Reset(collection);
 
             Assert.NotNull(subject);
             Assert.False(subject.IsModified);
@@ -123,23 +126,20 @@ namespace Geta.Optimizely.GenericLinks.Tests
             Assert.Equal(3, subject.Count);
             Assert.True(subject.IsModified);
 
-            subject.MakeReadOnly();
-            subject = subject.CreateWritableClone();
+            subject = Reset(subject);
             Assert.False(subject.IsModified);
 
             subject.RemoveAt(2);
             Assert.Equal(2, subject.Count);
             Assert.True(subject.IsModified);
 
-            subject.MakeReadOnly();
-            subject = subject.CreateWritableClone();
+            subject = Reset(subject);
             Assert.False(subject.IsModified);
 
             subject[0].Href = thirdLink.Href;
             Assert.True(subject.IsModified);
 
-            subject.MakeReadOnly();
-            subject = subject.CreateWritableClone();
+            subject = Reset(subject);
             Assert.False(subject.IsModified);
 
             subject.Clear();
