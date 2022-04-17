@@ -119,7 +119,7 @@ namespace Geta.Optimizely.GenericLinks.Tests
         private static DefaultLinkModelMetadataProvider CreateLinkModelMetadataProvider()
         {
             var localizationService = LocalizationService.Current;
-            var metadataHandlerRegistry = GetMetadataHandlerRegistry();
+            var metadataHandlerRegistry = CreateMetadataHandlerRegistry();
             var compositeDetailsProvider = new NullCompositeMetadataDetailsProvider();
             var propertyReflector = new DefaultPropertyReflector();
             var validationAttributeAdapter = new FakeValidationAttributeAdapterProvider();
@@ -132,7 +132,7 @@ namespace Geta.Optimizely.GenericLinks.Tests
         private static ExtensibleMetadataProvider CreateExtensibleModelMetadataProvider()
         {
             var localizationService = LocalizationService.Current;
-            var metadataHandlerRegistry = GetMetadataHandlerRegistry();
+            var metadataHandlerRegistry = CreateMetadataHandlerRegistry();
             var compositeDetailsProvider = new NullCompositeMetadataDetailsProvider();
             var propertyReflector = new DefaultPropertyReflector();
             var validationAttributeAdapter = new FakeValidationAttributeAdapterProvider();
@@ -140,7 +140,7 @@ namespace Geta.Optimizely.GenericLinks.Tests
             return new ExtensibleMetadataProvider(metadataHandlerRegistry, localizationService, metadataProvider, validationAttributeAdapter);
         }
 
-        private static MetadataHandlerRegistry GetMetadataHandlerRegistry()
+        private static MetadataHandlerRegistry CreateMetadataHandlerRegistry()
         {
             var editorDescriptors = Enumerable.Empty<EditorDescriptor>();
             var modelAccessorCreators = Enumerable.Empty<IModelAccessorCreator>();
