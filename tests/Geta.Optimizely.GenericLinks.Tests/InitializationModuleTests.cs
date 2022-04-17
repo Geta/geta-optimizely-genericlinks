@@ -57,7 +57,7 @@ namespace Geta.Optimizely.GenericLinks.Tests
             serviceCollection.AddSingleton<ExtensibleMetadataProvider>();
             serviceCollection.AddSingleton<ICompositeMetadataDetailsProvider, NullCompositeMetadataDetailsProvider>();
             serviceCollection.AddSingleton<IValidationAttributeAdapterProvider, FakeValidationAttributeAdapterProvider>();
-            serviceCollection.AddSingleton<IModelMetadataProvider, TestModelMetadataProvider>();
+            serviceCollection.AddSingleton<IModelMetadataProvider, FakeModelMetadataProvider>();
             serviceCollection.AddSingleton(CreateMetadataHandlerRegistry());
             serviceCollection.AddSingleton(CreatePropertyDefinitionTypeRepository());
 

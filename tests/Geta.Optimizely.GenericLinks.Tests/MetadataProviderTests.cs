@@ -1,7 +1,6 @@
 // Copyright (c) Geta Digital. All rights reserved.
 // Licensed under Apache-2.0. See the LICENSE file in the project root for more information
 
-using EPiServer.Core;
 using EPiServer.Framework.Localization;
 using EPiServer.Shell;
 using EPiServer.Shell.ObjectEditing;
@@ -116,7 +115,7 @@ namespace Geta.Optimizely.GenericLinks.Tests
             var compositeDetailsProvider = new NullCompositeMetadataDetailsProvider();
             var propertyReflector = new DefaultPropertyReflector();
             var validationAttributeAdapter = new FakeValidationAttributeAdapterProvider();
-            var metadataProvider = new TestModelMetadataProvider(compositeDetailsProvider, propertyReflector);
+            var metadataProvider = new FakeModelMetadataProvider(compositeDetailsProvider, propertyReflector);
             var extensibleMetaProvider = new ExtensibleMetadataProvider(metadataHandlerRegistry, localizationService, metadataProvider, validationAttributeAdapter);
 
             return new DefaultLinkModelMetadataProvider(extensibleMetaProvider, localizationService, metadataHandlerRegistry, compositeDetailsProvider, validationAttributeAdapter, propertyReflector);
@@ -129,7 +128,7 @@ namespace Geta.Optimizely.GenericLinks.Tests
             var compositeDetailsProvider = new NullCompositeMetadataDetailsProvider();
             var propertyReflector = new DefaultPropertyReflector();
             var validationAttributeAdapter = new FakeValidationAttributeAdapterProvider();
-            var metadataProvider = new TestModelMetadataProvider(compositeDetailsProvider, propertyReflector);
+            var metadataProvider = new FakeModelMetadataProvider(compositeDetailsProvider, propertyReflector);
             return new ExtensibleMetadataProvider(metadataHandlerRegistry, localizationService, metadataProvider, validationAttributeAdapter);
         }
 

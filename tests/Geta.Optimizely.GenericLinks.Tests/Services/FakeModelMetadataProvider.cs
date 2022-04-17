@@ -10,12 +10,12 @@ using System.Reflection;
 
 namespace Geta.Optimizely.GenericLinks.Tests.Services
 {
-    public class TestModelMetadataProvider : IModelMetadataProvider
+    public class FakeModelMetadataProvider : IModelMetadataProvider
     {
         private readonly ICompositeMetadataDetailsProvider _compositeMetadataDetailsProvider;
         private readonly IPropertyReflector _propertyReflector;
 
-        public TestModelMetadataProvider(ICompositeMetadataDetailsProvider compositeMetadataDetailsProvider, IPropertyReflector propertyReflector)
+        public FakeModelMetadataProvider(ICompositeMetadataDetailsProvider compositeMetadataDetailsProvider, IPropertyReflector propertyReflector)
         {
             _compositeMetadataDetailsProvider = compositeMetadataDetailsProvider;
             _propertyReflector = propertyReflector;
