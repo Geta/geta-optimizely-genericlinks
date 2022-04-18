@@ -52,30 +52,6 @@ namespace Geta.Optimizely.GenericLinks.Tests
             Assert.Contains("test", subject.Convert(new DialogContentOptions { BaseClass = "test" }));           
         }
 
-
-        [Fact]
-        public void ValueWriters_can_Write()
-        {
-            ILinkDataAttibuteConverter subject = new StringAttributeConverter();
-
-            Assert.True(subject.CanConvert(typeof(string)));
-            Assert.Equal("test", subject.Convert("test"));
-
-            subject = new ConvertibleAttributeConverter();
-
-            Assert.True(subject.CanConvert(typeof(int)));
-            Assert.Equal("1", subject.Convert(1));
-            Assert.True(subject.CanConvert(typeof(double)));
-            Assert.Equal("1.1", subject.Convert(1.1));
-            Assert.True(subject.CanConvert(typeof(DateTime)));
-            Assert.Equal("01/01/2000 00:00:00", subject.Convert(new DateTime(2000, 1, 1)));
-
-            subject = new JsonAttributeConverter();
-
-            Assert.True(subject.CanConvert(typeof(DialogContentOptions)));
-            Assert.Contains("test", subject.Convert(new DialogContentOptions { BaseClass = "test" }));
-        }
-
         [Fact]
         public void NewtonsoftLinkDataConverter_can_Read()
         {
