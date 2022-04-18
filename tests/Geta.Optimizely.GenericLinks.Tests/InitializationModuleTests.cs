@@ -66,22 +66,32 @@ namespace Geta.Optimizely.GenericLinks.Tests
             
             subject.ConfigureContainer(configurationContext);
 
-            var engine = CreateInitializationEngine(serviceCollection);
+            var engine = new InitializationEngine(serviceCollection, HostType.TestFramework);
+            var provider = serviceCollection.BuildServiceProvider();
 
-            subject.Initialize(engine);
+            ServiceLocator.SetScopedServiceProvider(provider);
 
-            var handlerRegistry = engine.Locate.Advanced.GetService<MetadataHandlerRegistry>();
-            
-            Assert.NotNull(handlerRegistry);
+            try
+            {
+                subject.Initialize(engine);
 
-            if (handlerRegistry is null)
-                throw new InvalidOperationException("handler registry cannot be null");
+                var handlerRegistry = engine.Locate.Advanced.GetService<MetadataHandlerRegistry>();
 
-            var singleHandler = handlerRegistry.GetMetadataHandlers(typeof(TestLinkData));
-            Assert.NotEmpty(singleHandler);
+                Assert.NotNull(handlerRegistry);
 
-            var collectionHandler = handlerRegistry.GetMetadataHandlers(typeof(LinkDataCollection<TestLinkData>));
-            Assert.NotEmpty(collectionHandler);
+                if (handlerRegistry is null)
+                    throw new InvalidOperationException("handler registry cannot be null");
+
+                var singleHandler = handlerRegistry.GetMetadataHandlers(typeof(TestLinkData));
+                Assert.NotEmpty(singleHandler);
+
+                var collectionHandler = handlerRegistry.GetMetadataHandlers(typeof(LinkDataCollection<TestLinkData>));
+                Assert.NotEmpty(collectionHandler);
+            }
+            finally
+            {
+                ServiceLocator.SetScopedServiceProvider(null);
+            }
         }
 
         [Fact]
@@ -93,21 +103,11 @@ namespace Geta.Optimizely.GenericLinks.Tests
 
             subject.ConfigureContainer(configurationContext);
 
-            var engine = CreateInitializationEngine(serviceCollection);
+            var engine = new InitializationEngine(serviceCollection, HostType.TestFramework);
             
             subject.Uninitialize(engine);
 
             Assert.NotEmpty(serviceCollection);
-        }
-
-        private static InitializationEngine CreateInitializationEngine(IServiceCollection services)
-        {
-            var engine = new InitializationEngine(services, HostType.TestFramework);
-            var provider = services.BuildServiceProvider();
-
-            ServiceLocator.SetServiceProvider(provider);
-
-            return engine;
         }
 
         private static MetadataHandlerRegistry CreateMetadataHandlerRegistry()

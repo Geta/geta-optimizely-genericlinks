@@ -21,18 +21,22 @@ namespace Geta.Optimizely.GenericLinks.Tests
             var testFailureException = new InvalidOperationException("Test failed");
             var failureResolver = new ExceptionBackingTypeResolver(testFailureException);
 
-            var propertyType = typeof(PropertyTestCollection);
+            var collectionPropertyType = typeof(PropertyTestCollection);
+            var singlePropertyType = typeof(PropertyTestLinkData);
             var definitions = new List<PropertyDefinitionType>
             {
-                propertyType.ToDefinition(1, PropertyDataType.LinkCollection)
+                collectionPropertyType.ToDefinition(1001, PropertyDataType.LinkCollection),
+                singlePropertyType.ToDefinition(1002, PropertyDataType.LinkCollection)
             };
 
             var definitionRepository = new InMemoryPropertyDefinitionTypeRepository(definitions);
             var subject = new LinkDataBackingTypeResolverInterceptor(failureResolver, definitionRepository);
 
             var resolvedType = subject.Resolve(typeof(LinkDataCollection<TestLinkData>));
+            Assert.Equal(collectionPropertyType, resolvedType);
 
-            Assert.Equal(propertyType, resolvedType);
+            resolvedType = subject.Resolve(typeof(TestLinkData));
+            Assert.Equal(singlePropertyType, resolvedType);
         }
     }
 }

@@ -8,6 +8,14 @@ namespace Geta.Optimizely.GenericLinks.Tests.Models
 {
     public class PropertyTestCollection : PropertyLinkDataCollection<TestLinkData>
     {
+        public PropertyTestCollection() : base()
+        {
+        }
+
+        public PropertyTestCollection(LinkDataCollection<TestLinkData> linkItemCollection) : base(linkItemCollection)
+        {
+        }
+
         public PropertyTestCollection(
             IUrlResolver urlResolver,
             IAttributeSanitizer attributeSanitizer,
@@ -25,9 +33,14 @@ namespace Geta.Optimizely.GenericLinks.Tests.Models
         {
         }
 
-        public string GetBackingValue()
+        public string GetBackingProperty()
         {
             return LongString;
+        }
+
+        public string? ToBackingValue()
+        {
+            return ToLongString();
         }
     }
 }

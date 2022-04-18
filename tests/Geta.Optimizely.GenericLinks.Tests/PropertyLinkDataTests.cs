@@ -3,16 +3,72 @@
 
 using System;
 using System.Collections.Generic;
+using EPiServer.ServiceLocation;
 using EPiServer.Web;
+using EPiServer.Web.Routing;
 using Geta.Optimizely.GenericLinks.Html;
 using Geta.Optimizely.GenericLinks.Tests.Models;
 using Geta.Optimizely.GenericLinks.Tests.Services;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace Geta.Optimizely.GenericLinks.Tests
 {
     public class PropertyLinkDataTests
     {
+        [Fact]
+        public void PropertyLinkData_can_Construct()
+        {
+            var subject = CreatePropertyLinkData(null);
+            Assert.NotNull(subject);
+
+            var link = CreateLinkData("1", "http://localhost/1");
+            subject = CreatePropertyLinkData(link);
+            Assert.NotNull(subject);
+
+            ConfigureScopedServiceLocator();
+
+            try
+            {
+                subject = new PropertyTestLinkData();
+                Assert.NotNull(subject);
+                
+                subject = new PropertyTestLinkData(link);
+                Assert.NotNull(subject);                
+            }
+            finally
+            {
+                ClearScopedServiceLocator();
+            }
+        }
+
+        [Fact]
+        public void PropertyLinkDataCollection_can_Construct()
+        {
+            var subject = CreatePropertyLinkDataCollection();
+            Assert.NotNull(subject);
+
+            var link = CreateLinkData("1", "http://localhost/1");
+            subject = CreatePropertyLinkDataCollection(link);
+            Assert.NotNull(subject);
+
+            ConfigureScopedServiceLocator();
+
+            try
+            {
+                subject = new PropertyTestCollection();
+                Assert.NotNull(subject);
+
+                var collection = CreateLinkDataCollection(link);
+                subject = new PropertyTestCollection(collection);
+                Assert.NotNull(subject);
+            }
+            finally
+            {
+                ClearScopedServiceLocator();
+            }
+        }
+
         [Fact]
         public void PropertyLinkData_can_Clone_and_Copy()
         {
@@ -71,13 +127,14 @@ namespace Geta.Optimizely.GenericLinks.Tests
 
             AssertEqual(link, subject.Link);
 
-            var serialized = subject.GetBackingValue();
+            var serialized = subject.ToBackingValue();
             Assert.NotNull(serialized);
 
             subject.LoadData(serialized);
 
             AssertEqual(link, subject.Link);
 
+            serialized = subject.GetBackingProperty();
             subject.ParseToSelf(serialized);
 
             AssertEqual(link, subject.Link);
@@ -154,7 +211,7 @@ namespace Geta.Optimizely.GenericLinks.Tests
             AssertEqual(firstLink, subject.Links[0]);
             AssertEqual(secondLink, subject.Links[1]);
 
-            var serialized = subject.GetBackingValue();
+            var serialized = subject.ToBackingValue();
             Assert.NotNull(serialized);
 
             subject.LoadData(serialized);
@@ -164,6 +221,7 @@ namespace Geta.Optimizely.GenericLinks.Tests
             AssertEqual(firstLink, subject.Links[0]);
             AssertEqual(secondLink, subject.Links[1]);
 
+            serialized = subject.GetBackingProperty();
             subject.ParseToSelf(serialized);
 
             Assert.Equal(2, subject.Links.Count);
@@ -383,6 +441,25 @@ namespace Geta.Optimizely.GenericLinks.Tests
                 return new PropertyTestLinkData(urlResolver, attributeSanitizer, linkSerializer);
 
             return new PropertyTestLinkData(linkData, urlResolver, attributeSanitizer, linkSerializer);
+        }
+
+        private static void ConfigureScopedServiceLocator()
+        {
+            var serviceCollection = new ServiceCollection();
+
+            serviceCollection.AddSingleton<IUrlResolver, FakeUrlResolver>();
+            serviceCollection.AddSingleton<IVirtualPathResolver, FakeVirtualPathResolver>();
+            serviceCollection.AddSingleton<IAttributeSanitizer, DefaultAttributeSanitizer>();
+            serviceCollection.AddSingleton<ILinkHtmlSerializer, DefaultLinkHtmlSerializer>();
+
+            var serviceProvider = serviceCollection.BuildServiceProvider();
+
+            ServiceLocator.SetScopedServiceProvider(serviceProvider);
+        }
+
+        private static void ClearScopedServiceLocator()
+        {
+            ServiceLocator.SetScopedServiceProvider(null);
         }
 
         private static PropertyTestCollection CreatePropertyLinkDataCollection(params TestLinkData[] linkData)

@@ -6,7 +6,9 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
-- Adjusted nullability for methods `LoadData` and `ParseToSelf` in property implementations.
+- Adjusted reference nullability for methods `LoadData` and `ParseToSelf` in property implementations.
+- Adjusted reference nullability for action in `SetAttribute` to represent actual functionality.
+- Clarified supported behaviour in `NewtonsoftLinkDataConverter` and `SystemTextLinkDataConverter` by throwing appropriate exceptions.
 
 ## [1.1.2]
 

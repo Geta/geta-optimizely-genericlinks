@@ -199,7 +199,7 @@ namespace Geta.Optimizely.GenericLinks
             }
         }
 
-        protected virtual void SetAttribute<T>(T? value, Func<T?, string> conversion, [CallerMemberName] string? key = null)
+        protected virtual void SetAttribute<T>(T? value, Func<T, string> conversion, [CallerMemberName] string? key = null)
         {
             if (conversion is null)
                 return;

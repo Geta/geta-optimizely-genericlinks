@@ -46,5 +46,12 @@ namespace Geta.Optimizely.GenericLinks.Tests.Models
             set => SetAttribute(value, (v) => v?.ToString(CultureInfo.InvariantCulture)
                 ?? throw new InvalidOperationException("value cannot be null"));
         }
+
+        [Display(Name = "Thumbnail caption", Order = 350)]
+        public virtual string? ThumbnailCaption
+        {
+            get => GetAttribute();
+            set => SetAttribute(value);
+        }
     }
 }

@@ -21,6 +21,7 @@ using Geta.Optimizely.GenericLinks.Converters.Values;
 using Geta.Optimizely.GenericLinks.Html;
 using Geta.Optimizely.GenericLinks.Tests.Models;
 using Geta.Optimizely.GenericLinks.Tests.Services;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Xunit;
 
@@ -83,6 +84,7 @@ namespace Geta.Optimizely.GenericLinks.Tests
             var href = "http://localhost/1";
             var width = 256;
             var height = 256;
+            var caption = "test";
             var thumbnail = new ContentReference(320);
             var modfied = new DateTime(2000, 1, 1);
 
@@ -91,8 +93,8 @@ namespace Geta.Optimizely.GenericLinks.Tests
             var serializer = Newtonsoft.Json.JsonSerializer.CreateDefault();
             var readableJson = new[]
             {
-                $"{{ text: \"{text}\", href: \"{href}\", attributes: {{ thumbnail: \"{thumbnail}\", thumbnailWidth: {width}, thumbnailHeight: {height}, thumbnailModified: \"{modfied}\" }} }}",
-                $"[{{ text: \"{text}\", href: \"{href}\", attributes: {{ thumbnail: \"{thumbnail}\", thumbnailWidth: {width}, thumbnailHeight: {height}, thumbnailModified: \"{modfied}\" }} }}]"
+                $"{{ text: \"{text}\", href: \"{href}\", attributes: {{ thumbnail: \"{thumbnail}\", thumbnailWidth: {width}, thumbnailHeight: {height}, thumbnailModified: \"{modfied}\", thumbnailCaption: \"{caption}\" }} }}",
+                $"[{{ text: \"{text}\", href: \"{href}\", attributes: {{ thumbnail: \"{thumbnail}\", thumbnailWidth: {width}, thumbnailHeight: {height}, thumbnailModified: \"{modfied}\", thumbnailCaption: \"{caption}\" }} }}]"
             };
 
             foreach (var jsonString in readableJson)
@@ -115,6 +117,7 @@ namespace Geta.Optimizely.GenericLinks.Tests
                 Assert.Equal(modfied, linkData.ThumbnailModified);
                 Assert.Equal(width, linkData.ThumbnailWidth);
                 Assert.Equal(width, linkData.ThumbnailHeight);
+                Assert.Equal(caption, linkData.ThumbnailCaption);
             }
         }
 
@@ -193,6 +196,7 @@ namespace Geta.Optimizely.GenericLinks.Tests
                 ThumbnailModified = new DateTime(2000, 1, 1),
                 ThumbnailWidth = 256,
                 ThumbnailHeight = 256,
+                ThumbnailCaption = "test"
             };
 
             var subject = CreateSystemTextLinkDataConverter<TestThumbnailLinkData>();
@@ -299,11 +303,29 @@ namespace Geta.Optimizely.GenericLinks.Tests
         private static SystemTextLinkDataConverter<TLinkData> CreateSystemTextLinkDataConverter<TLinkData>()
             where TLinkData : LinkData, new()
         {
-            var propertyReflector = new DefaultPropertyReflector();
-            var linkModelConverter = CreateLinkModelConverter();
-            var valueWriters = CreateValueWriters();
+            var serviceCollection = new ServiceCollection();
+            
+            serviceCollection.AddSingleton<IPropertyReflector, DefaultPropertyReflector>();
+            serviceCollection.AddSingleton<ILinkModelConverter>(CreateLinkModelConverter());
+            serviceCollection.AddSingleton<ILinkDataValueWriter, StringValueWriter>();
+            serviceCollection.AddSingleton<ILinkDataValueWriter, ContentReferenceValueWriter>();
+            serviceCollection.AddSingleton<ILinkDataValueWriter, Int32ValueWriter>();
+            serviceCollection.AddSingleton<ILinkDataValueWriter, DoubleValueWriter>();
+            serviceCollection.AddSingleton<ILinkDataValueWriter, DecimalValueWriter>();
+            serviceCollection.AddSingleton<ILinkDataValueWriter, DateTimeValueWriter>();
 
-            return new SystemTextLinkDataConverter<TLinkData>(propertyReflector, linkModelConverter, valueWriters);
+            var serviceProvider = serviceCollection.BuildServiceProvider();
+            var factory = new SystemTextLinkDataJsonConverterFactory(serviceProvider);
+            var options = new JsonSerializerOptions();
+
+            if (!factory.CanConvert(typeof(TLinkData)))
+                throw new ArgumentException("Type parameter TLinkData not compatible with factory");
+
+            var converter = factory.CreateConverter(typeof(TLinkData), options) as SystemTextLinkDataConverter<TLinkData>;
+            if (converter is null)
+                throw new InvalidOperationException("converter cannot be null");
+
+            return converter;
         }
 
         private static DefaultLinkModelConverter CreateLinkModelConverter()
@@ -341,14 +363,6 @@ namespace Geta.Optimizely.GenericLinks.Tests
             yield return new JsonAttributeConverter();
         }
 
-        private static IEnumerable<ILinkDataValueWriter> CreateValueWriters()
-        {
-            yield return new StringValueWriter();
-            yield return new ContentReferenceValueWriter();
-            yield return new Int32ValueWriter();
-            yield return new DoubleValueWriter();
-            yield return new DecimalValueWriter();
-            yield return new DateTimeValueWriter();
-        }
+        
     }
 }
