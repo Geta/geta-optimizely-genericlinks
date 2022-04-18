@@ -47,6 +47,24 @@ namespace Geta.Optimizely.GenericLinks.Tests.Models
                 ?? throw new InvalidOperationException("value cannot be null"));
         }
 
+        [Display(Name = "Thumbnail aspect", Order = 251)]
+        [UIHint(UIHint.Image)]
+        public virtual double? ThumbnailAspect
+        {
+            get => GetAttribute((v) => double.Parse(v, CultureInfo.InvariantCulture));
+            set => SetAttribute(value, (v) => v?.ToString(CultureInfo.InvariantCulture)
+                ?? throw new InvalidOperationException("value cannot be null"));
+        }
+
+        [Display(Name = "Thumbnail tolerance", Order = 252)]
+        [UIHint(UIHint.Image)]
+        public virtual decimal? ThumbnailTolerance
+        {
+            get => GetAttribute((v) => decimal.Parse(v, CultureInfo.InvariantCulture));
+            set => SetAttribute(value, (v) => v?.ToString(CultureInfo.InvariantCulture)
+                ?? throw new InvalidOperationException("value cannot be null"));
+        }
+
         [Display(Name = "Thumbnail caption", Order = 350)]
         public virtual string? ThumbnailCaption
         {

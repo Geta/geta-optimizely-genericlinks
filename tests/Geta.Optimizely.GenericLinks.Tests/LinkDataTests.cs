@@ -205,6 +205,12 @@ namespace Geta.Optimizely.GenericLinks.Tests
             subject = Reset(subject);
             Assert.False(subject.IsModified);
 
+            subject[1] = thirdLink;
+            Assert.True(subject.IsModified);
+
+            subject = Reset(subject);
+            Assert.False(subject.IsModified);
+
             subject[0].Href = thirdLink.Href;
             Assert.True(subject.IsModified);
 

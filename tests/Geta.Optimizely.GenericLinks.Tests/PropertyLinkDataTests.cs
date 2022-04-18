@@ -227,7 +227,43 @@ namespace Geta.Optimizely.GenericLinks.Tests
             Assert.Equal(2, subject.Links.Count);
 
             AssertEqual(firstLink, subject.Links[0]);
-            AssertEqual(secondLink, subject.Links[1]);
+            AssertEqual(secondLink, subject.Links[1]);            
+        }
+
+        [Fact]
+        public void PropertyLinkDataCollection_can_set_Value()
+        {
+            var firstLink = CreateLinkData("1", "http://localhost/1");
+            var secondLink = CreateLinkData("2", "http://localhost/2");
+            var propertyLinkCollection = CreatePropertyLinkDataCollection(firstLink, secondLink);
+            var serializedProperty = propertyLinkCollection.ToBackingValue();
+
+            var subject = CreatePropertyLinkDataCollection();
+
+            subject.Value = serializedProperty;
+
+            var value = subject.Value as LinkDataCollection<TestLinkData>;
+            Assert.NotNull(value);
+
+            if (value is null)
+                throw new InvalidOperationException("value cannot be null");
+
+            Assert.Equal(2, value.Count);
+        }
+
+        [Fact]
+        public void PropertyLinkData_can_set_Value()
+        {
+            var link = CreateLinkData("1", "http://localhost/1");
+            var propertyLink = CreatePropertyLinkData(link);
+            var serializedProperty = propertyLink.ToBackingValue();
+
+            var subject = CreatePropertyLinkData(null);
+
+            subject.Value = serializedProperty;
+
+            var value = subject.Value as TestLinkData;
+            Assert.NotNull(value);
         }
 
         [Fact]

@@ -83,7 +83,9 @@ namespace Geta.Optimizely.GenericLinks.Tests
             var text = "Test 1";
             var href = "http://localhost/1";
             var width = 256;
-            var height = 256;
+            var height = 128;
+            var tolerance = 0.0001m;
+            var aspect = 2.0;
             var caption = "test";
             var thumbnail = new ContentReference(320);
             var modfied = new DateTime(2000, 1, 1);
@@ -93,8 +95,8 @@ namespace Geta.Optimizely.GenericLinks.Tests
             var serializer = Newtonsoft.Json.JsonSerializer.CreateDefault();
             var readableJson = new[]
             {
-                $"{{ text: \"{text}\", href: \"{href}\", attributes: {{ thumbnail: \"{thumbnail}\", thumbnailWidth: {width}, thumbnailHeight: {height}, thumbnailModified: \"{modfied}\", thumbnailCaption: \"{caption}\" }} }}",
-                $"[{{ text: \"{text}\", href: \"{href}\", attributes: {{ thumbnail: \"{thumbnail}\", thumbnailWidth: {width}, thumbnailHeight: {height}, thumbnailModified: \"{modfied}\", thumbnailCaption: \"{caption}\" }} }}]"
+                $"{{ text: \"{text}\", href: \"{href}\", attributes: {{ thumbnail: \"{thumbnail}\", thumbnailWidth: {width}, thumbnailHeight: {height}, thumbnailModified: \"{modfied}\", thumbnailCaption: \"{caption}\", thumbnailAspect:\"{aspect}\", thumbnailTolerance:\"{tolerance}\" }} }}",
+                $"[{{ text: \"{text}\", href: \"{href}\", attributes: {{ thumbnail: \"{thumbnail}\", thumbnailWidth: {width}, thumbnailHeight: {height}, thumbnailModified: \"{modfied}\", thumbnailCaption: \"{caption}\", thumbnailAspect:\"{aspect}\", thumbnailTolerance:\"{tolerance}\" }} }}]"
             };
 
             foreach (var jsonString in readableJson)
@@ -116,8 +118,10 @@ namespace Geta.Optimizely.GenericLinks.Tests
                 Assert.Equal(thumbnail, linkData.Thumbnail);
                 Assert.Equal(modfied, linkData.ThumbnailModified);
                 Assert.Equal(width, linkData.ThumbnailWidth);
-                Assert.Equal(width, linkData.ThumbnailHeight);
+                Assert.Equal(height, linkData.ThumbnailHeight);
                 Assert.Equal(caption, linkData.ThumbnailCaption);
+                Assert.Equal(aspect, linkData.ThumbnailAspect);
+                Assert.Equal(tolerance, linkData.ThumbnailTolerance);
             }
         }
 
