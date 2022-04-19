@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.4]
+
+### Added
+
+- Upper bound on package version constraint for `EPiServer.CMS.UI`.
+
 ## [1.1.3]
 
 ### Changed
