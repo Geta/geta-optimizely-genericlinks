@@ -55,7 +55,6 @@ namespace Geta.Optimizely.GenericLinks
             set => SetAttribute(value);
         }
 
-        [Required]
         [Display(Order = 400)]
         public virtual string? Href
         {

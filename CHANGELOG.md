@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.0]
+
+### Modified
+
+- Removed `[Required]` attribute from `Href` on `LinkData`.
+
 ## [1.1.4]
 
 ### Added
