@@ -9,12 +9,18 @@ namespace Geta.Optimizely.GenericLinks.Tests.Services
     {
         public string ToAbsolute(string virtualPath)
         {
-            return virtualPath;
+            if (!virtualPath.StartsWith("~/"))
+                return virtualPath;
+
+            return virtualPath.Substring(2);
         }
 
-        public string ToAppRelative(string virtualPath)
+        public string ToAppRelative(string absolutePath)
         {
-            return virtualPath;
+            if (absolutePath.StartsWith("~/"))
+                return absolutePath;
+
+            return !absolutePath.StartsWith("/") ? "~/" + absolutePath : "~" + absolutePath;
         }
     }
 }

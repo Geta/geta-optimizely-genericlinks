@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.0]
+
+### Added
+
+- Added extension methods `GetMappedHref`, `ToMappedLink` and `ToPermanentLink` for `LinkData` to further emulate behaviour of `LinkItem`.
+
 ## [1.2.0]
 
 ### Modified

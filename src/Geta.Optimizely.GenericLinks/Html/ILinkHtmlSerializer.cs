@@ -1,9 +1,6 @@
 // Copyright (c) Geta Digital. All rights reserved.
 // Licensed under Apache-2.0. See the LICENSE file in the project root for more information
 
-using Geta.Optimizely.GenericLinks;
-using System;
-
 namespace Geta.Optimizely.GenericLinks.Html
 {
     public interface ILinkHtmlSerializer
@@ -13,5 +10,7 @@ namespace Geta.Optimizely.GenericLinks.Html
 
         string Serialize<TLinkData>(LinkDataCollection<TLinkData>? links, StringMode mode)
             where TLinkData : ILinkData;
+
+        string? CreateLink(string? hrefValue, ILinkData linkData);
     }
 }

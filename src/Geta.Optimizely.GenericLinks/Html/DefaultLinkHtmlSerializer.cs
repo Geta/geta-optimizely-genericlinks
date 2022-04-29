@@ -39,6 +39,32 @@ namespace Geta.Optimizely.GenericLinks.Html
             return SerializeLinks(links, mode);
         }
 
+        public virtual string? CreateLink(string? hrefValue, ILinkData linkData)
+        {
+            if (string.IsNullOrEmpty(hrefValue))
+            {
+                return WebUtility.HtmlEncode(linkData.Text);
+            }
+
+            var stringBuilder = new StringBuilder();
+            stringBuilder.Append("<a");
+            foreach (var attribute in linkData.Attributes)
+            {
+                if (string.IsNullOrEmpty(attribute.Value))
+                    continue;
+
+                var value = attribute.Value;
+
+                if (attribute.Key == "href")
+                    value = hrefValue;
+
+                stringBuilder.Append($" {attribute.Key}=\"{WebUtility.HtmlEncode(value)}\"");
+            }
+
+            stringBuilder.Append($">{WebUtility.HtmlEncode(linkData.Text)}</a>");
+            return stringBuilder.ToString();
+        }
+
         protected virtual string SerializeLinks<TLinkData>(IEnumerable<TLinkData> links, StringMode mode)
             where TLinkData : ILinkData
         {
@@ -79,32 +105,6 @@ namespace Geta.Optimizely.GenericLinks.Html
 
             stringBuilder.Append(CreateLink(href, link));
             stringBuilder.Append("</li>");
-        }
-
-        protected virtual string? CreateLink(string hrefValue, ILinkData linkData)
-        {
-            if (string.IsNullOrEmpty(hrefValue))
-            {
-                return WebUtility.HtmlEncode(linkData.Text);
-            }
-
-            var stringBuilder = new StringBuilder();
-            stringBuilder.Append("<a");
-            foreach (var attribute in linkData.Attributes)
-            {
-                if (string.IsNullOrEmpty(attribute.Value))
-                    continue;
-
-                var value = attribute.Value;
-
-                if (attribute.Key == "href")
-                    value = hrefValue;
-
-                stringBuilder.Append($" {attribute.Key}=\"{WebUtility.HtmlEncode(value)}\"");
-            }
-
-            stringBuilder.Append($">{WebUtility.HtmlEncode(linkData.Text)}</a>");
-            return stringBuilder.ToString();
-        }
+        }        
     }
 }
