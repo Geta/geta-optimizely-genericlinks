@@ -84,6 +84,7 @@ namespace Geta.Optimizely.GenericLinks
             set
             {
                 ThrowIfReadOnly();
+                MarkInitialized();
 
                 if (value is null)
                 {
@@ -150,7 +151,11 @@ namespace Geta.Optimizely.GenericLinks
         }
         protected override string LongString
         {
-            get => _htmlSerializer.Serialize(_linkItemCollection, StringMode.InternalMode);
+            get 
+            {
+                EnsureInitialized();
+                return _htmlSerializer.Serialize(_linkItemCollection, StringMode.InternalMode);
+            }            
             set => base.LongString = value;
         }
 
@@ -249,6 +254,8 @@ namespace Geta.Optimizely.GenericLinks
             {
                 _linkItemCollection = ParseToLinkCollection((string)value);
             }
+
+            MarkInitialized();
         }
 
         public virtual void RemapPermanentLinkReferences(IDictionary<Guid, Guid> idMap)

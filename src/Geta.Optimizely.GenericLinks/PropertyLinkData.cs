@@ -148,7 +148,11 @@ namespace Geta.Optimizely.GenericLinks
         }
         protected override string LongString
         {
-            get => _htmlSerializer.Serialize(_linkItem, StringMode.InternalMode);
+            get
+            {
+                EnsureInitialized();
+                return _htmlSerializer.Serialize(_linkItem, StringMode.InternalMode);
+            }            
             set => base.LongString = value;
         }
 
@@ -242,6 +246,8 @@ namespace Geta.Optimizely.GenericLinks
             {
                 _linkItem = ParseToLink((string)value);
             }
+
+            MarkInitialized();
         }
 
         public virtual void RemapPermanentLinkReferences(IDictionary<Guid, Guid> idMap)

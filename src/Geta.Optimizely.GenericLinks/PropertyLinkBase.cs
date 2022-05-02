@@ -2,6 +2,7 @@
 // Licensed under Apache-2.0. See the LICENSE file in the project root for more information
 
 using EPiServer.Core;
+using EPiServer.Core.Internal;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
@@ -10,12 +11,15 @@ namespace Geta.Optimizely.GenericLinks
 {
     public abstract class PropertyLinkBase : PropertyLongString
     {
+        private bool _initialized;
+
         protected PropertyLinkBase()
         {
         }
 
         protected PropertyLinkBase(string value) : base(value)
         {
+            _initialized = true;   
         }
 
         public override object? SaveData(PropertyDataCollection properties)
@@ -28,6 +32,22 @@ namespace Geta.Optimizely.GenericLinks
         protected abstract string SanitizeValue(string value);
 
         protected abstract string GetPermanentUrl(string href);
+
+        protected virtual void MarkInitialized()
+        {
+            _initialized = true;
+        }
+
+        protected virtual void EnsureInitialized()
+        {
+            if (_initialized)
+                return;
+
+            if (((ILazyProperty)this).HasLazyValue)
+                return;
+
+            ParseToSelf(LongString);
+        }
 
         protected virtual void ParseAttributes(XElement element, ILinkData linkItem)
         {

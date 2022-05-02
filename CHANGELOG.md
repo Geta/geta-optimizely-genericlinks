@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.1]
+
+### Fixed
+
+- Fixed a bug where LongString won't be initialized because of override.
+
 ## [1.3.0]
 
 ### Added
