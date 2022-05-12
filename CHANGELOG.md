@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.1]
+
+### Fixed
+
+- Bug with `[Required]` not working properly for `LinkData` property `Text`.
+- Bug with single editor not registering changes for items created with `...` window.
+- Bug with items without links becoming saved as empty because of bug in `IsNull` evaluation.
+
 ## [1.3.0]
 
 ### Added

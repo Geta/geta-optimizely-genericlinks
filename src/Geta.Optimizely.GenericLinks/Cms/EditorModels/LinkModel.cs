@@ -10,6 +10,7 @@ namespace Geta.Optimizely.GenericLinks.Cms.EditorModels
 {
     public class LinkModel
     {
+        [Required]
         [DisplayName("/episerver/cms/widget/editlink/linkname")]
         public virtual string? Text { get; set; }
 

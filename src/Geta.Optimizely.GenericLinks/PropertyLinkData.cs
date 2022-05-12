@@ -114,7 +114,7 @@ namespace Geta.Optimizely.GenericLinks
         {
             get
             {
-                if (_linkItem is not null && !string.IsNullOrEmpty(_linkItem.Href))
+                if (_linkItem is not null && !string.IsNullOrEmpty(_linkItem.Text))
                     return false;
 
                 return !((ILazyProperty)this).HasLazyValue;
