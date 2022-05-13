@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -71,8 +72,8 @@ namespace Geta.Optimizely.GenericLinks.Tests
             var serializer = Newtonsoft.Json.JsonSerializer.CreateDefault();
             var readableJson = new[]
             {
-                $"{{ text: \"{text}\", href: \"{href}\", attributes: {{ thumbnail: \"{thumbnail}\", thumbnailWidth: {width}, thumbnailHeight: {height}, thumbnailModified: \"{modfied}\", thumbnailCaption: \"{caption}\", thumbnailAspect:\"{aspect}\", thumbnailTolerance:\"{tolerance}\" }} }}",
-                $"[{{ text: \"{text}\", href: \"{href}\", attributes: {{ thumbnail: \"{thumbnail}\", thumbnailWidth: {width}, thumbnailHeight: {height}, thumbnailModified: \"{modfied}\", thumbnailCaption: \"{caption}\", thumbnailAspect:\"{aspect}\", thumbnailTolerance:\"{tolerance}\" }} }}]"
+                $"{{ text: \"{text}\", href: \"{href}\", attributes: {{ thumbnail: \"{thumbnail}\", thumbnailWidth: {width}, thumbnailHeight: {height}, thumbnailModified: \"{modfied}\", thumbnailCaption: \"{caption}\", thumbnailAspect:\"{aspect}\", thumbnailTolerance:\"{tolerance.ToString(CultureInfo.InvariantCulture)}\" }} }}",
+                $"[{{ text: \"{text}\", href: \"{href}\", attributes: {{ thumbnail: \"{thumbnail}\", thumbnailWidth: {width}, thumbnailHeight: {height}, thumbnailModified: \"{modfied}\", thumbnailCaption: \"{caption}\", thumbnailAspect:\"{aspect}\", thumbnailTolerance:\"{tolerance.ToString(CultureInfo.InvariantCulture)}\" }} }}]"
             };
 
             foreach (var jsonString in readableJson)

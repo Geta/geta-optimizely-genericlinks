@@ -343,7 +343,7 @@ namespace Geta.Optimizely.GenericLinks.Tests
 
             Assert.True(subject.IsNull);
 
-            subject.Link = CreateLinkData("1", "");
+            subject.Link = CreateLinkData("", "http://localhost/1");
 
             Assert.True(subject.IsNull);
 
