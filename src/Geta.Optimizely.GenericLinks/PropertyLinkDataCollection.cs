@@ -128,7 +128,15 @@ namespace Geta.Optimizely.GenericLinks
 
         public override object? Value
         {
-            get => _linkItemCollection;
+            get
+            {
+                if (((ILazyProperty)this).HasLazyValue)
+                {
+                    LoadData(base.LongString);
+                }
+                
+                return _linkItemCollection;
+            } 
             set
             {
                 SetPropertyValue(value, delegate
