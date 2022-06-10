@@ -148,10 +148,23 @@ namespace Geta.Optimizely.GenericLinks.Tests
         }
 
         [Fact]
-        public void SystemTextLinkDataConverter_cant_Read()
+        public void SystemTextLinkDataConverter_can_Read()
         {
-            var readableJson = $"{{ \"text\": \"x\", \"href\": \"http://localhost\" }}";
-            var jsonData = Encoding.UTF8.GetBytes(readableJson);
+            var text = "Test 1";
+            var href = "http://localhost/1";
+            var width = 256;
+            var height = 128;
+            var tolerance = 0.0001m;
+            var aspect = 2.0;
+            var caption = "test";
+            var thumbnail = new ContentReference(320);
+            var modfied = new DateTime(2000, 1, 1);
+
+            var readableJson = new[]
+            {
+                $"{{ \"text\": \"{text}\", \"href\": \"{href}\", \"attributes\": {{ \"thumbnail\": \"{thumbnail}\", \"thumbnailWidth\": {width}, \"thumbnailHeight\": {height}, \"thumbnailModified\": \"{modfied}\", \"thumbnailCaption\": \"{caption}\", \"thumbnailAspect\":{aspect}, \"thumbnailTolerance\":\"{tolerance.ToString(CultureInfo.InvariantCulture)}\" }} }}",
+                $"[{{ \"text\": \"{text}\", \"href\": \"{href}\", \"attributes\": {{ \"thumbnail\": \"{thumbnail}\", \"thumbnailWidth\": {width}, \"thumbnailHeight\": {height}, \"thumbnailModified\": \"{modfied}\", \"thumbnailCaption\": \"{caption}\", \"thumbnailAspect\":\"{aspect}\", \"thumbnailTolerance\":\"{tolerance.ToString(CultureInfo.InvariantCulture)}\" }} }}]"
+            };
 
             var subject = CreateSystemTextLinkDataConverter<TestThumbnailLinkData>();
             var options = new JsonSerializerOptions
@@ -159,11 +172,59 @@ namespace Geta.Optimizely.GenericLinks.Tests
                 PropertyNameCaseInsensitive = true,
             };
 
-            Assert.Throws<NotSupportedException>(() => 
+            foreach (var jsonString in readableJson)
             {
+                var jsonData = Encoding.UTF8.GetBytes(jsonString);
                 var reader = new Utf8JsonReader(jsonData);
-                subject.Read(ref reader, typeof(TestThumbnailLinkData), options);
-            });
+
+                reader.Read();
+
+                var linkData = subject.Read(ref reader, typeof(TestThumbnailLinkData), options);
+
+                Assert.NotNull(linkData);
+
+                if (linkData is null)
+                    throw new InvalidOperationException("linkData cannot be null");
+
+                Assert.Equal(text, linkData.Text);
+                Assert.Equal(href, linkData.Href);
+                Assert.Equal(thumbnail, linkData.Thumbnail);
+                Assert.Equal(modfied, linkData.ThumbnailModified);
+                Assert.Equal(width, linkData.ThumbnailWidth);
+                Assert.Equal(height, linkData.ThumbnailHeight);
+                Assert.Equal(caption, linkData.ThumbnailCaption);
+                Assert.Equal(aspect, linkData.ThumbnailAspect);
+                Assert.Equal(tolerance, linkData.ThumbnailTolerance);
+            }
+        }
+
+        [Fact]
+        public void SystemTextLinkDataConverter_can_Read_null()
+        {
+            var unreadableJson = new[]
+            {
+                $"",
+                $"[]"
+            };
+
+            var subject = CreateSystemTextLinkDataConverter<TestThumbnailLinkData>();
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+            };
+
+            foreach (var jsonString in unreadableJson)
+            {
+                var jsonData = Encoding.UTF8.GetBytes(jsonString);
+                var reader = new Utf8JsonReader(jsonData);
+
+                if (jsonString.Length > 0)
+                    reader.Read();
+
+                var linkData = subject.Read(ref reader, typeof(TestThumbnailLinkData), options);
+
+                Assert.Null(linkData);
+            }
         }
 
         [Fact]
