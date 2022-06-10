@@ -2,7 +2,7 @@
 
 ![](<http://tc.geta.no/app/rest/builds/buildType:(id:GetaPackages_Genericlinks_00ci),branch:master/statusIcon>)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Geta_geta-optimizely-genericlinks&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Geta_geta-optimizely-genericlinks)
-[![Platform](https://img.shields.io/badge/Platform-.NET%205-blue.svg?style=flat)](https://docs.microsoft.com/en-us/dotnet/)
+[![Platform](https://img.shields.io/badge/Platform-.NET%206-blue.svg?style=flat)](https://docs.microsoft.com/en-us/dotnet/)
 [![Platform](https://img.shields.io/badge/Optimizely-%2012-orange.svg?style=flat)](http://world.episerver.com/cms/)
 
 ## What is does?
