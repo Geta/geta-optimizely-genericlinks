@@ -6,7 +6,7 @@ define("genericLinks/editors/GenericItemEditor", [
   "dojo/_base/lang",
   "dojo/aspect",
   "dojo/when",
-  "epi-cms/widget/_SelectorBase",
+  "genericLinks/widget/_SelectorBase",
   "epi-cms/contentediting/command/ItemEdit",
   "genericLinks/viewmodel/ItemCollectionViewModel",
   "genericLinks/viewmodel/LinkItemModel",

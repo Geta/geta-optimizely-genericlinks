@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.3]
+
+- Fixed an issue with "Select Content" button added in Episerver.CMS 12.7
+
 ## [1.3.1]
 
 ### Fixed
