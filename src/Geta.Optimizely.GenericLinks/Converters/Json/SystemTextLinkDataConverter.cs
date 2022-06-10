@@ -118,19 +118,6 @@ namespace Geta.Optimizely.GenericLinks.Converters.Json
             }
         }
 
-        protected virtual object GetNumber(JsonElement element)
-        {
-            var text = element.GetRawText();
-            if (text.IndexOf('.') > -1)
-            {
-                return Convert.ToDouble(text);
-            }
-            else
-            {
-                return Convert.ToInt32(text);
-            }
-        }
-
         public override void Write(Utf8JsonWriter writer, TLinkData value, JsonSerializerOptions options)
         {
             var clientModel = _linkModelConverter.ToClientModel(value);

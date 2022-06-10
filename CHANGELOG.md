@@ -2,7 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.4]
+
+### Fixed
+
+- Addressed an issue where `SystemTextLinkDataConverter` was used during block creation by implementing reading.
+
 ## [1.3.3]
+
+### Fixed
 
 - Fixed an issue with "Select Content" button added in Episerver.CMS 12.7
 
