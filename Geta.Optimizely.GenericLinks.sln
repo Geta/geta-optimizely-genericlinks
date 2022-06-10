@@ -21,6 +21,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sandbox", "Sandbox", "{6A19
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AlloyMvcTemplates", "sandbox\Alloy\AlloyMvcTemplates.csproj", "{DB5EA34C-7A62-42B0-9EE0-AA3B52E0AC94}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Geta.Optimizely.GenericLinks.ContentDeliveryApi", "src\Geta.Optimizely.GenericLinks.ContentDeliveryApi\Geta.Optimizely.GenericLinks.ContentDeliveryApi.csproj", "{D4BD5B42-990A-4ABC-9D15-1402AE6B0791}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{DB5EA34C-7A62-42B0-9EE0-AA3B52E0AC94}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DB5EA34C-7A62-42B0-9EE0-AA3B52E0AC94}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DB5EA34C-7A62-42B0-9EE0-AA3B52E0AC94}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D4BD5B42-990A-4ABC-9D15-1402AE6B0791}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D4BD5B42-990A-4ABC-9D15-1402AE6B0791}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D4BD5B42-990A-4ABC-9D15-1402AE6B0791}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D4BD5B42-990A-4ABC-9D15-1402AE6B0791}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

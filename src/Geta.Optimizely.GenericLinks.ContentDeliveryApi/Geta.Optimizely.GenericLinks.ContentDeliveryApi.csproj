@@ -1,49 +1,40 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net5.0;net6.0</TargetFrameworks>
-    <Nullable>enable</Nullable>
+    <TargetFrameworks>net6.0;net5.0</TargetFrameworks>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <CodeAnalysisTreatWarningsAsErrors>true</CodeAnalysisTreatWarningsAsErrors>
-    <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
-    <PackageId>Geta.Optimizely.GenericLinks</PackageId>
-    <Title>Extensible link items for Optimizely</Title>
+    <PackageId>Geta.Optimizely.GenericLinks.ContentDeliveryApi</PackageId>
+    <Title>GenericLink essentials for Optimizely ContentDeliveryApi</Title>
     <Authors>Geta Digital</Authors>
     <Company>Geta Digital</Company>
     <PackageIcon>icon.png</PackageIcon>
     <PackageIconUrl>https://cdn.geta.no/opensource/icons/Geta-logo-3.png</PackageIconUrl>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <Description>Adds an extensible alternative to the LinkItemCollection in Optimizely.</Description>
-    <PackageTags>Geta Optimizely Links LinkItemCollection</PackageTags>
+    <Description>Adds property models and converters for Optimizely ContentDeliveryApi.</Description>
+    <PackageTags>Geta Optimizely Links LinkItemCollection ContentDeliveryApi</PackageTags>
     <RepositoryType>Git</RepositoryType>
     <RepositoryUrl>https://github.com/Geta/geta-optimizely-genericlinks</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net5.0'">
-    <PackageReference Include="EPiServer.CMS.UI" Version="[12.0.3,13.0)" />
+    <PackageReference Include="EPiServer.ContentDeliveryApi.Core" Version="[3.0.0,4.0.0)" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
-    <PackageReference Include="EPiServer.CMS.UI" Version="[12.4.0,13.0)" />
+    <PackageReference Include="EPiServer.ContentDeliveryApi.Core" Version="[3.3.0,4.0.0)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Geta.Optimizely.GenericLinks\Geta.Optimizely.GenericLinks.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
   </PropertyGroup>
-  
-  <ImportGroup>
-    <Import Project="$(SolutionDir)\src\pack.proj" Condition="Exists('$(SolutionDir)\src\pack.proj')" />
-  </ImportGroup>
 
   <ItemGroup>
     <None Include="..\..\resources\icon.png" Pack="true" PackagePath="\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include=".\msbuild\CopyZipFiles.targets">
-      <Pack>true</Pack>
-      <PackagePath>build\$(TargetFramework)\$(MSBuildProjectName).targets</PackagePath>
-    </Content>
   </ItemGroup>
 
   <ItemGroup>
@@ -51,4 +42,5 @@
       <_Parameter1>$(AssemblyName).Tests</_Parameter1>
     </AssemblyAttribute>
   </ItemGroup>
+
 </Project>

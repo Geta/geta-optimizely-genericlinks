@@ -5,10 +5,13 @@ using EPiServer.DataAnnotations;
 using EPiServer.Web;
 using Geta.Optimizely.GenericLinks.Extensions;
 using Geta.Optimizely.GenericLinks.Helpers;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.CompilerServices;
+using SystemTextJsonIgnore = System.Text.Json.Serialization.JsonIgnoreAttribute;
+using NewtonsoftJsonIgnore = Newtonsoft.Json.JsonIgnoreAttribute;
 
 namespace Geta.Optimizely.GenericLinks
 {
@@ -70,6 +73,8 @@ namespace Geta.Optimizely.GenericLinks
         public virtual IDictionary<string, string> Attributes => _attributes;
 
         [Ignore]
+        [SystemTextJsonIgnore]
+        [NewtonsoftJsonIgnore]
         public virtual bool IsModified
         {
             get => _isModified;
@@ -77,6 +82,8 @@ namespace Geta.Optimizely.GenericLinks
 
         [Ignore]
         [ScaffoldColumn(false)]
+        [SystemTextJsonIgnore]
+        [NewtonsoftJsonIgnore]
         public virtual IList<Guid> ReferencedPermanentLinkIds
         {
             get

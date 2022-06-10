@@ -22,6 +22,7 @@ Requires using .NET 5.0 or higher and Optimizely 12
 
 ### Documentation
 
+- [Adding support for EPiServer.ContentDeliveryApi](./docs/content-delivery-api.md)
 - [Advanced property handling](./docs/advanced-property-handling.md)
 - [Adding support for additional property types](./docs/adding-support-for-new-properties.md)
 
