@@ -22,11 +22,13 @@ namespace Geta.Optimizely.GenericLinks
 
         private bool _isModified;
         private string? _text;
+        private object _pessimisticLock;
 
         protected LinkData()
         {
             _attributes = new Dictionary<string, string>(4);
             _attributeKeys = new Dictionary<string, string>(4);
+            _pessimisticLock = new object();
         }
 
         [Required]
@@ -229,10 +231,16 @@ namespace Geta.Optimizely.GenericLinks
             if (_attributeKeys.TryGetValue(key, out var attributeKey))
                 return attributeKey;
 
-            attributeKey = key.ToCamel();
-            _attributeKeys.TryAdd(key, attributeKey);
+            lock (_pessimisticLock)
+            {
+                if (_attributeKeys.ContainsKey(key))
+                    return _attributeKeys[key];
 
-            return attributeKey;
+                attributeKey = key.ToCamel();
+                _attributeKeys.Add(key, attributeKey);
+
+                return attributeKey;
+            }
         }
     }
 }

@@ -9,5 +9,10 @@ namespace Geta.Optimizely.GenericLinks.Tests.Models
         {
             base.SetAttribute(value, key);
         }
+
+        public virtual void CallGetAttributeKey(string key)
+        {
+            base.GetAttributeKey(key);
+        }
     }
 }

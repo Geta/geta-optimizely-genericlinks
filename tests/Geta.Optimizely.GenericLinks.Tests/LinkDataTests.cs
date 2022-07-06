@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using EPiServer.Web;
 using Geta.Optimizely.GenericLinks.Tests.Models;
 using Xunit;
@@ -37,6 +38,25 @@ namespace Geta.Optimizely.GenericLinks.Tests
 
             var hiddenAttribute = subject.Attributes["aria-hidden"];
             Assert.Equal(ariaHidden, hiddenAttribute);
+        }
+
+        [Fact]
+        public async Task LinkData_GetAttributeKey_is_thread_safe()
+        {
+            var key = "TestProperty";
+            var subject = CreateLinkData(string.Empty, string.Empty);
+            var taskCount = 1000;
+            var tasks = new List<Task>(taskCount);
+
+            for (var i = 0; i < taskCount; i++)
+            {
+                var task = Task.Run(() => subject.CallGetAttributeKey(key));
+                tasks.Add(task);
+            }
+            
+            await Task.WhenAll(tasks);
+
+            Assert.All(tasks, x => Assert.True(x.IsCompleted));
         }
 
         [Fact]
