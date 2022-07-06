@@ -19,10 +19,11 @@ namespace Geta.Optimizely.GenericLinks
     {
         private readonly IDictionary<string, string> _attributes;
         private readonly IDictionary<string, string> _attributeKeys;
+        private readonly object _pessimisticLock;
 
         private bool _isModified;
         private string? _text;
-        private object _pessimisticLock;
+        
 
         protected LinkData()
         {
