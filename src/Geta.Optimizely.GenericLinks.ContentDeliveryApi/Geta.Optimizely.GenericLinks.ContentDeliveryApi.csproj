@@ -10,11 +10,14 @@
     <Company>Geta Digital</Company>
     <PackageIcon>icon.png</PackageIcon>
     <PackageIconUrl>https://cdn.geta.no/opensource/icons/Geta-logo-3.png</PackageIconUrl>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageReleaseNotes>https://github.com/Geta/geta-optimizely-genericlinks/blob/master/CHANGELOG.md</PackageReleaseNotes>
+    <PackageProjectUrl>https://github.com/Geta/geta-optimizely-genericlinks</PackageProjectUrl>
     <Description>Adds property models and converters for Optimizely ContentDeliveryApi.</Description>
     <PackageTags>Geta Optimizely Links LinkItemCollection ContentDeliveryApi</PackageTags>
     <RepositoryType>Git</RepositoryType>
-    <RepositoryUrl>https://github.com/Geta/geta-optimizely-genericlinks</RepositoryUrl>
+    <RepositoryUrl>https://github.com/Geta/geta-optimizely-genericlinks.git</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net5.0'">
