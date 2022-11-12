@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.4.3]
+
+### Fixed
+
+- Addressed an issue where content creation screen would be blank if `PropertyLinkData` based property was decorated with `[Required]`.
+
+## [1.4.2]
+
+### Fixed
+
+- Addressed a suspected concurrency issue where `LinkData.GetAttributeKey` probably wasn't thread safe'.
+
 ## [1.4.1]
 
 ### Fixed

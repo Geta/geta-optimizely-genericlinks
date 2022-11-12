@@ -100,6 +100,7 @@ define("genericLinks/editors/GenericItemEditor", [
       }
     },
     _setValueAttr: function (value) {
+      if (!this.model) return;
       if (!value || (value instanceof Array && value.length === 0)) {
         this.model.set("data", []);
         this.updateDisplay(null);
