@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 
 - Issue with `GenericItemEditor` where contents would not be initialized properly if `_setValueAttr` fires before `postCreate` (happens in on-page edit and quick edit).
+- Issue with source control triggering change after every build because of `CopyZipFiles.targets`.
 
 ## [1.4.4]
 
