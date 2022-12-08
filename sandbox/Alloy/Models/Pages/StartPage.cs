@@ -5,7 +5,7 @@ using EPiServer.DataAnnotations;
 using EPiServer.SpecializedProperties;
 using AlloyMvcTemplates.Models.Blocks;
 using Geta.Optimizely.GenericLinks;
-using AlloyMvcTemplates.Infrastructure.Properties;
+using AlloyDependencies;
 
 namespace AlloyMvcTemplates.Models.Pages
 {

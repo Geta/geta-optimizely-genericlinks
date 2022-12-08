@@ -1,7 +1,10 @@
+using AlloyMvcTemplates.Business.Initialization;
 using AlloyMvcTemplates.Extensions;
 using AlloyMvcTemplates.Infrastructure;
 using EPiServer.Cms.UI.AspNetIdentity;
+using EPiServer.ContentApi.Core.DependencyInjection;
 using EPiServer.Data;
+using EPiServer.Framework.Web.Resources;
 using EPiServer.Scheduler;
 using EPiServer.ServiceLocation;
 using EPiServer.Web.Routing;
@@ -45,12 +48,31 @@ namespace AlloyMvcTemplates
                 {
                     o.ConnectionStringOptions.ConnectionString = _configuration.GetConnectionString("EPiServerDB").Replace("App_Data", Path.GetFullPath("App_Data"));
                 });
+
+                services.Configure<ClientResourceOptions>(uiOptions =>
+                {
+                    uiOptions.Debug = true;
+                });
             }
 
-            services.AddCmsAspNetIdentity<ApplicationUser>();
+            services.AddTransient<EnableCatalogRoot>();
+
+            services.AddCmsAspNetIdentity<ApplicationUser>(configureIdentity: configure =>
+            {
+                configure.Password.RequireNonAlphanumeric = false;
+                configure.Password.RequiredLength = 4;
+                configure.Password.RequireUppercase = false;
+                configure.Password.RequireDigit = false;
+            });
             services.AddMvc();
             services.AddAlloy();
-            services.AddCms();
+            services.AddCms()
+                 .AddContentApiCore()
+                 .ConfigureForContentDeliveryClient();
+
+            services.AddCommerce();
+            services.AddContentDeliveryApi();
+            services.AddGenericLinkConverters();
 
             services.AddEmbeddedLocalization<Startup>();
 

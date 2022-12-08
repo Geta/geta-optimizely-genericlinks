@@ -117,10 +117,7 @@ define("genericLinks/viewmodel/ItemCollectionViewModel", [
     },
     updateItemData: function (item) {
       var index = this.getItemIndex(this._selectedItem);
-      if (index < 0) {
-        return;
-      }
-
+        if (index < 0) index = 0;
       var self = this;
       when(self._createItemModel(item), function (model) {
         self._selectedItem = self._data[index] = model;

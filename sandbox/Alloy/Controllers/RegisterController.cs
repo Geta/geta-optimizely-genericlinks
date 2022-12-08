@@ -19,7 +19,6 @@ namespace AlloyMvcTemplates.Controllers
     /// <summary>
     /// Used to register a user for first time
     /// </summary>
-    [RegisterFirstAdminWithLocalRequest]
     public class RegisterController : Controller
     {
         string AdminRoleName = Roles.WebAdmins;

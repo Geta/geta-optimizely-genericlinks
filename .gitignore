@@ -195,3 +195,6 @@ FakesAssemblies/
 
 # Local Configuration
 *.local.json
+
+# Licenses
+**/License.config
