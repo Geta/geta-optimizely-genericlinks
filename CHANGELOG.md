@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.4.5]
+
+### Fixed
+
+- Issue with `GenericItemEditor` where contents would not be initialized properly if `_setValueAttr` fires before `postCreate` (happens in on-page edit and quick edit).
+
 ## [1.4.4]
 
 ### Fixed

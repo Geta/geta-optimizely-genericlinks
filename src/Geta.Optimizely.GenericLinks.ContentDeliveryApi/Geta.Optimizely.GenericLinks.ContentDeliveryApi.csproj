@@ -3,7 +3,6 @@
   <PropertyGroup>
     <TargetFrameworks>net6.0;net5.0</TargetFrameworks>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-    <CodeAnalysisTreatWarningsAsErrors>true</CodeAnalysisTreatWarningsAsErrors>
     <PackageId>Geta.Optimizely.GenericLinks.ContentDeliveryApi</PackageId>
     <Title>GenericLink essentials for Optimizely ContentDeliveryApi</Title>
     <Authors>Geta Digital</Authors>

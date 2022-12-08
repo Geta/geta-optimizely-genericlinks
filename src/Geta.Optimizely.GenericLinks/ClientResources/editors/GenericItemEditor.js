@@ -21,6 +21,7 @@ define("genericLinks/editors/GenericItemEditor", [
   LinkItemModel
 ) {
   return declare([_SelectorBase], {
+    _deferredValue: null,
     postCreate: function () {
       this.inherited(arguments);
       this.set(
@@ -31,6 +32,10 @@ define("genericLinks/editors/GenericItemEditor", [
           canEdit: true,
         })
       );
+      if (this._deferredValue) {
+        this._setValueAttr(this._deferredValue);
+        this._deferredValue = null;
+      }
       if (!this.value) {
         this._updateDisplayNode(null);
       }
@@ -100,7 +105,10 @@ define("genericLinks/editors/GenericItemEditor", [
       }
     },
     _setValueAttr: function (value) {
-      if (!this.model) return;
+      if (!this.model) {
+        this._deferredValue = value;
+        return;
+      };
       if (!value || (value instanceof Array && value.length === 0)) {
         this.model.set("data", []);
         this.updateDisplay(null);
