@@ -48,6 +48,7 @@ namespace Geta.Optimizely.GenericLinks.Initialization
             services.TryAddSingleton<IPropertyReflector, DefaultPropertyReflector>();
             services.TryAddTransient<IAttributeSanitizer, DefaultAttributeSanitizer>();
             services.TryAddTransient<ILinkHtmlSerializer, DefaultLinkHtmlSerializer>();
+            services.TryAddSingleton<INewtonsoftJsonSerializerProvider, DefaultNewtonsoftJsonSerializerProvider>();
 
             TryAddAttributeConverters(services);
             TryAddJsonValueWriters(services);

@@ -13,7 +13,6 @@ using EPiServer.Core;
 using EPiServer.DataAbstraction;
 using EPiServer.Shell;
 using Geta.Optimizely.GenericLinks.Cms.EditorDescriptors;
-using Geta.Optimizely.GenericLinks.Cms.EditorModels;
 using Geta.Optimizely.GenericLinks.Cms.Metadata;
 using Geta.Optimizely.GenericLinks.Converters;
 using Geta.Optimizely.GenericLinks.Converters.Attributes;
@@ -103,21 +102,41 @@ namespace Geta.Optimizely.GenericLinks.Tests
         }
 
         [Fact]
-        public void NewtonsoftLinkDataConverter_cant_Write()
+        public void NewtonsoftLinkDataConverter_can_Write()
         {
             var subject = CreateNewtonsoftLinkDataConverter();
             var serializer = Newtonsoft.Json.JsonSerializer.CreateDefault();
 
-            using var writer = new StringWriter();
+            using var memoryStream = new MemoryStream();
+            using var writer = new StreamWriter(memoryStream);
             using var jsonWriter = new JsonTextWriter(writer);
 
-            var linkModel = new LinkModel
+            var model = new TestThumbnailLinkData
             {
-                Text = "Test",
-                Href = "http://localhost/1"
+                Text = "1",
+                Href = "http://localhost/1",
+                Thumbnail = new ContentReference(1),
+                ThumbnailModified = new DateTime(2000, 1, 1),
+                ThumbnailWidth = 256,
+                ThumbnailHeight = 256,
+                ThumbnailCaption = "test"
             };
 
-            Assert.Throws<NotSupportedException>(() => subject.WriteJson(jsonWriter, linkModel, serializer));
+            subject.WriteJson(jsonWriter, model, serializer);
+
+            jsonWriter.Flush();
+            memoryStream.Flush();
+            memoryStream.Seek(0, SeekOrigin.Begin);
+
+            using var reader = new StreamReader(memoryStream, leaveOpen: true);
+            var json = reader.ReadToEnd();
+
+            Assert.NotNull(json);
+            Assert.Contains(model.Text, json);
+            Assert.Contains(model.Href, json);
+            Assert.Contains(JsonConvert.SerializeObject(model.Thumbnail), json);
+            Assert.Contains(JsonConvert.SerializeObject(model.ThumbnailModified), json);
+            Assert.Contains(JsonConvert.SerializeObject(model.ThumbnailWidth), json);
         }
 
         [Fact]
@@ -337,9 +356,11 @@ namespace Geta.Optimizely.GenericLinks.Tests
 
         private static NewtonsoftLinkDataConverter CreateNewtonsoftLinkDataConverter()
         {
+            var propertyReflector = new DefaultPropertyReflector();
             var linkModelConverter = CreateLinkModelConverter();
+            var serializerProvider = new DefaultNewtonsoftJsonSerializerProvider();
 
-            return new NewtonsoftLinkDataConverter(linkModelConverter);
+            return new NewtonsoftLinkDataConverter(propertyReflector, linkModelConverter, serializerProvider);
         }
 
         private static SystemTextLinkDataConverter<TLinkData> CreateSystemTextLinkDataConverter<TLinkData>()

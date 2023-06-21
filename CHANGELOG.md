@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.5.0]
+
+### Added
+
+- Added support for writing in `NewtonsoftLinkDataConverter` for edge cases where the default serialization handling has been modified.
+
 ## [1.4.5]
 
 ### Fixed
