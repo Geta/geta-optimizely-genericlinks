@@ -5,7 +5,6 @@ using EPiServer.DataAnnotations;
 using EPiServer.Web;
 using Geta.Optimizely.GenericLinks.Extensions;
 using Geta.Optimizely.GenericLinks.Helpers;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -32,9 +31,8 @@ namespace Geta.Optimizely.GenericLinks
             _pessimisticLock = new object();
         }
 
-        [Required]
         [Display(Order = 100)]
-        public virtual string? Text 
+        public virtual string? Text
         {
             get => _text;
             set
@@ -176,10 +174,9 @@ namespace Geta.Optimizely.GenericLinks
             if (key is null)
                 return default;
 
-            if (!Attributes.TryGetValue(GetAttributeKey(key), out var value))
-                return default;
+            Attributes.TryGetValue(GetAttributeKey(key), out var value);
 
-            return conversion(value);
+            return conversion(value ?? string.Empty);
         }
 
         protected virtual void SetAttribute(string? value, [CallerMemberName] string? key = null)

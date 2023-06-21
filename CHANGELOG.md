@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.6.0]
+
+### Removed
+
+- Removed `[Required]` on `LinkData.Text` property. Node will display as `{unnamed}` in editor if `Text` is omitted.
+
 ## [1.5.0]
 
 ### Added

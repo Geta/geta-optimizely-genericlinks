@@ -108,7 +108,7 @@ define("genericLinks/editors/GenericItemEditor", [
       if (!this.model) {
         this._deferredValue = value;
         return;
-      };
+      }
       if (!value || (value instanceof Array && value.length === 0)) {
         this.model.set("data", []);
         this.updateDisplay(null);
@@ -145,14 +145,12 @@ define("genericLinks/editors/GenericItemEditor", [
     },
 
     _setSelectedContentNameAttr: function (value) {
-      if (value) {
-        this.selectedContentNameNode.innerHTML =
-          "<span class='dijitInline dijitIcon epi-iconLink epi-objectIcon'></span>&nbsp;" +
-          value;
-        this._updateDisplayNodeTitle();
-      } else {
-        this.inherited(arguments);
-      }
+      const name = value || "{unnamed}";
+
+      this.selectedContentNameNode.innerHTML =
+        "<span class='dijitInline dijitIcon epi-iconLink epi-objectIcon'></span>&nbsp;" +
+        name;
+      this._updateDisplayNodeTitle();
     },
   });
 });
