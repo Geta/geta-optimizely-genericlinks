@@ -3,18 +3,26 @@
 
 define("genericLinks/editors/GenericCollectionEditor", [
   "dojo/_base/declare",
+  "epi/dependency",
   "epi-cms/dgrid/formatters",
   "epi/shell/TypeDescriptorManager",
   "epi-cms/contentediting/editors/ItemCollectionEditor",
   "genericLinks/viewmodel/ItemCollectionViewModel",
 ], function (
   declare,
+  dependency,
   formatters,
   TypeDescriptorManager,
   ItemCollectionEditor,
   ItemCollectionViewModel
 ) {
   return declare([ItemCollectionEditor], {
+    constructor: function () {
+      const repositoryDescriptors = dependency.resolve(
+        "epi.cms.contentRepositoryDescriptors"
+      );
+      this.roots = repositoryDescriptors.pages.roots;
+    },
     postCreate: function () {
       this.set(
         "model",
