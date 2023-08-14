@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.6.1]
+
+### Fixed
+
+- Issue with auto save on cancel (introduced in CMS ~12.19) (#17).
+- Issue with comparison view when an external link is defined (#18).
+- Issue with select content modal (introduced in CMS ~12.19) (#19).
+
 ## [1.6.0]
 
 ### Removed
