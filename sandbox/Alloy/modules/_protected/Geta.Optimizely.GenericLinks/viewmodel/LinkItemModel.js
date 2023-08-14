@@ -77,18 +77,18 @@ define("genericLinks/viewmodel/LinkItemModel", [
       this.href = this.permanentUrl = value;
     },
 
-      _onTryUpdateItemModel: function () {
-          if (!this.typeIdentifier) {
-              return when(
-                  PermanentLinkHelper.getContent(this.href),
-                  lang.hitch(this, function (content) {
-                      if (content) {
-                          this._parseFromContent(content);
-                      }
-                  })
-              );
-          }
-      },
+    _onTryUpdateItemModel: function () {
+      if (!this.typeIdentifier) {
+        return when(
+          PermanentLinkHelper.getContent(this.href),
+          lang.hitch(this, function (content) {
+            if (content) {
+              this._parseFromContent(content);
+            }
+          })
+        );
+      }
+    },
 
     _parseFromContent: function (content) {
       if (content) {

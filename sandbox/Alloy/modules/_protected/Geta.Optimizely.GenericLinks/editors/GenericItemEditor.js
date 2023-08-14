@@ -67,12 +67,16 @@ define("genericLinks/editors/GenericItemEditor", [
           "onDialogHideComplete",
           function () {
             this.set("isShowingChildDialog", false);
+
+            // Fix for quirk in CMS 12.19 where closing the dialog triggers autosave.
+            // This stops the value from being null at the incorrect moment.
+            this.value = this.getValue();
           }.bind(this)
         ),
         this.model.on(
           "changed",
           lang.hitch(this, function () {
-            const value = this.model.get("value") || [];
+            const value = this.getValue();
             this.updateDisplay(value);
             this.onChange((this.value = value));
           })
@@ -133,6 +137,10 @@ define("genericLinks/editors/GenericItemEditor", [
       this._editItemCommand.set("canExecute", true);
       this._editItemCommand.set("value", this.model.get("selectedItem"));
       this._editItemCommand.execute();
+    },
+
+    getValue: function () {
+      return this.model.get("value") || this.getEmptyValue();
     },
 
     getEmptyValue: function () {
