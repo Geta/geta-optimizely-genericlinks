@@ -119,6 +119,8 @@ namespace Geta.Optimizely.GenericLinks.Tests
                 ThumbnailModified = new DateTime(2000, 1, 1),
                 ThumbnailWidth = 256,
                 ThumbnailHeight = 256,
+                ThumbnailAspect = 1,
+                ThumbnailTolerance = 1,
                 ThumbnailCaption = "test"
             };
 
@@ -257,6 +259,8 @@ namespace Geta.Optimizely.GenericLinks.Tests
                 ThumbnailModified = new DateTime(2000, 1, 1),
                 ThumbnailWidth = 256,
                 ThumbnailHeight = 256,
+                ThumbnailAspect = 1,
+                ThumbnailTolerance = 1,
                 ThumbnailCaption = "test"
             };
 
