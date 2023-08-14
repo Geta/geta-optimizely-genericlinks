@@ -234,7 +234,7 @@ define("genericLinks/viewmodel/ItemCollectionViewModel", [
     },
 
     _valueGetter: function () {
-      return this._data.map(function (item) {
+      return this._dataGetter().map(function (item) {
         return item.serialize();
       }, this);
     },
