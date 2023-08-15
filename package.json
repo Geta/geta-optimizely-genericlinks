@@ -2,15 +2,13 @@
   "name": "geta-optimizely-generic-link-items",
   "version": "1.0.0",
   "description": "Plugin for Optimizely",
-  "license": "UNLICENSED",
-  "scripts": {
-    "lint": "eslint . --plugin=@episerver/cms --format=@episerver/eslint-formatter-cms"
+  "repository": {
+    "url": "git@github.com:Geta/geta-optimizely-genericlinks.git",
+    "type": "git"
   },
-  "devDependencies": {
-    "@episerver/eslint-formatter-cms": "^1.0.0",
-    "@episerver/eslint-plugin-cms": "^2.1.1",
-    "eslint": "^4.0.0",
-    "eslint-cli": "^1.1.1",
-    "eslint-config-defaults": "^9.0.0"
-  }
+  "bugs": {
+    "url": "https://github.com/Geta/geta-optimizely-genericlinks/issues"
+  },
+  "license": "UNLICENSED",
+  "scripts": {}
 }
