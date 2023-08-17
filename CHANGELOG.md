@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.6.2]
+
+### Fixed
+
+- Issue with change tracking and delete button (#20).
+
 ## [1.6.1]
 
 ### Fixed
