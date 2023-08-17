@@ -121,6 +121,7 @@ define("genericLinks/editors/GenericItemEditor", [
       if (value && !(value instanceof Array)) {
         value = [value];
       }
+      this.value = value;
       this.model.set("data", value);
       this.updateDisplay(value);
     },
