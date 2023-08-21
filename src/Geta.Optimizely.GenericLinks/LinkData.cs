@@ -176,7 +176,10 @@ namespace Geta.Optimizely.GenericLinks
 
             Attributes.TryGetValue(GetAttributeKey(key), out var value);
 
-            return conversion(value ?? string.Empty);
+            if (string.IsNullOrEmpty(value))
+                return default;
+
+            return conversion(value);
         }
 
         protected virtual void SetAttribute(string? value, [CallerMemberName] string? key = null)
