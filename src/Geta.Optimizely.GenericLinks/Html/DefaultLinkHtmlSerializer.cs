@@ -41,11 +41,6 @@ namespace Geta.Optimizely.GenericLinks.Html
 
         public virtual string? CreateLink(string? hrefValue, ILinkData linkData)
         {
-            if (string.IsNullOrEmpty(hrefValue))
-            {
-                return WebUtility.HtmlEncode(linkData.Text);
-            }
-
             var stringBuilder = new StringBuilder();
             stringBuilder.Append("<a");
             foreach (var attribute in linkData.Attributes)

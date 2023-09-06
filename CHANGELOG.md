@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.0]
+
+### Added
+
+- Import/Export functionality (#22).
+
+### Fixed
+
+- Potential issue in `DefaultLinkHtmlSerializer` where data would be lost if no link url was present.
+
+## [1.7.0]
+
+### Added
+
+- Default value handling for `LinkData` properties (#21).
+
 ## [1.6.2]
 
 ### Fixed

@@ -50,3 +50,15 @@ public virtual LinkDataCollection<ThumbnailLinkData> Thumbnails { get; set; }
 ```
 
 ![Property looks like this](./images/thumbnal-links.png)
+
+## Register type for import/export
+
+In Startup.cs
+
+```
+public void ConfigureServices(IServiceCollection services)
+{
+    ...
+    services.AddLinkDataExportTransform<ThumbnailLinkData>();
+}
+```
