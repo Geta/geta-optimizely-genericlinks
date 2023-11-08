@@ -155,6 +155,10 @@ define("genericLinks/viewmodel/ItemCollectionViewModel", [
       return index;
     },
 
+    hasReachedItemsLimit: function () {
+      return false;
+    },
+
     _init: function (data) {
       var self = this,
         itemDfds;

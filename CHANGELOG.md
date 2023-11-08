@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.1]
+
+### Fixed
+
+- Issue with breaking change in `Optimizely.CMS.UI 12.24.0` (#25).
+
 ## [1.8.0]
 
 ### Added
