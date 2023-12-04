@@ -10,6 +10,9 @@ using System.Collections.Generic;
 using Geta.Optimizely.GenericLinks.Cms.Registration;
 using Geta.Optimizely.GenericLinks.Tests.Services;
 using Xunit;
+using System.Threading.Tasks;
+using EPiServer.Data.Dynamic;
+using System.Linq;
 
 namespace Geta.Optimizely.GenericLinks.Tests
 {
@@ -37,6 +40,33 @@ namespace Geta.Optimizely.GenericLinks.Tests
 
             resolvedType = subject.Resolve(typeof(TestLinkData));
             Assert.Equal(singlePropertyType, resolvedType);
+        }
+
+        [Fact]
+        public async Task LinkDataBackingTypeResolverInterceptor_can_be_called_in_parallel()
+        {
+            var collectionPropertyType = typeof(PropertyTestCollection);
+            var definitions = new List<PropertyDefinitionType>
+            {
+                collectionPropertyType.ToDefinition(1001, PropertyDataType.LinkCollection)
+            };
+
+            var definitionRepository = new InMemoryPropertyDefinitionTypeRepository(definitions);
+            var backingResolver = new NullBackingTypeResolver();
+            var subject = new LinkDataBackingTypeResolverInterceptor(backingResolver, definitionRepository);
+            var tasks = new List<Task<Type>>();
+
+            for (var i = 0; i < 5; i++)
+            {
+                var task = Task.Factory.StartNew(() => subject.Resolve(typeof(LinkDataCollection<TestLinkData>)));
+                tasks.Add(task);
+            }
+
+            await Assert.AllAsync(tasks, async task =>
+            {
+                var type = await task;
+                Assert.Equal(collectionPropertyType, type);
+            });
         }
     }
 }

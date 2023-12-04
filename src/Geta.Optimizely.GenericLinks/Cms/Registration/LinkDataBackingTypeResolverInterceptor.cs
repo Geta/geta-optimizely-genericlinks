@@ -12,7 +12,7 @@ namespace Geta.Optimizely.GenericLinks.Cms.Registration
     {
         private readonly IBackingTypeResolver _interceptedResolver;
         private readonly IPropertyDefinitionTypeRepository _propertyDefinitionRepository;
-        private readonly IDictionary<Type, Type> _resolvedTypes;
+        private readonly Dictionary<Type, Type> _resolvedTypes;
         private readonly Type _baseType;
         private readonly Type _collectionBaseType;
         private readonly Type _propertyBaseType;
@@ -64,7 +64,7 @@ namespace Geta.Optimizely.GenericLinks.Cms.Registration
                 if (!propertyType.IsAssignableFrom(definitionType))
                     continue;
 
-                _resolvedTypes.Add(type, definitionType);
+                _resolvedTypes.TryAdd(type, definitionType);
 
                 return definitionType;
             }
