@@ -7,12 +7,10 @@ using Geta.Optimizely.GenericLinks.Tests.Extensions;
 using Geta.Optimizely.GenericLinks.Tests.Models;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Geta.Optimizely.GenericLinks.Cms.Registration;
 using Geta.Optimizely.GenericLinks.Tests.Services;
 using Xunit;
-using System.Threading.Tasks;
-using EPiServer.Data.Dynamic;
-using System.Linq;
 
 namespace Geta.Optimizely.GenericLinks.Tests
 {
