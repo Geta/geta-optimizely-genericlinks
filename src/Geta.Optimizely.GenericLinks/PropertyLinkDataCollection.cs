@@ -134,9 +134,9 @@ namespace Geta.Optimizely.GenericLinks
                 {
                     LoadData(base.LongString);
                 }
-                
+
                 return _linkItemCollection;
-            } 
+            }
             set
             {
                 SetPropertyValue(value, delegate
@@ -144,7 +144,7 @@ namespace Geta.Optimizely.GenericLinks
                     var collection = value as LinkDataCollection<TLinkData>;
                     if (collection is not null || value is null)
                     {
-                        _linkItemCollection = collection;
+                        Links = collection;
                     }
                     else
                     {

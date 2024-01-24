@@ -135,7 +135,7 @@ namespace Geta.Optimizely.GenericLinks
 
                 return _linkItem;
             }
-            
+
             set
             {
                 SetPropertyValue(value, delegate
@@ -143,7 +143,7 @@ namespace Geta.Optimizely.GenericLinks
                     var linkData = value as TLinkData;
                     if (linkData is not null || value is null)
                     {
-                        _linkItem = linkData;
+                        Link = linkData;
                     }
                     else
                     {
@@ -209,7 +209,7 @@ namespace Geta.Optimizely.GenericLinks
             if (!IsReadOnly)
                 _linkItem?.SetModified(false);
 
-            base.MakeReadOnly();            
+            base.MakeReadOnly();
         }
 
         public override PropertyData Copy()
