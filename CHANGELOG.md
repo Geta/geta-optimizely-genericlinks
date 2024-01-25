@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.3]
+
+### Fixed
+
+- Fixed an issue with data not being copied correctly due to issues with implementation of `Value` properties in `PropertyLinkData` and `PropertyLinkDataCollection` (#27).
+
+## [1.8.2]
+
+### Fixed
+
+- Fixed an exception in `LinkDataBackingTypeResolverInterceptor` (#26).
+
 ## [1.8.1]
 
 ### Fixed
