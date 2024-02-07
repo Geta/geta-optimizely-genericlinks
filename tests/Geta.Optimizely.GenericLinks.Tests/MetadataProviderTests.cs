@@ -13,133 +13,132 @@ using Geta.Optimizely.GenericLinks.Cms.EditorModels;
 using Geta.Optimizely.GenericLinks.Tests.Services;
 using Xunit;
 
-namespace Geta.Optimizely.GenericLinks.Tests
+namespace Geta.Optimizely.GenericLinks.Tests;
+
+public class MetadataProviderTests
 {
-    public class MetadataProviderTests
+    [Fact]
+    public void LinkModelMetadataProvider_returns_Metadata()
     {
-        [Fact]
-        public void LinkModelMetadataProvider_returns_Metadata()
+        var subject = CreateLinkModelMetadataProvider();
+
+        var metadata = subject.CreateMetadata(Enumerable.Empty<Attribute>(), typeof(TestPage), null, typeof(TestLinkData), string.Empty);
+
+        Assert.NotNull(metadata);
+    }
+
+    [Fact]
+    public void LinkModelMetadataProvider_returns_Metadata_for_Properties()
+    {
+        var subject = CreateLinkModelMetadataProvider();
+        var testInstance = new LinkModel<TestThumbnailLinkData>();
+
+        var metadata = subject.GetMetadataForProperties(testInstance, testInstance.GetType());
+
+        Assert.NotNull(metadata);
+        Assert.True(metadata.Count() > 7);
+    }
+
+    [Fact]
+    public void LinkModelMetadataProvider_sorts_Metadata_for_Properties()
+    {
+        var subject = CreateLinkModelMetadataProvider();
+        var testInstance = new LinkModel<TestThumbnailLinkData>();
+
+        var metadata = subject.GetMetadataForProperties(testInstance, testInstance.GetType());
+
+        Assert.NotNull(metadata);
+
+        var metaArray = metadata.ToArray();
+
+        for (var i = 1; i < metaArray.Length; i++)
         {
-            var subject = CreateLinkModelMetadataProvider();
+            var first = metaArray[i - 1];
+            var second = metaArray[i];
 
-            var metadata = subject.CreateMetadata(Enumerable.Empty<Attribute>(), typeof(TestPage), null, typeof(TestLinkData), string.Empty);
-
-            Assert.NotNull(metadata);
+            Assert.True(first.Order <= second.Order);
         }
+    }
 
-        [Fact]
-        public void LinkModelMetadataProvider_returns_Metadata_for_Properties()
-        {
-            var subject = CreateLinkModelMetadataProvider();
-            var testInstance = new LinkModel<TestThumbnailLinkData>();
+    [Fact]
+    public void LinkModelMetadataExtender_extends_single()
+    {
+        var provider = CreateExtensibleModelMetadataProvider();
+        var attributes = Enumerable.Empty<Attribute>();
+        var testType = typeof(TestLinkData);
 
-            var metadata = subject.GetMetadataForProperties(testInstance, testInstance.GetType());
+        var metadata = provider.GetExtendedMetadataForType(testType, () => null);
+        var subject = CreateLinkDataMetadataExtender(testType, true);
+        
+        subject.ModifyMetadata(metadata, attributes);
 
-            Assert.NotNull(metadata);
-            Assert.True(metadata.Count() > 7);
-        }
+        Assert.NotNull(metadata);
+        Assert.NotNull(metadata.ClientEditingClass);
+        Assert.StartsWith("genericLinks", metadata.ClientEditingClass);
+        Assert.EndsWith("GenericItemEditor", metadata.ClientEditingClass);
 
-        [Fact]
-        public void LinkModelMetadataProvider_sorts_Metadata_for_Properties()
-        {
-            var subject = CreateLinkModelMetadataProvider();
-            var testInstance = new LinkModel<TestThumbnailLinkData>();
+        Assert.NotNull(metadata.OverlayConfiguration);
+        Assert.NotNull(metadata.EditorConfiguration);
+    }
 
-            var metadata = subject.GetMetadataForProperties(testInstance, testInstance.GetType());
+    [Fact]
+    public void LinkModelMetadataExtender_extends_collection()
+    {
+        var provider = CreateExtensibleModelMetadataProvider();
+        var attributes = Enumerable.Empty<Attribute>();
+        var testType = typeof(TestLinkData);
 
-            Assert.NotNull(metadata);
+        var metadata = provider.GetExtendedMetadataForType(testType, () => null);
+        var subject = CreateLinkDataMetadataExtender(testType, false);
 
-            var metaArray = metadata.ToArray();
+        subject.ModifyMetadata(metadata, attributes);
 
-            for (var i = 1; i < metaArray.Length; i++)
-            {
-                var first = metaArray[i - 1];
-                var second = metaArray[i];
+        Assert.NotNull(metadata);
+        Assert.NotNull(metadata.ClientEditingClass);
+        Assert.StartsWith("genericLinks", metadata.ClientEditingClass);
+        Assert.EndsWith("GenericCollectionEditor", metadata.ClientEditingClass);
 
-                Assert.True(first.Order <= second.Order);
-            }
-        }
+        Assert.NotNull(metadata.OverlayConfiguration);
+        Assert.NotNull(metadata.EditorConfiguration);
+    }
 
-        [Fact]
-        public void LinkModelMetadataExtender_extends_single()
-        {
-            var provider = CreateExtensibleModelMetadataProvider();
-            var attributes = Enumerable.Empty<Attribute>();
-            var testType = typeof(TestLinkData);
+    private static LinkDataMetadataExtender CreateLinkDataMetadataExtender(Type extenderType, bool singleItem)
+    {
+        var descriptors = Enumerable.Empty<IContentRepositoryDescriptor>();
+        return new LinkDataMetadataExtender(extenderType, singleItem, descriptors);
+    }
 
-            var metadata = provider.GetExtendedMetadataForType(testType, () => null);
-            var subject = CreateLinkDataMetadataExtender(testType, true);
-            
-            subject.ModifyMetadata(metadata, attributes);
+    private static DefaultLinkModelMetadataProvider CreateLinkModelMetadataProvider()
+    {
+        var localizationService = LocalizationService.Current;
+        var metadataHandlerRegistry = CreateMetadataHandlerRegistry();
+        var compositeDetailsProvider = new NullCompositeMetadataDetailsProvider();
+        var propertyReflector = new DefaultPropertyReflector();
+        var validationAttributeAdapter = new FakeValidationAttributeAdapterProvider();
+        var metadataProvider = new FakeModelMetadataProvider(compositeDetailsProvider, propertyReflector);
+        var extensibleMetaProvider = new ExtensibleMetadataProvider(metadataHandlerRegistry, localizationService, metadataProvider, validationAttributeAdapter);
 
-            Assert.NotNull(metadata);
-            Assert.NotNull(metadata.ClientEditingClass);
-            Assert.StartsWith("genericLinks", metadata.ClientEditingClass);
-            Assert.EndsWith("GenericItemEditor", metadata.ClientEditingClass);
+        return new DefaultLinkModelMetadataProvider(extensibleMetaProvider, localizationService, metadataHandlerRegistry, compositeDetailsProvider, validationAttributeAdapter, propertyReflector);
+    }
 
-            Assert.NotNull(metadata.OverlayConfiguration);
-            Assert.NotNull(metadata.EditorConfiguration);
-        }
+    private static ExtensibleMetadataProvider CreateExtensibleModelMetadataProvider()
+    {
+        var localizationService = LocalizationService.Current;
+        var metadataHandlerRegistry = CreateMetadataHandlerRegistry();
+        var compositeDetailsProvider = new NullCompositeMetadataDetailsProvider();
+        var propertyReflector = new DefaultPropertyReflector();
+        var validationAttributeAdapter = new FakeValidationAttributeAdapterProvider();
+        var metadataProvider = new FakeModelMetadataProvider(compositeDetailsProvider, propertyReflector);
+        return new ExtensibleMetadataProvider(metadataHandlerRegistry, localizationService, metadataProvider, validationAttributeAdapter);
+    }
 
-        [Fact]
-        public void LinkModelMetadataExtender_extends_collection()
-        {
-            var provider = CreateExtensibleModelMetadataProvider();
-            var attributes = Enumerable.Empty<Attribute>();
-            var testType = typeof(TestLinkData);
+    private static MetadataHandlerRegistry CreateMetadataHandlerRegistry()
+    {
+        var editorDescriptors = Enumerable.Empty<EditorDescriptor>();
+        var modelAccessorCreators = Enumerable.Empty<IModelAccessorCreator>();
+        var editorDefinitionRepository = new NullEditorDefinitionRepository();
+        var metadataHandlerRegistry = new MetadataHandlerRegistry(editorDescriptors, modelAccessorCreators, editorDefinitionRepository);
 
-            var metadata = provider.GetExtendedMetadataForType(testType, () => null);
-            var subject = CreateLinkDataMetadataExtender(testType, false);
-
-            subject.ModifyMetadata(metadata, attributes);
-
-            Assert.NotNull(metadata);
-            Assert.NotNull(metadata.ClientEditingClass);
-            Assert.StartsWith("genericLinks", metadata.ClientEditingClass);
-            Assert.EndsWith("GenericCollectionEditor", metadata.ClientEditingClass);
-
-            Assert.NotNull(metadata.OverlayConfiguration);
-            Assert.NotNull(metadata.EditorConfiguration);
-        }
-
-        private static LinkDataMetadataExtender CreateLinkDataMetadataExtender(Type extenderType, bool singleItem)
-        {
-            var descriptors = Enumerable.Empty<IContentRepositoryDescriptor>();
-            return new LinkDataMetadataExtender(extenderType, singleItem, descriptors);
-        }
-
-        private static DefaultLinkModelMetadataProvider CreateLinkModelMetadataProvider()
-        {
-            var localizationService = LocalizationService.Current;
-            var metadataHandlerRegistry = CreateMetadataHandlerRegistry();
-            var compositeDetailsProvider = new NullCompositeMetadataDetailsProvider();
-            var propertyReflector = new DefaultPropertyReflector();
-            var validationAttributeAdapter = new FakeValidationAttributeAdapterProvider();
-            var metadataProvider = new FakeModelMetadataProvider(compositeDetailsProvider, propertyReflector);
-            var extensibleMetaProvider = new ExtensibleMetadataProvider(metadataHandlerRegistry, localizationService, metadataProvider, validationAttributeAdapter);
-
-            return new DefaultLinkModelMetadataProvider(extensibleMetaProvider, localizationService, metadataHandlerRegistry, compositeDetailsProvider, validationAttributeAdapter, propertyReflector);
-        }
-
-        private static ExtensibleMetadataProvider CreateExtensibleModelMetadataProvider()
-        {
-            var localizationService = LocalizationService.Current;
-            var metadataHandlerRegistry = CreateMetadataHandlerRegistry();
-            var compositeDetailsProvider = new NullCompositeMetadataDetailsProvider();
-            var propertyReflector = new DefaultPropertyReflector();
-            var validationAttributeAdapter = new FakeValidationAttributeAdapterProvider();
-            var metadataProvider = new FakeModelMetadataProvider(compositeDetailsProvider, propertyReflector);
-            return new ExtensibleMetadataProvider(metadataHandlerRegistry, localizationService, metadataProvider, validationAttributeAdapter);
-        }
-
-        private static MetadataHandlerRegistry CreateMetadataHandlerRegistry()
-        {
-            var editorDescriptors = Enumerable.Empty<EditorDescriptor>();
-            var modelAccessorCreators = Enumerable.Empty<IModelAccessorCreator>();
-            var editorDefinitionRepository = new NullEditorDefinitionRepository();
-            var metadataHandlerRegistry = new MetadataHandlerRegistry(editorDescriptors, modelAccessorCreators, editorDefinitionRepository);
-
-            return metadataHandlerRegistry;
-        }
+        return metadataHandlerRegistry;
     }
 }

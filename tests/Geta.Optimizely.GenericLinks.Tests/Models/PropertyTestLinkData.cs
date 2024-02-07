@@ -4,43 +4,42 @@
 using EPiServer.Web.Routing;
 using Geta.Optimizely.GenericLinks.Html;
 
-namespace Geta.Optimizely.GenericLinks.Tests.Models
+namespace Geta.Optimizely.GenericLinks.Tests.Models;
+
+public class PropertyTestLinkData : PropertyLinkData<TestLinkData>
 {
-    public class PropertyTestLinkData : PropertyLinkData<TestLinkData>
+    public PropertyTestLinkData() : base()
     {
-        public PropertyTestLinkData() : base()
-        {
-        }
+    }
 
-        public PropertyTestLinkData(TestLinkData linkItem) : base(linkItem)
-        {
-        }
+    public PropertyTestLinkData(TestLinkData linkItem) : base(linkItem)
+    {
+    }
 
-        public PropertyTestLinkData(
-            IUrlResolver urlResolver,
-            IAttributeSanitizer attributeSanitizer,
-            ILinkHtmlSerializer htmlSerializer)
-            : base(urlResolver, attributeSanitizer, htmlSerializer)
-        {
-        }
+    public PropertyTestLinkData(
+        IUrlResolver urlResolver,
+        IAttributeSanitizer attributeSanitizer,
+        ILinkHtmlSerializer htmlSerializer)
+        : base(urlResolver, attributeSanitizer, htmlSerializer)
+    {
+    }
 
-        public PropertyTestLinkData(
-            TestLinkData linkItem,
-            IUrlResolver urlResolver,
-            IAttributeSanitizer attributeSanitizer,
-            ILinkHtmlSerializer htmlSerializer)
-            : base(linkItem, urlResolver, attributeSanitizer, htmlSerializer)
-        {
-        }
+    public PropertyTestLinkData(
+        TestLinkData linkItem,
+        IUrlResolver urlResolver,
+        IAttributeSanitizer attributeSanitizer,
+        ILinkHtmlSerializer htmlSerializer)
+        : base(linkItem, urlResolver, attributeSanitizer, htmlSerializer)
+    {
+    }
 
-        public string GetBackingProperty()
-        {
-            return LongString;
-        }
+    public string GetBackingProperty()
+    {
+        return LongString;
+    }
 
-        public string? ToBackingValue()
-        {
-            return ToLongString();
-        }
+    public string? ToBackingValue()
+    {
+        return ToLongString();
     }
 }

@@ -8,49 +8,48 @@ using EPiServer.Core.Transfer.Internal;
 using System.Linq;
 using Geta.Optimizely.GenericLinks.Html;
 
-namespace Geta.Optimizely.GenericLinks.Transfer
+namespace Geta.Optimizely.GenericLinks.Transfer;
+
+public sealed class PropertyLinkDataCollectionTransform<TLinkData> : PropertyTransform<PropertyLinkDataCollection<TLinkData>>
+    where TLinkData : ILinkData, new()
 {
-    public sealed class PropertyLinkDataCollectionTransform<TLinkData> : PropertyTransform<PropertyLinkDataCollection<TLinkData>>
-        where TLinkData : ILinkData, new()
+    private readonly IContentLoader _contentLoader;
+    private readonly ILinkHtmlSerializer _linkHtmlSerializer;
+    private readonly IImplicitContentExporter _implicitContentExporter;
+
+    public PropertyLinkDataCollectionTransform(
+        IImplicitContentExporter implicitContentExporter,
+        ILinkHtmlSerializer linkHtmlSerializer,
+        IContentLoader contentLoader)
     {
-        private readonly IContentLoader _contentLoader;
-        private readonly ILinkHtmlSerializer _linkHtmlSerializer;
-        private readonly IImplicitContentExporter _implicitContentExporter;
+        _implicitContentExporter = implicitContentExporter;
+        _linkHtmlSerializer = linkHtmlSerializer;
+        _contentLoader = contentLoader;
+    }
 
-        public PropertyLinkDataCollectionTransform(
-            IImplicitContentExporter implicitContentExporter,
-            ILinkHtmlSerializer linkHtmlSerializer,
-            IContentLoader contentLoader)
+    protected override bool TransformForExport(
+      PropertyLinkDataCollection<TLinkData> source,
+      RawProperty output,
+      PropertyExportContext context)
+    {
+        if (source.Value is null)
         {
-            _implicitContentExporter = implicitContentExporter;
-            _linkHtmlSerializer = linkHtmlSerializer;
-            _contentLoader = contentLoader;
-        }
-
-        protected override bool TransformForExport(
-          PropertyLinkDataCollection<TLinkData> source,
-          RawProperty output,
-          PropertyExportContext context)
-        {
-            if (source.Value is null)
-            {
-                output.Value = null;
-                return true;
-            }
-
-            var sourceLinks = source.Links!.Select(l => l.ReferencedPermanentLinkIds);
-
-            foreach (var guids in sourceLinks)
-            {
-                foreach (var contentGuid in guids)
-                {
-                    if (_contentLoader.TryGet<IContent>(contentGuid, out var content))
-                        _implicitContentExporter.ExportDependentContent(content, context.TransferContext);
-                }
-            }
-
-            output.Value = _linkHtmlSerializer.Serialize(source.Links, StringMode.InternalMode);
+            output.Value = null;
             return true;
         }
+
+        var sourceLinks = source.Links!.Select(l => l.ReferencedPermanentLinkIds);
+
+        foreach (var guids in sourceLinks)
+        {
+            foreach (var contentGuid in guids)
+            {
+                if (_contentLoader.TryGet<IContent>(contentGuid, out var content))
+                    _implicitContentExporter.ExportDependentContent(content, context.TransferContext);
+            }
+        }
+
+        output.Value = _linkHtmlSerializer.Serialize(source.Links, StringMode.InternalMode);
+        return true;
     }
 }

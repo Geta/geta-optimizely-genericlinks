@@ -3,18 +3,17 @@
 
 using System.Text.RegularExpressions;
 
-namespace Geta.Optimizely.GenericLinks.Html
+namespace Geta.Optimizely.GenericLinks.Html;
+
+public class DefaultAttributeSanitizer : IAttributeSanitizer
 {
-    public class DefaultAttributeSanitizer : IAttributeSanitizer
+    private static readonly Regex ControlCharacterFilter = new("[\\u0000-\\u001F]", RegexOptions.Compiled);
+
+    public string Sanitize(string input)
     {
-        private static readonly Regex ControlCharacterFilter = new("[\\u0000-\\u001F]", RegexOptions.Compiled);
+        if (string.IsNullOrWhiteSpace(input))
+            return string.Empty;
 
-        public string Sanitize(string input)
-        {
-            if (string.IsNullOrWhiteSpace(input))
-                return string.Empty;
-
-            return ControlCharacterFilter.Replace(input, string.Empty);
-        }
+        return ControlCharacterFilter.Replace(input, string.Empty);
     }
 }

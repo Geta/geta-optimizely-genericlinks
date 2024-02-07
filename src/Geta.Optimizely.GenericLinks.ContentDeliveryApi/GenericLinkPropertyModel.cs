@@ -7,32 +7,31 @@ using EPiServer.ContentApi.Core.Serialization.Models;
 using EPiServer.Web.Routing;
 using Geta.Optimizely.GenericLinks.Extensions;
 
-namespace Geta.Optimizely.GenericLinks.ContentDeliveryApi
+namespace Geta.Optimizely.GenericLinks.ContentDeliveryApi;
+
+public class GenericLinkPropertyModel<T> : PropertyModel<T, PropertyLinkData<T>>, IExpandableProperty<T> where T : LinkData, new()
 {
-    public class GenericLinkPropertyModel<T> : PropertyModel<T, PropertyLinkData<T>>, IExpandableProperty<T> where T : LinkData, new()
+    private readonly IUrlResolver _urlResolver;
+
+    public GenericLinkPropertyModel(PropertyLinkData<T> propertyLinkData, IUrlResolver urlResolver) : base(propertyLinkData)
     {
-        private readonly IUrlResolver _urlResolver;
+        _urlResolver = urlResolver;
+        Value = GetValue(propertyLinkData?.Link);
+        ExpandedValue = Value;
+    }
 
-        public GenericLinkPropertyModel(PropertyLinkData<T> propertyLinkData, IUrlResolver urlResolver) : base(propertyLinkData)
-        {
-            _urlResolver = urlResolver;
-            Value = GetValue(propertyLinkData?.Link);
-            ExpandedValue = Value;
-        }
+    public virtual T ExpandedValue { get; set; }
 
-        public virtual T ExpandedValue { get; set; }
+    public virtual void Expand(CultureInfo language)
+    {
+    }        
 
-        public virtual void Expand(CultureInfo language)
-        {
-        }        
+    private T GetValue(T link)
+    {
+        if (link is null)
+            return null;
 
-        private T GetValue(T link)
-        {
-            if (link is null)
-                return null;
-
-            link.Href = _urlResolver.GetUrl(link.GetMappedHref());
-            return link;
-        }
+        link.Href = _urlResolver.GetUrl(link.GetMappedHref());
+        return link;
     }
 }

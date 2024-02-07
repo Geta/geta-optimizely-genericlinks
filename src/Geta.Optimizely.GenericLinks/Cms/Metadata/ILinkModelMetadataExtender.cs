@@ -3,9 +3,8 @@
 
 using EPiServer.Shell.ObjectEditing;
 
-namespace Geta.Optimizely.GenericLinks.Cms.Metadata
+namespace Geta.Optimizely.GenericLinks.Cms.Metadata;
+
+public interface ILinkModelMetadataProvider : IMetadataProvider
 {
-    public interface ILinkModelMetadataProvider : IMetadataProvider
-    {
-    }
 }

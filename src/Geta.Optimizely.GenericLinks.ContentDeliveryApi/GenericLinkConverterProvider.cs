@@ -7,32 +7,31 @@ using EPiServer.ContentApi.Core.Serialization;
 using EPiServer.Core;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Geta.Optimizely.GenericLinks.ContentDeliveryApi
+namespace Geta.Optimizely.GenericLinks.ContentDeliveryApi;
+
+public class GenericLinkConverterProvider : IPropertyConverterProvider
 {
-    public class GenericLinkConverterProvider : IPropertyConverterProvider
+    private readonly IServiceProvider _serviceProvider;
+
+    public GenericLinkConverterProvider(IServiceProvider serviceProvider)
     {
-        private readonly IServiceProvider _serviceProvider;
+        _serviceProvider = serviceProvider;
+    }
 
-        public GenericLinkConverterProvider(IServiceProvider serviceProvider)
+    public virtual int SortOrder => 100;
+
+    public virtual IPropertyConverter Resolve(PropertyData propertyData)
+    {
+        var valueType = propertyData.PropertyValueType;
+
+        if (!typeof(LinkData).IsAssignableFrom(valueType)
+          || !typeof(PropertyLinkData<>).MakeGenericType(valueType).IsAssignableFrom(propertyData.GetOriginalType()))
         {
-            _serviceProvider = serviceProvider;
+            return null;
         }
 
-        public virtual int SortOrder => 100;
+        var instanceType = typeof(PropertyGenericLinkConverter<>).MakeGenericType(valueType);
 
-        public virtual IPropertyConverter Resolve(PropertyData propertyData)
-        {
-            var valueType = propertyData.PropertyValueType;
-
-            if (!typeof(LinkData).IsAssignableFrom(valueType)
-              || !typeof(PropertyLinkData<>).MakeGenericType(valueType).IsAssignableFrom(propertyData.GetOriginalType()))
-            {
-                return null;
-            }
-
-            var instanceType = typeof(PropertyGenericLinkConverter<>).MakeGenericType(valueType);
-
-            return ActivatorUtilities.CreateInstance(_serviceProvider, instanceType) as IPropertyConverter;
-        }
+        return ActivatorUtilities.CreateInstance(_serviceProvider, instanceType) as IPropertyConverter;
     }
 }

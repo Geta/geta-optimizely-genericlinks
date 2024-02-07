@@ -10,113 +10,112 @@ using Geta.Optimizely.GenericLinks.Tests.Models;
 using Geta.Optimizely.GenericLinks.Tests.Services;
 using Xunit;
 
-namespace Geta.Optimizely.GenericLinks.Tests
+namespace Geta.Optimizely.GenericLinks.Tests;
+
+public class ExtensionTests
 {
-    public class ExtensionTests
+    [Fact]
+    public void Enumerable_Yield_yields()
     {
-        [Fact]
-        public void Enumerable_Yield_yields()
+        var subject = 1;
+        var enumerable = EnumerableExtensions.Yield(subject);
+
+        Assert.Single(enumerable);
+        Assert.True(typeof(IEnumerable).IsAssignableFrom(enumerable.GetType()));
+    }
+
+    [Fact]
+    public void Enumerator_Empty_is_empty()
+    {
+        var subject = Enumerator.Empty();
+
+        Assert.False(subject.MoveNext());
+
+        subject = Enumerator.Empty<int>();
+
+        Assert.False(subject.MoveNext());
+    }
+
+    [Fact]
+    public void LinkDataExtensions_GetMappedHref_returns_href()
+    {
+        var virtualPathResolver = new FakeVirtualPathResolver();
+        var linkData = new TestLinkData()
         {
-            var subject = 1;
-            var enumerable = EnumerableExtensions.Yield(subject);
+            Href = "~/localhost/"
+        };
 
-            Assert.Single(enumerable);
-            Assert.True(typeof(IEnumerable).IsAssignableFrom(enumerable.GetType()));
-        }
+        var subject = LinkDataExtensions.GetMappedHref(linkData, virtualPathResolver);
 
-        [Fact]
-        public void Enumerator_Empty_is_empty()
+        Assert.Equal("localhost/", subject);
+    }
+
+    [Fact]
+    public void LinkDataExtensions_ToMappedLink_returns_link()
+    {
+        var virtualPathResolver = new FakeVirtualPathResolver();
+        var urlResolver = new FakeUrlResolver();
+        var htmlSerializer = new DefaultLinkHtmlSerializer(virtualPathResolver, urlResolver);
+
+        var linkData = new TestLinkData()
         {
-            var subject = Enumerator.Empty();
+            Href = "~/localhost/",
+            Text = "Test",
+            Title = "A test link"
+        };
 
-            Assert.False(subject.MoveNext());
+        var subject = LinkDataExtensions.ToMappedLink(linkData, virtualPathResolver, htmlSerializer);
 
-            subject = Enumerator.Empty<int>();
+        Assert.NotNull(subject);
 
-            Assert.False(subject.MoveNext());
-        }
+        if (subject is null)
+            throw new InvalidOperationException("subject cannot be null");
 
-        [Fact]
-        public void LinkDataExtensions_GetMappedHref_returns_href()
+        var element = XElement.Parse(subject);
+
+        var innerText = element.Value;
+        Assert.Equal(linkData.Text, innerText);
+
+        var elementType = element.Name.LocalName;
+        Assert.Equal("a", elementType);
+
+        var title = element.Attribute("title")?.Value;
+        Assert.Equal(linkData.Title, title);
+
+        var href = element.Attribute("href")?.Value;
+        Assert.Equal("localhost/", href);
+    }
+
+    [Fact]
+    public void LinkDataExtensions_ToPermanent_returns_link()
+    {
+        var virtualPathResolver = new FakeVirtualPathResolver();
+        var urlResolver = new FakeUrlResolver();
+        var htmlSerializer = new DefaultLinkHtmlSerializer(virtualPathResolver, urlResolver);
+
+        var linkData = new TestLinkData()
         {
-            var virtualPathResolver = new FakeVirtualPathResolver();
-            var linkData = new TestLinkData()
-            {
-                Href = "~/localhost/"
-            };
+            Href = "~/localhost/",
+            Text = "Test",
+            Target = "_blank"
+        };
 
-            var subject = LinkDataExtensions.GetMappedHref(linkData, virtualPathResolver);
+        var subject = LinkDataExtensions.ToPermanentLink(linkData, urlResolver, htmlSerializer);
 
-            Assert.Equal("localhost/", subject);
-        }
+        Assert.NotNull(subject);
 
-        [Fact]
-        public void LinkDataExtensions_ToMappedLink_returns_link()
-        {
-            var virtualPathResolver = new FakeVirtualPathResolver();
-            var urlResolver = new FakeUrlResolver();
-            var htmlSerializer = new DefaultLinkHtmlSerializer(virtualPathResolver, urlResolver);
+        if (subject is null)
+            throw new InvalidOperationException("subject cannot be null");
 
-            var linkData = new TestLinkData()
-            {
-                Href = "~/localhost/",
-                Text = "Test",
-                Title = "A test link"
-            };
+        var element = XElement.Parse(subject);
 
-            var subject = LinkDataExtensions.ToMappedLink(linkData, virtualPathResolver, htmlSerializer);
+        var innerText = element.Value;
+        Assert.Equal(linkData.Text, innerText);
 
-            Assert.NotNull(subject);
+        var elementType = element.Name.LocalName;
+        Assert.Equal("a", elementType);
 
-            if (subject is null)
-                throw new InvalidOperationException("subject cannot be null");
-
-            var element = XElement.Parse(subject);
-
-            var innerText = element.Value;
-            Assert.Equal(linkData.Text, innerText);
-
-            var elementType = element.Name.LocalName;
-            Assert.Equal("a", elementType);
-
-            var title = element.Attribute("title")?.Value;
-            Assert.Equal(linkData.Title, title);
-
-            var href = element.Attribute("href")?.Value;
-            Assert.Equal("localhost/", href);
-        }
-
-        [Fact]
-        public void LinkDataExtensions_ToPermanent_returns_link()
-        {
-            var virtualPathResolver = new FakeVirtualPathResolver();
-            var urlResolver = new FakeUrlResolver();
-            var htmlSerializer = new DefaultLinkHtmlSerializer(virtualPathResolver, urlResolver);
-
-            var linkData = new TestLinkData()
-            {
-                Href = "~/localhost/",
-                Text = "Test",
-                Target = "_blank"
-            };
-
-            var subject = LinkDataExtensions.ToPermanentLink(linkData, urlResolver, htmlSerializer);
-
-            Assert.NotNull(subject);
-
-            if (subject is null)
-                throw new InvalidOperationException("subject cannot be null");
-
-            var element = XElement.Parse(subject);
-
-            var innerText = element.Value;
-            Assert.Equal(linkData.Text, innerText);
-
-            var elementType = element.Name.LocalName;
-            Assert.Equal("a", elementType);
-
-            var target = element.Attribute("target")?.Value;
-            Assert.Equal(linkData.Target, target);
-        }
+        var target = element.Attribute("target")?.Value;
+        Assert.Equal(linkData.Target, target);
     }
 }

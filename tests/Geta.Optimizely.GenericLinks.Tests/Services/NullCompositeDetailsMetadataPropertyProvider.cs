@@ -3,20 +3,19 @@
 
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 
-namespace Geta.Optimizely.GenericLinks.Tests.Services
+namespace Geta.Optimizely.GenericLinks.Tests.Services;
+
+public class NullCompositeMetadataDetailsProvider : ICompositeMetadataDetailsProvider
 {
-    public class NullCompositeMetadataDetailsProvider : ICompositeMetadataDetailsProvider
+    public void CreateBindingMetadata(BindingMetadataProviderContext context)
     {
-        public void CreateBindingMetadata(BindingMetadataProviderContext context)
-        {
-        }
+    }
 
-        public void CreateDisplayMetadata(DisplayMetadataProviderContext context)
-        {
-        }
+    public void CreateDisplayMetadata(DisplayMetadataProviderContext context)
+    {
+    }
 
-        public void CreateValidationMetadata(ValidationMetadataProviderContext context)
-        {
-        }
+    public void CreateValidationMetadata(ValidationMetadataProviderContext context)
+    {
     }
 }

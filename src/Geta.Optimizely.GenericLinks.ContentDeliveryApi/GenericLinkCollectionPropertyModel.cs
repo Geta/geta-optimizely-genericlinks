@@ -7,37 +7,36 @@ using EPiServer.ContentApi.Core.Serialization.Models;
 using EPiServer.Web.Routing;
 using Geta.Optimizely.GenericLinks.Extensions;
 
-namespace Geta.Optimizely.GenericLinks.ContentDeliveryApi
+namespace Geta.Optimizely.GenericLinks.ContentDeliveryApi;
+
+public class GenericLinkCollectionPropertyModel<T> : PropertyModel<LinkDataCollection<T>, PropertyLinkDataCollection<T>>, IExpandableProperty<LinkDataCollection<T>> where T : LinkData, new()
 {
-    public class GenericLinkCollectionPropertyModel<T> : PropertyModel<LinkDataCollection<T>, PropertyLinkDataCollection<T>>, IExpandableProperty<LinkDataCollection<T>> where T : LinkData, new()
+    private readonly IUrlResolver _urlResolver;
+
+    public GenericLinkCollectionPropertyModel(PropertyLinkDataCollection<T> propertyLinkData, IUrlResolver urlResolver) : base(propertyLinkData)
     {
-        private readonly IUrlResolver _urlResolver;
+        _urlResolver = urlResolver;
+        Value = GetValue(propertyLinkData?.Links);
 
-        public GenericLinkCollectionPropertyModel(PropertyLinkDataCollection<T> propertyLinkData, IUrlResolver urlResolver) : base(propertyLinkData)
+        ExpandedValue = Value;
+    }
+
+    public virtual LinkDataCollection<T> ExpandedValue { get; set; }
+
+    public virtual void Expand(CultureInfo language)
+    {
+    }
+
+    private LinkDataCollection<T> GetValue(LinkDataCollection<T> links)
+    {
+        if (links is null)
+            return null;
+
+        foreach (var link in links)
         {
-            _urlResolver = urlResolver;
-            Value = GetValue(propertyLinkData?.Links);
-
-            ExpandedValue = Value;
+            link.Href = _urlResolver.GetUrl(link.GetMappedHref());
         }
 
-        public virtual LinkDataCollection<T> ExpandedValue { get; set; }
-
-        public virtual void Expand(CultureInfo language)
-        {
-        }
-
-        private LinkDataCollection<T> GetValue(LinkDataCollection<T> links)
-        {
-            if (links is null)
-                return null;
-
-            foreach (var link in links)
-            {
-                link.Href = _urlResolver.GetUrl(link.GetMappedHref());
-            }
-
-            return links;
-        }
+        return links;
     }
 }

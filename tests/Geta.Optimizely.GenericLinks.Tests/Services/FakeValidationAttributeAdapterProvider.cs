@@ -5,13 +5,12 @@ using Microsoft.AspNetCore.Mvc.DataAnnotations;
 using Microsoft.Extensions.Localization;
 using System.ComponentModel.DataAnnotations;
 
-namespace Geta.Optimizely.GenericLinks.Tests.Services
+namespace Geta.Optimizely.GenericLinks.Tests.Services;
+
+public class FakeValidationAttributeAdapterProvider : IValidationAttributeAdapterProvider
 {
-    public class FakeValidationAttributeAdapterProvider : IValidationAttributeAdapterProvider
+    public IAttributeAdapter GetAttributeAdapter(ValidationAttribute attribute, IStringLocalizer? stringLocalizer)
     {
-        public IAttributeAdapter GetAttributeAdapter(ValidationAttribute attribute, IStringLocalizer? stringLocalizer)
-        {
-            return new FakeAttributeAdapter();
-        }
+        return new FakeAttributeAdapter();
     }
 }

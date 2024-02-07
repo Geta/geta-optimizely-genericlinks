@@ -1,7 +1,6 @@
-namespace Geta.Optimizely.GenericLinks
+namespace Geta.Optimizely.GenericLinks;
+
+public static class Constants
 {
-    public static class Constants
-    {
-        public const string ModuleName = "Geta.Optimizely.GenericLinks";
-    }
+    public const string ModuleName = "Geta.Optimizely.GenericLinks";
 }

@@ -5,14 +5,13 @@ using EPiServer.Shell;
 using System;
 using System.Linq;
 
-namespace Geta.Optimizely.GenericLinks.Extensions
+namespace Geta.Optimizely.GenericLinks.Extensions;
+
+internal static class UIDescriptorRegistryExtensions
 {
-    internal static class UIDescriptorRegistryExtensions
+    public static string? GetTypeIdentifier(this UIDescriptorRegistry descriptorRegistry, Type type)
     {
-        public static string? GetTypeIdentifier(this UIDescriptorRegistry descriptorRegistry, Type type)
-        {
-            return descriptorRegistry.GetTypeIdentifiers(type)
-                                     .FirstOrDefault();
-        }
+        return descriptorRegistry.GetTypeIdentifiers(type)
+                                 .FirstOrDefault();
     }
 }

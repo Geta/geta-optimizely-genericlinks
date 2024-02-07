@@ -26,110 +26,109 @@ using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
-namespace Geta.Optimizely.GenericLinks.Tests
+namespace Geta.Optimizely.GenericLinks.Tests;
+
+public class InitializationModuleTests
 {
-    public class InitializationModuleTests
+    [Fact]
+    public void InitializationModule_can_ConfigureContainer()
     {
-        [Fact]
-        public void InitializationModule_can_ConfigureContainer()
+        var serviceCollection = new ServiceCollection();
+        var context = new ServiceConfigurationContext(HostType.TestFramework, serviceCollection);
+        var subject = new GenericLinkInitializationModule();
+        
+        subject.ConfigureContainer(context);
+
+        Assert.Contains(serviceCollection, (d) => typeof(ILinkModelConverter).IsAssignableFrom(d.ServiceType));
+        Assert.Contains(serviceCollection, (d) => typeof(ILinkModelMetadataProvider).IsAssignableFrom(d.ServiceType));
+        Assert.Contains(serviceCollection, (d) => typeof(IPropertyReflector).IsAssignableFrom(d.ServiceType));
+        Assert.Contains(serviceCollection, (d) => typeof(IAttributeSanitizer).IsAssignableFrom(d.ServiceType));
+        Assert.Contains(serviceCollection, (d) => typeof(ILinkHtmlSerializer).IsAssignableFrom(d.ServiceType));
+        Assert.Contains(serviceCollection, (d) => typeof(ILinkDataAttibuteConverter).IsAssignableFrom(d.ServiceType));
+        Assert.Contains(serviceCollection, (d) => typeof(ILinkDataValueWriter).IsAssignableFrom(d.ServiceType));           
+    }
+
+    [Fact]
+    public void InitializationModule_can_Initialize()
+    {
+        var serviceCollection = new ServiceCollection();
+
+        serviceCollection.AddSingleton(LocalizationService.Current);
+        serviceCollection.AddSingleton<ExtensibleMetadataProvider>();
+        serviceCollection.AddSingleton<ICompositeMetadataDetailsProvider, NullCompositeMetadataDetailsProvider>();
+        serviceCollection.AddSingleton<IValidationAttributeAdapterProvider, FakeValidationAttributeAdapterProvider>();
+        serviceCollection.AddSingleton<IModelMetadataProvider, FakeModelMetadataProvider>();
+        serviceCollection.AddSingleton(CreateMetadataHandlerRegistry());
+        serviceCollection.AddSingleton(CreatePropertyDefinitionTypeRepository());
+
+        var configurationContext = new ServiceConfigurationContext(HostType.TestFramework, serviceCollection);
+        var subject = new GenericLinkInitializationModule();
+        
+        subject.ConfigureContainer(configurationContext);
+
+        var engine = new InitializationEngine(serviceCollection, HostType.TestFramework);
+        var provider = serviceCollection.BuildServiceProvider();
+
+        ServiceLocator.SetScopedServiceProvider(provider);
+
+        try
         {
-            var serviceCollection = new ServiceCollection();
-            var context = new ServiceConfigurationContext(HostType.TestFramework, serviceCollection);
-            var subject = new GenericLinkInitializationModule();
-            
-            subject.ConfigureContainer(context);
+            subject.Initialize(engine);
 
-            Assert.Contains(serviceCollection, (d) => typeof(ILinkModelConverter).IsAssignableFrom(d.ServiceType));
-            Assert.Contains(serviceCollection, (d) => typeof(ILinkModelMetadataProvider).IsAssignableFrom(d.ServiceType));
-            Assert.Contains(serviceCollection, (d) => typeof(IPropertyReflector).IsAssignableFrom(d.ServiceType));
-            Assert.Contains(serviceCollection, (d) => typeof(IAttributeSanitizer).IsAssignableFrom(d.ServiceType));
-            Assert.Contains(serviceCollection, (d) => typeof(ILinkHtmlSerializer).IsAssignableFrom(d.ServiceType));
-            Assert.Contains(serviceCollection, (d) => typeof(ILinkDataAttibuteConverter).IsAssignableFrom(d.ServiceType));
-            Assert.Contains(serviceCollection, (d) => typeof(ILinkDataValueWriter).IsAssignableFrom(d.ServiceType));           
+            var handlerRegistry = engine.Locate.Advanced.GetService<MetadataHandlerRegistry>();
+
+            Assert.NotNull(handlerRegistry);
+
+            if (handlerRegistry is null)
+                throw new InvalidOperationException("handler registry cannot be null");
+
+            var singleHandler = handlerRegistry.GetMetadataHandlers(typeof(TestLinkData));
+            Assert.NotEmpty(singleHandler);
+
+            var collectionHandler = handlerRegistry.GetMetadataHandlers(typeof(LinkDataCollection<TestLinkData>));
+            Assert.NotEmpty(collectionHandler);
         }
-
-        [Fact]
-        public void InitializationModule_can_Initialize()
+        finally
         {
-            var serviceCollection = new ServiceCollection();
-
-            serviceCollection.AddSingleton(LocalizationService.Current);
-            serviceCollection.AddSingleton<ExtensibleMetadataProvider>();
-            serviceCollection.AddSingleton<ICompositeMetadataDetailsProvider, NullCompositeMetadataDetailsProvider>();
-            serviceCollection.AddSingleton<IValidationAttributeAdapterProvider, FakeValidationAttributeAdapterProvider>();
-            serviceCollection.AddSingleton<IModelMetadataProvider, FakeModelMetadataProvider>();
-            serviceCollection.AddSingleton(CreateMetadataHandlerRegistry());
-            serviceCollection.AddSingleton(CreatePropertyDefinitionTypeRepository());
-
-            var configurationContext = new ServiceConfigurationContext(HostType.TestFramework, serviceCollection);
-            var subject = new GenericLinkInitializationModule();
-            
-            subject.ConfigureContainer(configurationContext);
-
-            var engine = new InitializationEngine(serviceCollection, HostType.TestFramework);
-            var provider = serviceCollection.BuildServiceProvider();
-
-            ServiceLocator.SetScopedServiceProvider(provider);
-
-            try
-            {
-                subject.Initialize(engine);
-
-                var handlerRegistry = engine.Locate.Advanced.GetService<MetadataHandlerRegistry>();
-
-                Assert.NotNull(handlerRegistry);
-
-                if (handlerRegistry is null)
-                    throw new InvalidOperationException("handler registry cannot be null");
-
-                var singleHandler = handlerRegistry.GetMetadataHandlers(typeof(TestLinkData));
-                Assert.NotEmpty(singleHandler);
-
-                var collectionHandler = handlerRegistry.GetMetadataHandlers(typeof(LinkDataCollection<TestLinkData>));
-                Assert.NotEmpty(collectionHandler);
-            }
-            finally
-            {
-                ServiceLocator.SetScopedServiceProvider(null);
-            }
+            ServiceLocator.SetScopedServiceProvider(null);
         }
+    }
 
-        [Fact]
-        public void InitializationModule_can_Uninitialize()
+    [Fact]
+    public void InitializationModule_can_Uninitialize()
+    {
+        var serviceCollection = new ServiceCollection();
+        var configurationContext = new ServiceConfigurationContext(HostType.TestFramework, serviceCollection);
+        var subject = new GenericLinkInitializationModule();
+
+        subject.ConfigureContainer(configurationContext);
+
+        var engine = new InitializationEngine(serviceCollection, HostType.TestFramework);
+        
+        subject.Uninitialize(engine);
+
+        Assert.NotEmpty(serviceCollection);
+    }
+
+    private static MetadataHandlerRegistry CreateMetadataHandlerRegistry()
+    {
+        var editorDescriptors = Enumerable.Empty<EditorDescriptor>();
+        var modelAccessorCreators = Enumerable.Empty<IModelAccessorCreator>();
+        var editorDefinitionRepository = new NullEditorDefinitionRepository();
+        var metadataHandlerRegistry = new MetadataHandlerRegistry(editorDescriptors, modelAccessorCreators, editorDefinitionRepository);
+
+        return metadataHandlerRegistry;
+    }
+    private static IPropertyDefinitionTypeRepository CreatePropertyDefinitionTypeRepository()
+    {
+        var definitions = new List<PropertyDefinitionType>
         {
-            var serviceCollection = new ServiceCollection();
-            var configurationContext = new ServiceConfigurationContext(HostType.TestFramework, serviceCollection);
-            var subject = new GenericLinkInitializationModule();
+            // Ids lower than 1000 are considered system types, belonging to Optimizely
+            typeof(PropertyTestCollection).ToDefinition(1001, PropertyDataType.LinkCollection),
+            typeof(PropertyTestLinkData).ToDefinition(1002, PropertyDataType.LinkCollection),
+            typeof(PropertyTestThumbnailCollection).ToDefinition(1003, PropertyDataType.LinkCollection)
+        };
 
-            subject.ConfigureContainer(configurationContext);
-
-            var engine = new InitializationEngine(serviceCollection, HostType.TestFramework);
-            
-            subject.Uninitialize(engine);
-
-            Assert.NotEmpty(serviceCollection);
-        }
-
-        private static MetadataHandlerRegistry CreateMetadataHandlerRegistry()
-        {
-            var editorDescriptors = Enumerable.Empty<EditorDescriptor>();
-            var modelAccessorCreators = Enumerable.Empty<IModelAccessorCreator>();
-            var editorDefinitionRepository = new NullEditorDefinitionRepository();
-            var metadataHandlerRegistry = new MetadataHandlerRegistry(editorDescriptors, modelAccessorCreators, editorDefinitionRepository);
-
-            return metadataHandlerRegistry;
-        }
-        private static IPropertyDefinitionTypeRepository CreatePropertyDefinitionTypeRepository()
-        {
-            var definitions = new List<PropertyDefinitionType>
-            {
-                // Ids lower than 1000 are considered system types, belonging to Optimizely
-                typeof(PropertyTestCollection).ToDefinition(1001, PropertyDataType.LinkCollection),
-                typeof(PropertyTestLinkData).ToDefinition(1002, PropertyDataType.LinkCollection),
-                typeof(PropertyTestThumbnailCollection).ToDefinition(1003, PropertyDataType.LinkCollection)
-            };
-
-            return new InMemoryPropertyDefinitionTypeRepository(definitions);
-        }
+        return new InMemoryPropertyDefinitionTypeRepository(definitions);
     }
 }

@@ -3,24 +3,23 @@
 
 using EPiServer.Web;
 
-namespace Geta.Optimizely.GenericLinks.Tests.Services
+namespace Geta.Optimizely.GenericLinks.Tests.Services;
+
+public class FakeVirtualPathResolver : IVirtualPathResolver
 {
-    public class FakeVirtualPathResolver : IVirtualPathResolver
+    public string ToAbsolute(string virtualPath)
     {
-        public string ToAbsolute(string virtualPath)
-        {
-            if (!virtualPath.StartsWith("~/"))
-                return virtualPath;
+        if (!virtualPath.StartsWith("~/"))
+            return virtualPath;
 
-            return virtualPath.Substring(2);
-        }
+        return virtualPath.Substring(2);
+    }
 
-        public string ToAppRelative(string absolutePath)
-        {
-            if (absolutePath.StartsWith("~/"))
-                return absolutePath;
+    public string ToAppRelative(string absolutePath)
+    {
+        if (absolutePath.StartsWith("~/"))
+            return absolutePath;
 
-            return !absolutePath.StartsWith("/") ? "~/" + absolutePath : "~" + absolutePath;
-        }
+        return !absolutePath.StartsWith("/") ? "~/" + absolutePath : "~" + absolutePath;
     }
 }

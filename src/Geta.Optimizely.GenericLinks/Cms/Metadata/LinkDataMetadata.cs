@@ -11,31 +11,30 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
-namespace Geta.Optimizely.GenericLinks.Cms.Metadata
+namespace Geta.Optimizely.GenericLinks.Cms.Metadata;
+
+public class LinkDataMetadata : ExtendedMetadata
 {
-    public class LinkDataMetadata : ExtendedMetadata
+    public LinkDataMetadata(
+        DefaultModelMetadata defaultMetadata,
+        IValidationAttributeAdapterProvider validationAttributeAdapterProvider,
+        ExtensibleMetadataProvider provider,
+        Type? containerType = null,
+        Func<object>? modelAccessor = null,
+        LocalizationService? localizationService = null)
+        : base(defaultMetadata, validationAttributeAdapterProvider, provider, containerType, modelAccessor, localizationService)
     {
-        public LinkDataMetadata(
-            DefaultModelMetadata defaultMetadata,
-            IValidationAttributeAdapterProvider validationAttributeAdapterProvider,
-            ExtensibleMetadataProvider provider,
-            Type? containerType = null,
-            Func<object>? modelAccessor = null,
-            LocalizationService? localizationService = null)
-            : base(defaultMetadata, validationAttributeAdapterProvider, provider, containerType, modelAccessor, localizationService)
-        {
-        }
-
-        public virtual void ExtendFromAttributes(IEnumerable<Attribute> attributes)
-        {
-            ReadSettingsFromUIHintAttributes(attributes.OfType<UIHintAttribute>());
-            ReadSettingsFromEditableAttributes(attributes);
-            ReadSettingsFromScaffoldColumnAttribute(attributes.FirstOfType<ScaffoldColumnAttribute>());
-            ReadSettingsFromDisplayAttributes(attributes);
-            ReadSettingsFromRequiredAttribute(attributes.FirstOfType<RequiredAttribute>());
-            ReadSettingsFromGroupSettingsAttribute(attributes.FirstOfType<GroupSettingsAttribute>());
-            ReadSettingsFromHintAttributes(attributes);
-        }
-
     }
+
+    public virtual void ExtendFromAttributes(IEnumerable<Attribute> attributes)
+    {
+        ReadSettingsFromUIHintAttributes(attributes.OfType<UIHintAttribute>());
+        ReadSettingsFromEditableAttributes(attributes);
+        ReadSettingsFromScaffoldColumnAttribute(attributes.FirstOfType<ScaffoldColumnAttribute>());
+        ReadSettingsFromDisplayAttributes(attributes);
+        ReadSettingsFromRequiredAttribute(attributes.FirstOfType<RequiredAttribute>());
+        ReadSettingsFromGroupSettingsAttribute(attributes.FirstOfType<GroupSettingsAttribute>());
+        ReadSettingsFromHintAttributes(attributes);
+    }
+
 }

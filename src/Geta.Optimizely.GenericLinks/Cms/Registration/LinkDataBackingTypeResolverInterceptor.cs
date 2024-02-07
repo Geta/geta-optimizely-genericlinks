@@ -3,73 +3,72 @@
 
 using EPiServer.DataAbstraction;
 using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Linq;
 
-namespace Geta.Optimizely.GenericLinks.Cms.Registration
+namespace Geta.Optimizely.GenericLinks.Cms.Registration;
+
+public class LinkDataBackingTypeResolverInterceptor : IBackingTypeResolver
 {
-    public class LinkDataBackingTypeResolverInterceptor : IBackingTypeResolver
+    private readonly IBackingTypeResolver _interceptedResolver;
+    private readonly IPropertyDefinitionTypeRepository _propertyDefinitionRepository;
+    private readonly ConcurrentDictionary<Type, Type> _resolvedTypes;
+    private readonly Type _baseType;
+    private readonly Type _collectionBaseType;
+    private readonly Type _propertyBaseType;
+    private readonly Type _collectionPropertyBaseType;
+
+    public LinkDataBackingTypeResolverInterceptor(IBackingTypeResolver interceptedResolver, IPropertyDefinitionTypeRepository propertyDefinitionRepository)
     {
-        private readonly IBackingTypeResolver _interceptedResolver;
-        private readonly IPropertyDefinitionTypeRepository _propertyDefinitionRepository;
-        private readonly Dictionary<Type, Type> _resolvedTypes;
-        private readonly Type _baseType;
-        private readonly Type _collectionBaseType;
-        private readonly Type _propertyBaseType;
-        private readonly Type _collectionPropertyBaseType;
+        _interceptedResolver = interceptedResolver;
+        _propertyDefinitionRepository = propertyDefinitionRepository;
+        _baseType = typeof(LinkData);
+        _collectionBaseType = typeof(LinkDataCollection);
+        _propertyBaseType = typeof(PropertyLinkData<>);
+        _collectionPropertyBaseType = typeof(PropertyLinkDataCollection<>);
+        _resolvedTypes = new ConcurrentDictionary<Type, Type>();
+    }
 
-        public LinkDataBackingTypeResolverInterceptor(IBackingTypeResolver interceptedResolver, IPropertyDefinitionTypeRepository propertyDefinitionRepository)
+    public virtual Type Resolve(Type type)
+    {
+        if (_baseType.IsAssignableFrom(type))
         {
-            _interceptedResolver = interceptedResolver;
-            _propertyDefinitionRepository = propertyDefinitionRepository;
-            _baseType = typeof(LinkData);
-            _collectionBaseType = typeof(LinkDataCollection);
-            _propertyBaseType = typeof(PropertyLinkData<>);
-            _collectionPropertyBaseType = typeof(PropertyLinkDataCollection<>);
-            _resolvedTypes = new Dictionary<Type, Type>();
-        }
-
-        public virtual Type Resolve(Type type)
-        {
-            if (_baseType.IsAssignableFrom(type))
-            {
-                var resolvedType = TryResolveType(type, _propertyBaseType);
-                if (resolvedType is not null)
-                    return resolvedType;
-            }
-
-            if (_collectionBaseType.IsAssignableFrom(type))
-            {
-                var resolvedType = TryResolveType(type, _collectionPropertyBaseType);
-                if (resolvedType is not null)
-                    return resolvedType;
-            }
-
-            return _interceptedResolver.Resolve(type);
-        }
-
-        protected virtual Type? TryResolveType(Type type, Type baseType)
-        {
-            if (_resolvedTypes.TryGetValue(type, out var resolvedType))
+            var resolvedType = TryResolveType(type, _propertyBaseType);
+            if (resolvedType is not null)
                 return resolvedType;
-
-            var linkDataType = type.GenericTypeArguments.Length > 0 ? type.GenericTypeArguments[0] : type;
-            var propertyType = baseType.MakeGenericType(linkDataType);
-
-            var definitions = _propertyDefinitionRepository.List();
-            var definitionTypes = definitions.Select(d => d.DefinitionType);
-
-            foreach (var definitionType in definitionTypes)
-            {
-                if (!propertyType.IsAssignableFrom(definitionType))
-                    continue;
-
-                _resolvedTypes.TryAdd(type, definitionType);
-
-                return definitionType;
-            }
-
-            return null;
         }
+
+        if (_collectionBaseType.IsAssignableFrom(type))
+        {
+            var resolvedType = TryResolveType(type, _collectionPropertyBaseType);
+            if (resolvedType is not null)
+                return resolvedType;
+        }
+
+        return _interceptedResolver.Resolve(type);
+    }
+
+    protected virtual Type? TryResolveType(Type type, Type baseType)
+    {
+        if (_resolvedTypes.TryGetValue(type, out var resolvedType))
+            return resolvedType;
+
+        var linkDataType = type.GenericTypeArguments.Length > 0 ? type.GenericTypeArguments[0] : type;
+        var propertyType = baseType.MakeGenericType(linkDataType);
+
+        var definitions = _propertyDefinitionRepository.List();
+        var definitionTypes = definitions.Select(d => d.DefinitionType);
+
+        foreach (var definitionType in definitionTypes)
+        {
+            if (!propertyType.IsAssignableFrom(definitionType))
+                continue;
+
+            _resolvedTypes.TryAdd(type, definitionType);
+
+            return definitionType;
+        }
+
+        return null;
     }
 }

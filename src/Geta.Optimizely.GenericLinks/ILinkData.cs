@@ -5,21 +5,20 @@ using EPiServer.Core.Transfer;
 using System;
 using System.Collections.Generic;
 
-namespace Geta.Optimizely.GenericLinks
+namespace Geta.Optimizely.GenericLinks;
+
+public interface ILinkData : ICloneable, IReferenceMap
 {
-    public interface ILinkData : ICloneable, IReferenceMap
-    {
-        IDictionary<string, string> Attributes { get; }
+    IDictionary<string, string> Attributes { get; }
 
-        string? Text { get; set; }
+    string? Text { get; set; }
 
-        string? Href { get; set; }
+    string? Href { get; set; }
 
-        string? Target { get; set; }
+    string? Target { get; set; }
 
-        string? Title { get; set; }
+    string? Title { get; set; }
 
-        void SetAttributes(IDictionary<string, string> attributes);
-        IDictionary<string, string> GetAttributes();
-    }
+    void SetAttributes(IDictionary<string, string> attributes);
+    IDictionary<string, string> GetAttributes();
 }

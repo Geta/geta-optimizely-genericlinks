@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.9.0]
+
+### Added
+
+- Added support for .NET 8
+
+### Removed
+
+- Removed support for .NET 5
+
 ## [1.8.3]
 
 ### Fixed

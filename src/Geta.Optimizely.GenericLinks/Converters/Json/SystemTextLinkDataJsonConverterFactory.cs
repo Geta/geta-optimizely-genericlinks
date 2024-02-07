@@ -7,27 +7,29 @@ using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Geta.Optimizely.GenericLinks.Converters.Json
+namespace Geta.Optimizely.GenericLinks.Converters.Json;
+
+public class SystemTextLinkDataJsonConverterFactory : JsonConverterFactory, IJsonConverter
 {
-    public class SystemTextLinkDataJsonConverterFactory : JsonConverterFactory, IJsonConverter
+    private readonly IServiceProvider _serviceProvider;
+
+    public SystemTextLinkDataJsonConverterFactory(IServiceProvider serviceProvider)
     {
-        private readonly IServiceProvider _serviceProvider;
+        _serviceProvider = serviceProvider;
+    }
 
-        public SystemTextLinkDataJsonConverterFactory(IServiceProvider serviceProvider)
-        {
-            _serviceProvider = serviceProvider;
-        }
+    public override bool CanConvert(Type typeToConvert)
+    {
+        if (typeToConvert == typeof(LinkData))
+            return false;
 
-        public override bool CanConvert(Type typeToConvert)
-        {
-            return typeof(LinkData).IsAssignableFrom(typeToConvert);
-        }
+        return typeof(LinkData).IsAssignableFrom(typeToConvert);
+    }
 
-        public override JsonConverter? CreateConverter(Type typeToConvert, JsonSerializerOptions options)
-        {
-            var converterType = typeof(SystemTextLinkDataConverter<>).MakeGenericType(typeToConvert);
+    public override JsonConverter? CreateConverter(Type typeToConvert, JsonSerializerOptions options)
+    {
+        var converterType = typeof(SystemTextLinkDataConverter<>).MakeGenericType(typeToConvert);
 
-            return (JsonConverter)ActivatorUtilities.CreateInstance(_serviceProvider, converterType);
-        }
+        return (JsonConverter)ActivatorUtilities.CreateInstance(_serviceProvider, converterType);
     }
 }

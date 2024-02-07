@@ -12,59 +12,58 @@ using Geta.Optimizely.GenericLinks.Cms.Registration;
 using Geta.Optimizely.GenericLinks.Tests.Services;
 using Xunit;
 
-namespace Geta.Optimizely.GenericLinks.Tests
+namespace Geta.Optimizely.GenericLinks.Tests;
+
+public class BackingTypeResolverTests
 {
-    public class BackingTypeResolverTests
+    [Fact]
+    public void LinkDataBackingTypeResolverInterceptor_can_Resolve()
     {
-        [Fact]
-        public void LinkDataBackingTypeResolverInterceptor_can_Resolve()
+        var testFailureException = new InvalidOperationException("Test failed");
+        var failureResolver = new ExceptionBackingTypeResolver(testFailureException);
+
+        var collectionPropertyType = typeof(PropertyTestCollection);
+        var singlePropertyType = typeof(PropertyTestLinkData);
+        var definitions = new List<PropertyDefinitionType>
         {
-            var testFailureException = new InvalidOperationException("Test failed");
-            var failureResolver = new ExceptionBackingTypeResolver(testFailureException);
+            collectionPropertyType.ToDefinition(1001, PropertyDataType.LinkCollection),
+            singlePropertyType.ToDefinition(1002, PropertyDataType.LinkCollection)
+        };
 
-            var collectionPropertyType = typeof(PropertyTestCollection);
-            var singlePropertyType = typeof(PropertyTestLinkData);
-            var definitions = new List<PropertyDefinitionType>
-            {
-                collectionPropertyType.ToDefinition(1001, PropertyDataType.LinkCollection),
-                singlePropertyType.ToDefinition(1002, PropertyDataType.LinkCollection)
-            };
+        var definitionRepository = new InMemoryPropertyDefinitionTypeRepository(definitions);
+        var subject = new LinkDataBackingTypeResolverInterceptor(failureResolver, definitionRepository);
 
-            var definitionRepository = new InMemoryPropertyDefinitionTypeRepository(definitions);
-            var subject = new LinkDataBackingTypeResolverInterceptor(failureResolver, definitionRepository);
+        var resolvedType = subject.Resolve(typeof(LinkDataCollection<TestLinkData>));
+        Assert.Equal(collectionPropertyType, resolvedType);
 
-            var resolvedType = subject.Resolve(typeof(LinkDataCollection<TestLinkData>));
-            Assert.Equal(collectionPropertyType, resolvedType);
+        resolvedType = subject.Resolve(typeof(TestLinkData));
+        Assert.Equal(singlePropertyType, resolvedType);
+    }
 
-            resolvedType = subject.Resolve(typeof(TestLinkData));
-            Assert.Equal(singlePropertyType, resolvedType);
+    [Fact]
+    public async Task LinkDataBackingTypeResolverInterceptor_can_be_called_in_parallel()
+    {
+        var collectionPropertyType = typeof(PropertyTestCollection);
+        var definitions = new List<PropertyDefinitionType>
+        {
+            collectionPropertyType.ToDefinition(1001, PropertyDataType.LinkCollection)
+        };
+
+        var definitionRepository = new InMemoryPropertyDefinitionTypeRepository(definitions);
+        var backingResolver = new NullBackingTypeResolver();
+        var subject = new LinkDataBackingTypeResolverInterceptor(backingResolver, definitionRepository);
+        var tasks = new List<Task<Type>>();
+
+        for (var i = 0; i < 50; i++)
+        {
+            var task = Task.Factory.StartNew(() => subject.Resolve(typeof(LinkDataCollection<TestLinkData>)));
+            tasks.Add(task);
         }
 
-        [Fact]
-        public async Task LinkDataBackingTypeResolverInterceptor_can_be_called_in_parallel()
+        await Assert.AllAsync(tasks, async task =>
         {
-            var collectionPropertyType = typeof(PropertyTestCollection);
-            var definitions = new List<PropertyDefinitionType>
-            {
-                collectionPropertyType.ToDefinition(1001, PropertyDataType.LinkCollection)
-            };
-
-            var definitionRepository = new InMemoryPropertyDefinitionTypeRepository(definitions);
-            var backingResolver = new NullBackingTypeResolver();
-            var subject = new LinkDataBackingTypeResolverInterceptor(backingResolver, definitionRepository);
-            var tasks = new List<Task<Type>>();
-
-            for (var i = 0; i < 5; i++)
-            {
-                var task = Task.Factory.StartNew(() => subject.Resolve(typeof(LinkDataCollection<TestLinkData>)));
-                tasks.Add(task);
-            }
-
-            await Assert.AllAsync(tasks, async task =>
-            {
-                var type = await task;
-                Assert.Equal(collectionPropertyType, type);
-            });
-        }
+            var type = await task;
+            Assert.Equal(collectionPropertyType, type);
+        });
     }
 }

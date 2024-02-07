@@ -7,41 +7,40 @@ using EPiServer.Core.Transfer.Internal;
 using EPiServer.Core;
 using Geta.Optimizely.GenericLinks.Html;
 
-namespace Geta.Optimizely.GenericLinks.Transfer
+namespace Geta.Optimizely.GenericLinks.Transfer;
+
+public sealed class PropertyLinkDataTransform<TLinkData> : PropertyTransform<PropertyLinkData<TLinkData>>
+    where TLinkData : LinkData, new()
 {
-    public sealed class PropertyLinkDataTransform<TLinkData> : PropertyTransform<PropertyLinkData<TLinkData>>
-        where TLinkData : LinkData, new()
+    private readonly IContentLoader _contentLoader;
+    private readonly IImplicitContentExporter _implicitContentExporter;
+    private readonly ILinkHtmlSerializer _linkHtmlSerializer;
+
+    public PropertyLinkDataTransform(
+        IImplicitContentExporter implicitContentExporter,
+        ILinkHtmlSerializer linkHtmlSerializer,
+        IContentLoader contentLoader)
     {
-        private readonly IContentLoader _contentLoader;
-        private readonly IImplicitContentExporter _implicitContentExporter;
-        private readonly ILinkHtmlSerializer _linkHtmlSerializer;
+        _implicitContentExporter = implicitContentExporter;
+        _linkHtmlSerializer = linkHtmlSerializer;
+        _contentLoader = contentLoader;
+    }
 
-        public PropertyLinkDataTransform(
-            IImplicitContentExporter implicitContentExporter,
-            ILinkHtmlSerializer linkHtmlSerializer,
-            IContentLoader contentLoader)
+    protected override bool TransformForExport(PropertyLinkData<TLinkData> source, RawProperty output, PropertyExportContext context)
+    {
+        if (source.Value is null)
         {
-            _implicitContentExporter = implicitContentExporter;
-            _linkHtmlSerializer = linkHtmlSerializer;
-            _contentLoader = contentLoader;
-        }
-
-        protected override bool TransformForExport(PropertyLinkData<TLinkData> source, RawProperty output, PropertyExportContext context)
-        {
-            if (source.Value is null)
-            {
-                output.Value = null;
-                return true;
-            }
-
-            foreach (var referencedPermanentLinkId in source.Link!.ReferencedPermanentLinkIds)
-            {
-                if (_contentLoader.TryGet(referencedPermanentLinkId, out IContent content))
-                    _implicitContentExporter.ExportDependentContent(content, context.TransferContext);
-            }
-
-            output.Value = _linkHtmlSerializer.Serialize(source.Link, StringMode.InternalMode);
+            output.Value = null;
             return true;
         }
+
+        foreach (var referencedPermanentLinkId in source.Link!.ReferencedPermanentLinkIds)
+        {
+            if (_contentLoader.TryGet(referencedPermanentLinkId, out IContent content))
+                _implicitContentExporter.ExportDependentContent(content, context.TransferContext);
+        }
+
+        output.Value = _linkHtmlSerializer.Serialize(source.Link, StringMode.InternalMode);
+        return true;
     }
 }

@@ -4,24 +4,23 @@
 using System;
 using System.Text.Json;
 
-namespace Geta.Optimizely.GenericLinks.Converters.Values
+namespace Geta.Optimizely.GenericLinks.Converters.Values;
+
+public class DoubleValueWriter : ILinkDataValueWriter
 {
-    public class DoubleValueWriter : ILinkDataValueWriter
+    public bool CanWrite(Type type)
     {
-        public bool CanWrite(Type type)
-        {
-            if (typeof(double).IsAssignableFrom(type))
-                return true;
+        if (typeof(double).IsAssignableFrom(type))
+            return true;
 
-            if (typeof(double?).IsAssignableFrom(type))
-                return true;
+        if (typeof(double?).IsAssignableFrom(type))
+            return true;
 
-            return false;
-        }
+        return false;
+    }
 
-        public void Write(Utf8JsonWriter writer, object value)
-        {
-            writer.WriteNumberValue((double)value);
-        }
+    public void Write(Utf8JsonWriter writer, object value)
+    {
+        writer.WriteNumberValue((double)value);
     }
 }

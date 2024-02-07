@@ -145,13 +145,16 @@ namespace AlloyMvcTemplates.Models.Pages
         public virtual string SelectionEditor2 { get; set; }
 
         [CultureSpecific]
-        [Display(Name= "Thumbnail link collection", GroupName = SystemTabNames.Content, Order = 340)]
+        [Display(Name = "Thumbnail link collection", GroupName = SystemTabNames.Content, Order = 340)]
         public virtual LinkDataCollection<ThumbnailLinkData> ThumbnailLinks { get; set; }
 
-        [Required]
         [CultureSpecific]
         [Display(Name = "Single thumbnail link", GroupName = SystemTabNames.Content, Order = 340)]
         public virtual ThumbnailLinkData ThumbnailLink { get; set; }
+
+        [CultureSpecific]
+        [Display(Name = "Nested thumbnail links", GroupName = SystemTabNames.Content, Order = 340)]
+        public virtual IList<NestedLinkBlock> NestedThumbnailLinks { get; set; }
     }
 
     public class TestSelectionFactory : ISelectionFactory

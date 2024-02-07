@@ -1,3 +1,4 @@
+using AlloyDependencies;
 using AlloyMvcTemplates.Business.Initialization;
 using AlloyMvcTemplates.Extensions;
 using AlloyMvcTemplates.Infrastructure;
@@ -73,6 +74,7 @@ namespace AlloyMvcTemplates
             services.AddCommerce();
             services.AddContentDeliveryApi();
             services.AddGenericLinkConverters();
+            services.AddLinkDataExportTransform<ThumbnailLinkData>();
 
             services.AddEmbeddedLocalization<Startup>();
 

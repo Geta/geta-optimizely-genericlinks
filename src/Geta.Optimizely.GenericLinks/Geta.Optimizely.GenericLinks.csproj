@@ -1,9 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net5.0;net6.0</TargetFrameworks>
+    <TargetFrameworks>net6.0;net8.0</TargetFrameworks>
     <Nullable>enable</Nullable>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+	<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
     <PackageId>Geta.Optimizely.GenericLinks</PackageId>
     <Title>Extensible link items for Optimizely</Title>
@@ -18,15 +19,16 @@
     <Description>Adds an extensible alternative to the LinkItemCollection in Optimizely.</Description>
     <PackageTags>Geta Optimizely Links LinkItemCollection</PackageTags>
     <RepositoryType>Git</RepositoryType>
+	<PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/Geta/geta-optimizely-genericlinks.git</RepositoryUrl>
   </PropertyGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'net5.0'">
-    <PackageReference Include="EPiServer.CMS.UI" Version="[12.0.3,13.0)" />
-  </ItemGroup>
-
   <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
     <PackageReference Include="EPiServer.CMS.UI" Version="[12.4.0,13.0)" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
+    <PackageReference Include="EPiServer.CMS.UI" Version="[12.17.0,13.0)" />
   </ItemGroup>
 
   <PropertyGroup>
@@ -38,14 +40,8 @@
   </ImportGroup>
 
   <ItemGroup>
+	<None Include="..\..\README.md" Pack="true" PackagePath="\" />
     <None Include="..\..\resources\icon.png" Pack="true" PackagePath="\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include=".\msbuild\CopyZipFiles.targets">
-      <Pack>true</Pack>
-      <PackagePath>build\$(TargetFramework)\$(MSBuildProjectName).targets</PackagePath>
-    </Content>
   </ItemGroup>
 
   <ItemGroup>

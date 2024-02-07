@@ -4,25 +4,24 @@
 using System;
 using System.Text.Json;
 
-namespace Geta.Optimizely.GenericLinks.Converters.Values
+namespace Geta.Optimizely.GenericLinks.Converters.Values;
+
+public class DateTimeValueWriter : ILinkDataValueWriter
 {
-    public class DateTimeValueWriter : ILinkDataValueWriter
+    public bool CanWrite(Type type)
     {
-        public bool CanWrite(Type type)
-        {
-            if (typeof(DateTime).IsAssignableFrom(type))
-                return true;
+        if (typeof(DateTime).IsAssignableFrom(type))
+            return true;
 
-            if (typeof(DateTime?).IsAssignableFrom(type))
-                return true;
+        if (typeof(DateTime?).IsAssignableFrom(type))
+            return true;
 
-            return false;
-        }
+        return false;
+    }
 
-        public void Write(Utf8JsonWriter writer, object value)
-        {
-            var dateValue = (DateTime)value;
-            writer.WriteStringValue(dateValue);
-        }
+    public void Write(Utf8JsonWriter writer, object value)
+    {
+        var dateValue = (DateTime)value;
+        writer.WriteStringValue(dateValue);
     }
 }

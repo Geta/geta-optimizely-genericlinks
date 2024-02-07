@@ -8,47 +8,46 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace Geta.Optimizely.GenericLinks.Tests.Services
+namespace Geta.Optimizely.GenericLinks.Tests.Services;
+
+public class FakeModelMetadataProvider : IModelMetadataProvider
 {
-    public class FakeModelMetadataProvider : IModelMetadataProvider
+    private readonly ICompositeMetadataDetailsProvider _compositeMetadataDetailsProvider;
+    private readonly IPropertyReflector _propertyReflector;
+
+    public FakeModelMetadataProvider(ICompositeMetadataDetailsProvider compositeMetadataDetailsProvider, IPropertyReflector propertyReflector)
     {
-        private readonly ICompositeMetadataDetailsProvider _compositeMetadataDetailsProvider;
-        private readonly IPropertyReflector _propertyReflector;
+        _compositeMetadataDetailsProvider = compositeMetadataDetailsProvider;
+        _propertyReflector = propertyReflector;
+    }
 
-        public FakeModelMetadataProvider(ICompositeMetadataDetailsProvider compositeMetadataDetailsProvider, IPropertyReflector propertyReflector)
+    public IEnumerable<ModelMetadata> GetMetadataForProperties(Type modelType)
+    {
+        var properties = _propertyReflector.GetProperties(modelType);
+
+        foreach (var property in properties)
         {
-            _compositeMetadataDetailsProvider = compositeMetadataDetailsProvider;
-            _propertyReflector = propertyReflector;
+            yield return GetMetadataForProperty(modelType, property);
         }
+    }
 
-        public IEnumerable<ModelMetadata> GetMetadataForProperties(Type modelType)
-        {
-            var properties = _propertyReflector.GetProperties(modelType);
+    public virtual ModelMetadata GetMetadataForType(Type modelType)
+    {
+        var identity = ModelMetadataIdentity.ForType(modelType);
+        var attributes = ModelAttributes.GetAttributesForType(modelType);
 
-            foreach (var property in properties)
-            {
-                yield return GetMetadataForProperty(modelType, property);
-            }
-        }
+        var defaultDetails = new DefaultMetadataDetails(identity, attributes);
 
-        public virtual ModelMetadata GetMetadataForType(Type modelType)
-        {
-            var identity = ModelMetadataIdentity.ForType(modelType);
-            var attributes = ModelAttributes.GetAttributesForType(modelType);
+        return new DefaultModelMetadata(this, _compositeMetadataDetailsProvider, defaultDetails);
+    }
 
-            var defaultDetails = new DefaultMetadataDetails(identity, attributes);
+    protected virtual ModelMetadata GetMetadataForProperty(Type containerType, PropertyInfo propertyInfo)
+    {
+        var identity = ModelMetadataIdentity.ForProperty(propertyInfo, propertyInfo.PropertyType, containerType);
+        var attributes = ModelAttributes.GetAttributesForProperty(containerType, propertyInfo, propertyInfo.PropertyType);
 
-            return new DefaultModelMetadata(this, _compositeMetadataDetailsProvider, defaultDetails);
-        }
+        var defaultDetails = new DefaultMetadataDetails(identity, attributes);
 
-        protected virtual ModelMetadata GetMetadataForProperty(Type containerType, PropertyInfo propertyInfo)
-        {
-            var identity = ModelMetadataIdentity.ForProperty(propertyInfo, propertyInfo.PropertyType, containerType);
-            var attributes = ModelAttributes.GetAttributesForProperty(containerType, propertyInfo, propertyInfo.PropertyType);
-
-            var defaultDetails = new DefaultMetadataDetails(identity, attributes);
-
-            return new DefaultModelMetadata(this, _compositeMetadataDetailsProvider, defaultDetails);
-        }
+        return new DefaultModelMetadata(this, _compositeMetadataDetailsProvider, defaultDetails);
     }
 }
