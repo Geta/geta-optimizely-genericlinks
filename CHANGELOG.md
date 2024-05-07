@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.9.1]
+
+### Fixed
+
+- Issue with Enum types not persisting
+
 ## [1.9.0]
 
 ### Added
