@@ -125,5 +125,6 @@ internal class GenericLinkInitializationModule : IConfigurableModule
         services.TryAddEnumerable(ServiceDescriptor.Singleton<ILinkDataValueWriter, DoubleValueWriter>());
         services.TryAddEnumerable(ServiceDescriptor.Singleton<ILinkDataValueWriter, DecimalValueWriter>());
         services.TryAddEnumerable(ServiceDescriptor.Singleton<ILinkDataValueWriter, DateTimeValueWriter>());
+        services.TryAddEnumerable(ServiceDescriptor.Singleton<ILinkDataValueWriter, EnumerableValueWriter>());
     }
 }

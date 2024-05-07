@@ -49,7 +49,7 @@ public class SerializationTests
         subject = new JsonAttributeConverter();
 
         Assert.True(subject.CanConvert(typeof(DialogContentOptions)));
-        Assert.Contains("test", subject.Convert(new DialogContentOptions { BaseClass = "test" }));           
+        Assert.Contains("test", subject.Convert(new DialogContentOptions { BaseClass = "test" }));
     }
 
     [Fact]
@@ -277,7 +277,7 @@ public class SerializationTests
         jsonWriter.Flush();
         memoryStream.Flush();
         memoryStream.Seek(0, SeekOrigin.Begin);
-        
+
         using var reader = new StreamReader(memoryStream, leaveOpen: true);
         var json = reader.ReadToEnd();
 
@@ -371,7 +371,7 @@ public class SerializationTests
         where TLinkData : LinkData, new()
     {
         var serviceCollection = new ServiceCollection();
-        
+
         serviceCollection.AddSingleton<IPropertyReflector, DefaultPropertyReflector>();
         serviceCollection.AddSingleton<ILinkModelConverter>(CreateLinkModelConverter());
         serviceCollection.AddSingleton<ILinkDataValueWriter, StringValueWriter>();
@@ -380,6 +380,7 @@ public class SerializationTests
         serviceCollection.AddSingleton<ILinkDataValueWriter, DoubleValueWriter>();
         serviceCollection.AddSingleton<ILinkDataValueWriter, DecimalValueWriter>();
         serviceCollection.AddSingleton<ILinkDataValueWriter, DateTimeValueWriter>();
+        serviceCollection.AddSingleton<ILinkDataValueWriter, EnumerableValueWriter>();
 
         var serviceProvider = serviceCollection.BuildServiceProvider();
         var factory = new SystemTextLinkDataJsonConverterFactory(serviceProvider);
@@ -430,5 +431,5 @@ public class SerializationTests
         yield return new JsonAttributeConverter();
     }
 
-    
+
 }
