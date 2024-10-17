@@ -21,6 +21,20 @@ public class ThumbnailLinkData : LinkData
         get => GetAttribute((v) => ContentReference.Parse(v));
         set => SetAttribute(value, (v) => v.ToString());
     }
+
+    [Display(Name = "Image description", Order = 10)]
+    public virtual string ThumbnailAlt
+    {
+        get => GetAttribute();
+        set => SetAttribute(value);
+    }
+
+    [Display(Name = "Image quality", Order = 20)]
+    public virtual double ThumbnailQuality
+    {
+        get => GetAttribute(Convert.ToDouble);
+        set => SetAttribute(Convert.ToString(value));
+    }
 }
 ```
 

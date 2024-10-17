@@ -15,6 +15,8 @@ Requires using .NET 5.0 or higher and Optimizely 12
 
 - `dotnet add package Geta.Optimizely.GenericLinks`
 
+Make sure to read the first example about implementation.
+
 ### Examples
 
 - [Example link collection with thumbnails](./docs/example-link-data-collection.md)
