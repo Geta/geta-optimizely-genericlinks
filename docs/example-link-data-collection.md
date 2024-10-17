@@ -35,6 +35,14 @@ public class ThumbnailLinkData : LinkData
         get => GetAttribute(Convert.ToDouble);
         set => SetAttribute(Convert.ToString(value));
     }
+
+    [Display(Name = "Thumbnail alignment", Order = 30)]
+    [SelectOneEnum(typeof(ThumbnailAlign))]
+    public virtual ThumbnailAlign Align
+    {
+        get => GetAttribute(Enum.Parse<ThumbnailAlign>);
+        set => SetAttribute(value, v => v.ToString());
+    }
 }
 ```
 
