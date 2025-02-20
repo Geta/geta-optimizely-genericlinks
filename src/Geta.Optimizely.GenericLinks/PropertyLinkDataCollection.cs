@@ -130,7 +130,7 @@ public abstract class PropertyLinkDataCollection<TLinkData> : PropertyLinkDataCo
     {
         get
         {
-            if (((ILazyProperty)this).HasLazyValue)
+            if (_linkItemCollection is null)
             {
                 LoadData(base.LongString);
             }
@@ -226,11 +226,11 @@ public abstract class PropertyLinkDataCollection<TLinkData> : PropertyLinkDataCo
 
         if (_linkItemCollection is null)
         {
-            links = new LinkDataCollection<TLinkData>();
+            links = [];
         }
         else
         {
-            links = new LinkDataCollection<TLinkData>(_linkItemCollection);
+            links = [.. _linkItemCollection];
         }
 
         collection.SetLinkItems(links);
@@ -247,7 +247,7 @@ public abstract class PropertyLinkDataCollection<TLinkData> : PropertyLinkDataCo
     {
         if (value is null)
         {
-            _linkItemCollection = null;
+            _linkItemCollection = [];
         }
         else if (value is LinkDataCollection<TLinkData>)
         {
@@ -278,7 +278,7 @@ public abstract class PropertyLinkDataCollection<TLinkData> : PropertyLinkDataCo
     protected override void SetDefaultValue()
     {
         base.SetDefaultValue();
-        _linkItemCollection = null;
+        _linkItemCollection = [];
     }
 
     protected virtual LinkDataCollection<TLinkData>? ParseToLinkCollection(string? value)

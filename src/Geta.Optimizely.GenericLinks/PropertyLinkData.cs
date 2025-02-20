@@ -34,6 +34,7 @@ public abstract class PropertyLinkData<TLinkData> : PropertyLinkData, IReference
     private readonly ILinkHtmlSerializer _htmlSerializer;
 
     private TLinkData? _linkItem;
+    private volatile bool _hasLoaded;
 
     protected PropertyLinkData()
         : this(
@@ -128,7 +129,7 @@ public abstract class PropertyLinkData<TLinkData> : PropertyLinkData, IReference
     {
         get
         {
-            if (((ILazyProperty)this).HasLazyValue)
+            if (_linkItem == null && !_hasLoaded)
             {
                 LoadData(base.LongString);
             }
@@ -251,6 +252,8 @@ public abstract class PropertyLinkData<TLinkData> : PropertyLinkData, IReference
         {
             _linkItem = ParseToLink((string)value);
         }
+
+        _hasLoaded = true;
     }
 
     public virtual void RemapPermanentLinkReferences(IDictionary<Guid, Guid> idMap)

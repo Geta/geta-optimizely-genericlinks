@@ -2,6 +2,7 @@
 // Licensed under Apache-2.0. See the LICENSE file in the project root for more information
 
 using EPiServer.DataAnnotations;
+using EPiServer.Data.Entity;
 using EPiServer.Web;
 using Geta.Optimizely.GenericLinks.Extensions;
 using Geta.Optimizely.GenericLinks.Helpers;
@@ -21,8 +22,8 @@ public abstract class LinkData : ILinkData
     private readonly object _pessimisticLock;
 
     private bool _isModified;
+    private bool _isReadOnly;
     private string? _text;
-
 
     protected LinkData()
     {
@@ -92,16 +93,13 @@ public abstract class LinkData : ILinkData
             var href = Href;
 
             if (string.IsNullOrEmpty(href))
-                return new List<Guid>(0);
+                return [];
 
             var guid = PermanentLinkUtility.GetGuid(href);
             if (guid == Guid.Empty)
-                return new List<Guid>(0);
+                return [];
 
-            return new List<Guid>(1)
-            {
-                guid
-            };
+            return [guid];
         }
     }
 
@@ -156,6 +154,87 @@ public abstract class LinkData : ILinkData
         item.SetModified(IsModified);
 
         return item;
+    }
+
+    //
+    // Summary:
+    //     Gets and sets the read-only property.
+    //
+    // Value:
+    //     true if this property is read only; otherwise, false.
+    public bool IsReadOnly
+    {
+        get
+        {
+            return _isReadOnly;
+        }
+        protected set
+        {
+            _isReadOnly = value;
+        }
+    }
+
+    //
+    // Summary:
+    //     Creates a writable clone of the property.
+    //
+    // Returns:
+    //     A writable copy of the property.
+    public virtual ILinkData CreateWritableClone()
+    {
+        return CreateWritableCloneInternal();
+    }
+    object IReadOnly.CreateWritableClone()
+    {
+        return CreateWritableCloneInternal();
+    }
+    private LinkData CreateWritableCloneInternal()
+    {
+        var obj = (LinkData)Clone();
+        obj._isReadOnly = false;
+        return obj;
+    }
+
+    //
+    // Summary:
+    //     Convert this property to ReadOnly
+    //
+    // Remarks:
+    //     Implementors should override this method when exposing complex objects that should
+    //     be read-only as well.
+    public virtual void MakeReadOnly()
+    {
+        if (!IsReadOnly)
+        {
+            _isModified = true;
+            _isReadOnly = true;
+        }
+    }
+
+    //
+    // Summary:
+    //     Convert this property to ReadOnly
+    //
+    // Remarks:
+    //     Implementors should override this method when exposing complex objects that should
+    //     be read-only as well.
+    public virtual void ResetModified()
+    {
+        if (!IsModified)
+        {
+            _isModified = false;
+        }
+    }
+
+    //
+    // Summary:
+    //     Checks if the property is read-only
+    protected void ThrowIfReadOnly()
+    {
+        if (IsReadOnly)
+        {
+            throw new NotSupportedException("LinkData is read-only.");
+        }
     }
 
     protected virtual string? GetAttribute([CallerMemberName] string? key = null)

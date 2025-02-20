@@ -1,10 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net6.0;net8.0</TargetFrameworks>
+    <TargetFrameworks>net8.0</TargetFrameworks>
     <Nullable>enable</Nullable>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-	<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
     <PackageId>Geta.Optimizely.GenericLinks</PackageId>
     <Title>Extensible link items for Optimizely</Title>
@@ -19,7 +19,7 @@
     <Description>Adds an extensible alternative to the LinkItemCollection in Optimizely.</Description>
     <PackageTags>Geta Optimizely Links LinkItemCollection</PackageTags>
     <RepositoryType>Git</RepositoryType>
-	<PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/Geta/geta-optimizely-genericlinks.git</RepositoryUrl>
   </PropertyGroup>
 
@@ -34,13 +34,13 @@
   <PropertyGroup>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
   </PropertyGroup>
-  
+
   <ImportGroup>
     <Import Project="$(SolutionDir)\src\pack.proj" Condition="Exists('$(SolutionDir)\src\pack.proj')" />
   </ImportGroup>
 
   <ItemGroup>
-	<None Include="..\..\README.md" Pack="true" PackagePath="\" />
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
     <None Include="..\..\resources\icon.png" Pack="true" PackagePath="\" />
   </ItemGroup>
 
