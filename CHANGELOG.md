@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.9.2]
+
+### Fixed
+
+- (Attempted) fix for issue where property value becomes null
+
+### Removed
+
+- Removed support for .NET 6
+
 ## [1.9.1]
 
 ### Fixed
