@@ -11,8 +11,10 @@ using EPiServer.Shell;
 using EPiServer.Shell.Json;
 using EPiServer.Shell.Modules;
 using EPiServer.Shell.ObjectEditing;
+using EPiServer.SpecializedProperties;
 using EPiServer.Web;
 using Geta.Optimizely.GenericLinks.Cms.EditorModels;
+using Geta.Optimizely.GenericLinks.Cms.Linking;
 using Geta.Optimizely.GenericLinks.Cms.Metadata;
 using Geta.Optimizely.GenericLinks.Cms.Registration;
 using Geta.Optimizely.GenericLinks.Converters;
@@ -40,6 +42,9 @@ internal class GenericLinkInitializationModule : IConfigurableModule
 
         services.AddSingleton<PropertyLinkDataCollectionDefinitionsLoader>();
         services.AddSingleton<PropertyLinkDataDefinitionsLoader>();
+        services.AddSingleton<LinkDataToSoftLinkResolver>();
+        services.AddSingleton<IPropertySoftLinkIndexer, LinkDataCollectionSoftLinkIndexer>();
+        services.AddSingleton<IPropertySoftLinkIndexer, LinkDataSoftLinkIndexer>();
         services.TryAddEnumerable(ServiceDescriptor.Singleton<ContentScannerExtension, GenericLinkContentScannerExtension>());
         services.TryAddEnumerable(ServiceDescriptor.Singleton<JsonConverter, NewtonsoftLinkDataConverter>());
         services.TryAddEnumerable(ServiceDescriptor.Singleton<IJsonConverter, SystemTextLinkDataJsonConverterFactory>());

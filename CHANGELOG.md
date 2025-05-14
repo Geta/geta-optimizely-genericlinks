@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.0]
+
+### Added
+
+- Support for soft link indexing, see updated documentation.
+
+### Fixed
+
+- Issue where where content referenced by GenericLink properties wouldn't display appropriate warnings when about to be deleted.
+
 ## [1.9.2]
 
 ### Fixed

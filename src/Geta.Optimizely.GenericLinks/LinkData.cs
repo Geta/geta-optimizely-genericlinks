@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.CompilerServices;
+using EPiServer.Core;
 using SystemTextJsonIgnore = System.Text.Json.Serialization.JsonIgnoreAttribute;
 using NewtonsoftJsonIgnore = Newtonsoft.Json.JsonIgnoreAttribute;
 
@@ -224,6 +225,15 @@ public abstract class LinkData : ILinkData
         {
             _isModified = false;
         }
+    }
+
+    //
+    // Summary:
+    //      Used to return references to internal content links
+
+    public virtual IEnumerable<ContentReference> GetReferencedContent()
+    {
+        return [];
     }
 
     //

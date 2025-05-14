@@ -17,6 +17,10 @@ Requires using .NET 5.0 or higher and Optimizely 12
 
 Make sure to read the first example about implementation.
 
+### New
+
+- [Example how to add soft links for content references](./docs/example-soft-links.md)
+
 ### Examples
 
 - [Example link collection with thumbnails](./docs/example-link-data-collection.md)
