@@ -23,4 +23,5 @@ public interface ILinkData : ICloneable, IReferenceMap, IModifiedTrackable, IRea
 
     void SetAttributes(IDictionary<string, string> attributes);
     IDictionary<string, string> GetAttributes();
+    IEnumerable<ContentReference> GetReferencedContent();
 }

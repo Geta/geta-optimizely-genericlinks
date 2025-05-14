@@ -12,10 +12,10 @@ namespace Geta.Optimizely.GenericLinks;
 
 public abstract class LinkDataCollection
 {
-
+    public abstract IEnumerable<ILinkData> GetLinks();
 }
 
-public class LinkDataCollection<TLinkData> : LinkDataCollection, IList<TLinkData>, IReadOnly<LinkDataCollection<TLinkData>>, ICloneable, IReferenceMap
+public class LinkDataCollection<TLinkData> : LinkDataCollection, IEnumerable<TLinkData>, IReadOnly<LinkDataCollection<TLinkData>>, ICloneable, IReferenceMap
     where TLinkData : ILinkData
 {
     private readonly List<TLinkData> _linkCollection;
@@ -25,7 +25,7 @@ public class LinkDataCollection<TLinkData> : LinkDataCollection, IList<TLinkData
 
     public LinkDataCollection()
     {
-        _linkCollection = new List<TLinkData>();
+        _linkCollection = [];
     }
 
     public LinkDataCollection(int capacity)
@@ -35,7 +35,7 @@ public class LinkDataCollection<TLinkData> : LinkDataCollection, IList<TLinkData
 
     public LinkDataCollection(IEnumerable<TLinkData> links)
     {
-        _linkCollection = new List<TLinkData>(links);
+        _linkCollection = [.. links];
     }
 
     protected LinkDataCollection(bool isModified, bool isReadOnly, List<TLinkData> links)
@@ -160,6 +160,12 @@ public class LinkDataCollection<TLinkData> : LinkDataCollection, IList<TLinkData
     }
 
     public virtual IEnumerator<TLinkData> GetEnumerator() => _linkCollection.GetEnumerator();
+
+    public override IEnumerable<ILinkData> GetLinks()
+    {
+        foreach (var link in _linkCollection)
+            yield return link;
+    }
 
     public virtual LinkDataCollection<TLinkData> CreateWritableClone()
     {
