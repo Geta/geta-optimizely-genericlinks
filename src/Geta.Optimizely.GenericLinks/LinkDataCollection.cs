@@ -15,7 +15,7 @@ public abstract class LinkDataCollection
     public abstract IEnumerable<ILinkData> GetLinks();
 }
 
-public class LinkDataCollection<TLinkData> : LinkDataCollection, IEnumerable<TLinkData>, IReadOnly<LinkDataCollection<TLinkData>>, ICloneable, IReferenceMap
+public class LinkDataCollection<TLinkData> : LinkDataCollection, IList<TLinkData>, IReadOnly<LinkDataCollection<TLinkData>>, ICloneable, IReferenceMap
     where TLinkData : ILinkData
 {
     private readonly List<TLinkData> _linkCollection;

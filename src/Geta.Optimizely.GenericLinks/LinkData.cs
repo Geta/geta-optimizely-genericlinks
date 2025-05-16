@@ -18,9 +18,8 @@ namespace Geta.Optimizely.GenericLinks;
 
 public abstract class LinkData : ILinkData
 {
-    private readonly IDictionary<string, string> _attributes;
-    private readonly IDictionary<string, string> _attributeKeys;
-    private readonly object _pessimisticLock;
+    private readonly Dictionary<string, string> _attributes;
+    private readonly Dictionary<string, string> _attributeKeys;
 
     private bool _isModified;
     private bool _isReadOnly;
@@ -30,7 +29,6 @@ public abstract class LinkData : ILinkData
     {
         _attributes = new Dictionary<string, string>(4);
         _attributeKeys = new Dictionary<string, string>(4);
-        _pessimisticLock = new object();
     }
 
     [Display(Order = 100)]
@@ -73,6 +71,8 @@ public abstract class LinkData : ILinkData
     }
 
     [ScaffoldColumn(false)]
+    [SystemTextJsonIgnore]
+    [NewtonsoftJsonIgnore]
     public virtual IDictionary<string, string> Attributes => _attributes;
 
     [Ignore]
@@ -163,6 +163,9 @@ public abstract class LinkData : ILinkData
     //
     // Value:
     //     true if this property is read only; otherwise, false.
+
+    [SystemTextJsonIgnore]
+    [NewtonsoftJsonIgnore]
     public bool IsReadOnly
     {
         get
@@ -321,15 +324,9 @@ public abstract class LinkData : ILinkData
         if (_attributeKeys.TryGetValue(key, out var attributeKey))
             return attributeKey;
 
-        lock (_pessimisticLock)
-        {
-            if (_attributeKeys.ContainsKey(key))
-                return _attributeKeys[key];
+        attributeKey = key.ToCamel();
+        _attributeKeys.TryAdd(key, attributeKey);
 
-            attributeKey = key.ToCamel();
-            _attributeKeys.Add(key, attributeKey);
-
-            return attributeKey;
-        }
+        return attributeKey;
     }
 }
