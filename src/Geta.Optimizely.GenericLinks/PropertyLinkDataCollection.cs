@@ -136,6 +136,9 @@ public abstract class PropertyLinkDataCollection<TLinkData> : PropertyLinkDataCo
 
             lock (_lazyLock)
             {
+                if (!((ILazyProperty)this).HasLazyValue)
+                    return _linkItemCollection;
+
                 LoadData(base.LongString);
 
                 return _linkItemCollection;
