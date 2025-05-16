@@ -24,7 +24,7 @@ public class GenericLinkPropertyModel<T> : PropertyModel<T, PropertyLinkData<T>>
 
     public virtual void Expand(CultureInfo language)
     {
-    }        
+    }
 
     private T GetValue(T link)
     {

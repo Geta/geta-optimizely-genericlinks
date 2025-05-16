@@ -34,6 +34,7 @@ public abstract class PropertyLinkDataCollection<TLinkData> : PropertyLinkDataCo
     private readonly IUrlResolver _urlResolver;
     private readonly IAttributeSanitizer _attributeSanitizer;
     private readonly ILinkHtmlSerializer _htmlSerializer;
+    private readonly object _lazyLock = new();
 
     private LinkDataCollection<TLinkData>? _linkItemCollection;
 
@@ -130,12 +131,15 @@ public abstract class PropertyLinkDataCollection<TLinkData> : PropertyLinkDataCo
     {
         get
         {
-            if (_linkItemCollection is null)
+            if (!((ILazyProperty)this).HasLazyValue)
+                return _linkItemCollection;
+
+            lock (_lazyLock)
             {
                 LoadData(base.LongString);
-            }
 
-            return _linkItemCollection;
+                return _linkItemCollection;
+            }
         }
         set
         {

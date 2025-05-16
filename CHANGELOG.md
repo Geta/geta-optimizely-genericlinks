@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.1]
+
+### Fixed
+
+- (Attempted) fix for issue with Lazy loading in ContentDelivery api.
+- Fix for issue with local blocks in `2.0.0`.
+
 ## [2.0.0]
 
 ### Added
