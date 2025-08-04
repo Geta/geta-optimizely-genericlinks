@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.4]
+
+### Fixed
+
+- Adjustment of fix for issue from 1.9.2 from #38. Thanks to [emarksonopti](https://github.com/emarksonopti).
+
 ## [2.0.3]
 
 ### Fixed
