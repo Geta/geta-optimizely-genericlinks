@@ -285,7 +285,7 @@ public abstract class PropertyLinkDataCollection<TLinkData> : PropertyLinkDataCo
     protected override void SetDefaultValue()
     {
         base.SetDefaultValue();
-        _linkItemCollection = [];
+        _linkItemCollection = null;
     }
 
     protected virtual LinkDataCollection<TLinkData>? ParseToLinkCollection(string? value)
