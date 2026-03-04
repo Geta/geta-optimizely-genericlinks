@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.5]
+
+- Adjusted LinkData to use `ConcurrentDictionary` internally because of threading problems.
+
 ## [2.0.4]
 
 ### Fixed

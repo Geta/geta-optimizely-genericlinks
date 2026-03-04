@@ -1,25 +1,26 @@
 // Copyright (c) Geta Digital. All rights reserved.
 // Licensed under Apache-2.0. See the LICENSE file in the project root for more information
 
-using EPiServer.DataAnnotations;
-using EPiServer.Data.Entity;
-using EPiServer.Web;
-using Geta.Optimizely.GenericLinks.Extensions;
-using Geta.Optimizely.GenericLinks.Helpers;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.CompilerServices;
 using EPiServer.Core;
-using SystemTextJsonIgnore = System.Text.Json.Serialization.JsonIgnoreAttribute;
+using EPiServer.Data.Entity;
+using EPiServer.DataAnnotations;
+using EPiServer.Web;
+using Geta.Optimizely.GenericLinks.Extensions;
+using Geta.Optimizely.GenericLinks.Helpers;
 using NewtonsoftJsonIgnore = Newtonsoft.Json.JsonIgnoreAttribute;
+using SystemTextJsonIgnore = System.Text.Json.Serialization.JsonIgnoreAttribute;
 
 namespace Geta.Optimizely.GenericLinks;
 
 public abstract class LinkData : ILinkData
 {
-    private readonly Dictionary<string, string> _attributes;
-    private readonly Dictionary<string, string> _attributeKeys;
+    private readonly ConcurrentDictionary<string, string> _attributes;
+    private readonly ConcurrentDictionary<string, string> _attributeKeys;
 
     private bool _isModified;
     private bool _isReadOnly;
@@ -27,8 +28,8 @@ public abstract class LinkData : ILinkData
 
     protected LinkData()
     {
-        _attributes = new Dictionary<string, string>(4);
-        _attributeKeys = new Dictionary<string, string>(4);
+        _attributes = new ConcurrentDictionary<string, string>();
+        _attributeKeys = new ConcurrentDictionary<string, string>();
     }
 
     [Display(Order = 100)]
