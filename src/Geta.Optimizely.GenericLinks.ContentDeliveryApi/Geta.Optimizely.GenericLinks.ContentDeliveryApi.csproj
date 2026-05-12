@@ -1,10 +1,12 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net8.0;net6.0</TargetFrameworks>
+    <TargetFramework>net10.0</TargetFramework>
     <LangVersion>latest</LangVersion>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <NuGetAudit>false</NuGetAudit>
+    <NoWarn>NU1608</NoWarn>
     <PackageId>Geta.Optimizely.GenericLinks.ContentDeliveryApi</PackageId>
     <Title>GenericLink essentials for Optimizely ContentDeliveryApi</Title>
     <Authors>Geta Digital</Authors>
@@ -15,19 +17,16 @@
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageReleaseNotes>https://github.com/Geta/geta-optimizely-genericlinks/blob/master/CHANGELOG.md</PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/Geta/geta-optimizely-genericlinks</PackageProjectUrl>
-    <Description>Adds property models and converters for Optimizely ContentDeliveryApi.</Description>
+    <Description>Adds property models and converters for Optimizely ContentDeliveryApi. Note: EPiServer.ContentDeliveryApi.Core is not yet available for CMS 13.</Description>
     <PackageTags>Geta Optimizely Links LinkItemCollection ContentDeliveryApi</PackageTags>
     <RepositoryType>Git</RepositoryType>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/Geta/geta-optimizely-genericlinks.git</RepositoryUrl>
   </PropertyGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
-    <PackageReference Include="EPiServer.ContentDeliveryApi.Core" Version="[3.3.0,4.0.0)" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
-    <PackageReference Include="EPiServer.ContentDeliveryApi.Core" Version="[3.7.0,4.0.0)" />
+  <ItemGroup>
+    <PackageReference Include="EPiServer.ContentDeliveryApi.Core" Version="[3.11.3,4.0.0)" />
+    <PackageReference Include="EPiServer.CMS.UI.Core" Version="[13.0.0,14.0)" />
   </ItemGroup>
 
   <ItemGroup>

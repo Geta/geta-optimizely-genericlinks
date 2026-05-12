@@ -29,44 +29,46 @@ public class LinkDataBackingTypeResolverInterceptor : IBackingTypeResolver
         _resolvedTypes = new ConcurrentDictionary<Type, Type>();
     }
 
-    public virtual Type Resolve(Type type)
+    public virtual PropertyDefinitionTypeResolution Resolve(Type type)
     {
         if (_baseType.IsAssignableFrom(type))
         {
-            var resolvedType = TryResolveType(type, _propertyBaseType);
-            if (resolvedType is not null)
-                return resolvedType;
+            var resolved = TryResolveDefinition(type, _propertyBaseType);
+            if (resolved is not null)
+                return new PropertyDefinitionTypeResolution(resolved, PropertyDefinitionKind.Value);
         }
 
         if (_collectionBaseType.IsAssignableFrom(type))
         {
-            var resolvedType = TryResolveType(type, _collectionPropertyBaseType);
-            if (resolvedType is not null)
-                return resolvedType;
+            var resolved = TryResolveDefinition(type, _collectionPropertyBaseType);
+            if (resolved is not null)
+                return new PropertyDefinitionTypeResolution(resolved, PropertyDefinitionKind.Value);
         }
 
         return _interceptedResolver.Resolve(type);
     }
 
-    protected virtual Type? TryResolveType(Type type, Type baseType)
+    protected virtual PropertyDefinitionType? TryResolveDefinition(Type type, Type baseType)
     {
         if (_resolvedTypes.TryGetValue(type, out var resolvedType))
-            return resolvedType;
+        {
+            return _propertyDefinitionRepository.List()
+                .FirstOrDefault(d => d.DefinitionType == resolvedType);
+        }
 
         var linkDataType = type.GenericTypeArguments.Length > 0 ? type.GenericTypeArguments[0] : type;
         var propertyType = baseType.MakeGenericType(linkDataType);
 
         var definitions = _propertyDefinitionRepository.List();
-        var definitionTypes = definitions.Select(d => d.DefinitionType);
 
-        foreach (var definitionType in definitionTypes)
+        foreach (var definition in definitions)
         {
-            if (!propertyType.IsAssignableFrom(definitionType))
+            if (!propertyType.IsAssignableFrom(definition.DefinitionType))
                 continue;
 
-            _resolvedTypes.TryAdd(type, definitionType);
+            _resolvedTypes.TryAdd(type, definition.DefinitionType);
 
-            return definitionType;
+            return definition;
         }
 
         return null;

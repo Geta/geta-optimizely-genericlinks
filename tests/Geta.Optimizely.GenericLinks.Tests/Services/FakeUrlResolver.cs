@@ -21,7 +21,7 @@ public class FakeUrlResolver : IUrlResolver
 
     public ContentRouteData Route(UrlBuilder urlBuilder, RouteArguments routeArguments)
     {
-        return new ContentRouteData(null, "en-US", string.Empty, null, null);
+        return new ContentRouteData(null, "en-US", string.Empty, null, null, null);
     }
 
     public bool TryToPermanent(string url, out string permanentUrl)

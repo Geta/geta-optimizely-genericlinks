@@ -68,14 +68,24 @@ internal class GenericLinkInitializationModule : IConfigurableModule
 
         context.ConfigurationComplete += (o, e) =>
         {
-            services.Intercept<IBackingTypeResolver>((provider, typeResolver) =>
-                new LinkDataBackingTypeResolverInterceptor(typeResolver, provider.GetRequiredService<IPropertyDefinitionTypeRepository>()));
+            var existingDescriptor = services.FirstOrDefault(d => d.ServiceType == typeof(IBackingTypeResolver));
+            if (existingDescriptor is not null)
+            {
+                services.Remove(existingDescriptor);
+                services.AddSingleton<IBackingTypeResolver>(provider =>
+                {
+                    var innerResolver = (IBackingTypeResolver)ActivatorUtilities.CreateInstance(
+                        provider, existingDescriptor.ImplementationType!);
+                    return new LinkDataBackingTypeResolverInterceptor(innerResolver,
+                        provider.GetRequiredService<IPropertyDefinitionTypeRepository>());
+                });
+            }
         };
     }
 
     public void Initialize(InitializationEngine context)
     {
-        var provider = context.Locate.Advanced;
+        var provider = context.Services;
         var metadataHandlerRegistry = provider.GetInstance<MetadataHandlerRegistry>();
         var collectionDefinitionLoader = provider.GetInstance<PropertyLinkDataCollectionDefinitionsLoader>();
         var propertyDefinitionLoader = provider.GetInstance<PropertyLinkDataDefinitionsLoader>();

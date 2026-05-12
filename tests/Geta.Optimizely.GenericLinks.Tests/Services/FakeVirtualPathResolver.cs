@@ -5,6 +5,7 @@ using EPiServer.Web;
 
 namespace Geta.Optimizely.GenericLinks.Tests.Services;
 
+#pragma warning disable CS0618 // IVirtualPathResolver is obsolete in CMS 13
 public class FakeVirtualPathResolver : IVirtualPathResolver
 {
     public string ToAbsolute(string virtualPath)

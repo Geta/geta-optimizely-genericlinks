@@ -163,7 +163,7 @@ public abstract class PropertyLinkDataCollection<TLinkData> : PropertyLinkDataCo
             });
         }
     }
-    protected override string LongString
+    public override string LongString
     {
         get => _htmlSerializer.Serialize(_linkItemCollection, StringMode.InternalMode);
         set => base.LongString = value;

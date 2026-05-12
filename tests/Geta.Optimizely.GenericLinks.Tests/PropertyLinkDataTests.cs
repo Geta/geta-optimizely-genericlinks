@@ -484,7 +484,9 @@ public class PropertyLinkDataTests
         var serviceCollection = new ServiceCollection();
 
         serviceCollection.AddSingleton<IUrlResolver, FakeUrlResolver>();
+        #pragma warning disable CS0618
         serviceCollection.AddSingleton<IVirtualPathResolver, FakeVirtualPathResolver>();
+        #pragma warning restore CS0618
         serviceCollection.AddSingleton<IAttributeSanitizer, DefaultAttributeSanitizer>();
         serviceCollection.AddSingleton<ILinkHtmlSerializer, DefaultLinkHtmlSerializer>();
 

@@ -8,8 +8,8 @@ namespace Geta.Optimizely.GenericLinks.Tests.Services;
 
 internal sealed class NullBackingTypeResolver : IBackingTypeResolver
 {
-    public Type? Resolve(Type type)
+    public PropertyDefinitionTypeResolution Resolve(Type type)
     {
-        return null;
+        return null!;
     }
 }

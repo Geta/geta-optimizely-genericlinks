@@ -2,6 +2,7 @@
 // Licensed under Apache-2.0. See the LICENSE file in the project root for more information
 
 using EPiServer.Core;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
@@ -18,6 +19,7 @@ public abstract class PropertyLinkBase : PropertyLongString
     {
     }
 
+    [Obsolete]
     public override object? SaveData(PropertyDataCollection properties)
     {
         return ToLongString();

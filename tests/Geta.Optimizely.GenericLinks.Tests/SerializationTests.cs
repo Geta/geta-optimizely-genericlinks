@@ -410,12 +410,10 @@ public class SerializationTests
     private static UIDescriptorRegistry CreateUiDescriptorRegistry()
     {
         var descriptors = Enumerable.Empty<UIDescriptor>();
-#pragma warning disable CS0618 // Type or member is obsolete
-        var initializers = Enumerable.Empty<IUIDescriptorInitializer>();
-#pragma warning restore CS0618 // Type or member is obsolete
         var providers = Enumerable.Empty<UIDescriptorProvider>();
+        var logger = Microsoft.Extensions.Logging.Abstractions.NullLogger<UIDescriptorRegistry>.Instance;
 
-        return new UIDescriptorRegistry(descriptors, initializers, providers);
+        return new UIDescriptorRegistry(descriptors, providers, logger);
     }
 
     private static IEnumerable<Frame> CreateSystemFrames()

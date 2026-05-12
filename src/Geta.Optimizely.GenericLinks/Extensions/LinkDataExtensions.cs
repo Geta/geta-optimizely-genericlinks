@@ -6,6 +6,7 @@ using EPiServer.Web;
 using EPiServer.Web.Routing;
 using Geta.Optimizely.GenericLinks.Html;
 
+#pragma warning disable CS0618 // IVirtualPathResolver is obsolete in CMS 13
 namespace Geta.Optimizely.GenericLinks.Extensions;
 
 public static class LinkDataExtensions

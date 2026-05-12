@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Geta.Optimizely.GenericLinks.Extensions;
 
+#pragma warning disable CS0618 // IVirtualPathResolver is obsolete in CMS 13
 namespace Geta.Optimizely.GenericLinks.Html;
 
 public class DefaultLinkHtmlSerializer : ILinkHtmlSerializer

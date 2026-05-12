@@ -156,7 +156,7 @@ public abstract class PropertyLinkData<TLinkData> : PropertyLinkData, IReference
             });
         }
     }
-    protected override string LongString
+    public override string LongString
     {
         get => _htmlSerializer.Serialize(_linkItem, StringMode.InternalMode);
         set => base.LongString = value;
