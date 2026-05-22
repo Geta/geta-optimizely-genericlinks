@@ -47,7 +47,7 @@ public class Startup
         services.AddLinkDataExportTransform<ThumbnailLinkData>();
 
         var moduleName = typeof(LinkData).Assembly.GetName().Name;
-        var fullPath = Path.GetFullPath($"../{moduleName}");
+        var fullPath = Path.GetFullPath($"../../src/{moduleName}");
 
         services.Configure<CompositeFileProviderOptions>(options =>
         {

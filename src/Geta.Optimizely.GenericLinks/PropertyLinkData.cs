@@ -118,7 +118,7 @@ public abstract class PropertyLinkData<TLinkData> : PropertyLinkData, IReference
             if (_linkItem is not null)
                 return false;
 
-            return !((ILazyProperty)this).HasLazyValue;
+            return !HasBaseLazyValue();
         }
     }
 
@@ -131,7 +131,15 @@ public abstract class PropertyLinkData<TLinkData> : PropertyLinkData, IReference
         {
             if (_linkItem == null && !_hasLoaded)
             {
-                LoadData(base.LongString);
+                if (HasBaseLazyValue())
+                {
+                    var rawValue = ConsumeLazyValue();
+                    LoadData(rawValue);
+                }
+                else
+                {
+                    LoadData(base.LongString);
+                }
             }
 
             return _linkItem;
@@ -244,13 +252,13 @@ public abstract class PropertyLinkData<TLinkData> : PropertyLinkData, IReference
         {
             _linkItem = null;
         }
-        else if (value is TLinkData)
+        else if (value is TLinkData linkData)
         {
-            Value = value;
+            _linkItem = linkData;
         }
-        else
+        else if (value is string text)
         {
-            _linkItem = ParseToLink((string)value);
+            _linkItem = ParseToLink(text);
         }
 
         _hasLoaded = true;

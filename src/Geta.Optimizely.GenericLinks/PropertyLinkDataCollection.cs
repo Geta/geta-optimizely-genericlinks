@@ -120,7 +120,7 @@ public abstract class PropertyLinkDataCollection<TLinkData> : PropertyLinkDataCo
             if (_linkItemCollection is not null && _linkItemCollection.Count > 0)
                 return false;
 
-            return !((ILazyProperty)this).HasLazyValue;
+            return !HasBaseLazyValue();
         }
     }
 
@@ -131,15 +131,16 @@ public abstract class PropertyLinkDataCollection<TLinkData> : PropertyLinkDataCo
     {
         get
         {
-            if (!((ILazyProperty)this).HasLazyValue)
+            if (!HasBaseLazyValue())
                 return _linkItemCollection;
 
             lock (_lazyLock)
             {
-                if (!((ILazyProperty)this).HasLazyValue)
+                if (!HasBaseLazyValue())
                     return _linkItemCollection;
 
-                LoadData(base.LongString);
+                var rawValue = ConsumeLazyValue();
+                LoadData(rawValue);
 
                 return _linkItemCollection;
             }
@@ -256,13 +257,13 @@ public abstract class PropertyLinkDataCollection<TLinkData> : PropertyLinkDataCo
         {
             _linkItemCollection = [];
         }
-        else if (value is LinkDataCollection<TLinkData>)
+        else if (value is LinkDataCollection<TLinkData> collection)
         {
-            Value = value;
+            _linkItemCollection = collection;
         }
-        else
+        else if (value is string text)
         {
-            _linkItemCollection = ParseToLinkCollection((string)value);
+            _linkItemCollection = ParseToLinkCollection(text);
         }
     }
 

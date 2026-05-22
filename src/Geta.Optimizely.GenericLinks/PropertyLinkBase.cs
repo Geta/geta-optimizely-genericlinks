@@ -5,18 +5,45 @@ using EPiServer.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Xml.Linq;
 
 namespace Geta.Optimizely.GenericLinks;
 
 public abstract class PropertyLinkBase : PropertyLongString
 {
+    private static readonly FieldInfo? LazyFactoryField =
+        typeof(PropertyLongString).GetField("_lazyValueFactory", BindingFlags.NonPublic | BindingFlags.Instance);
+
     protected PropertyLinkBase()
     {
     }
 
     protected PropertyLinkBase(string value) : base(value)
     {
+    }
+
+    // CMS 13 PropertyLongString.LongString getter casts the lazy value to (string).
+    // When the lazy factory returns a typed object instead of a string, that cast fails.
+    // This method consumes the factory directly, bypassing the base class's string-only path.
+    protected object? ConsumeLazyValue()
+    {
+        if (LazyFactoryField == null) return null;
+        var factory = LazyFactoryField.GetValue(this) as Func<object>;
+        if (factory == null) return null;
+        LazyFactoryField.SetValue(this, null);
+        return factory();
+    }
+
+    protected bool HasBaseLazyValue()
+    {
+        if (LazyFactoryField == null) return false;
+        return LazyFactoryField.GetValue(this) != null;
+    }
+
+    public override object? SaveData()
+    {
+        return ToLongString();
     }
 
     [Obsolete]
