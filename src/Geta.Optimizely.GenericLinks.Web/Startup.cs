@@ -55,6 +55,10 @@ public class Startup
                                                   $"/Optimizely/{moduleName}",
                                                   string.Empty,
                                                   fullPath));
+            options.BasePathFileProviders.Add(new MappingPhysicalFileProvider(
+                                                  "/",
+                                                  string.Empty,
+                                                  Path.GetFullPath(".")));
         });
     }
 

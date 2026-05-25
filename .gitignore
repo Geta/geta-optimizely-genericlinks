@@ -1,6 +1,9 @@
 **/modules
 !sandbox/**/modules/_protected/Geta.Optimizely.GenericLinks
 
+# Junction to Foundation App_Data (created at dev time, not committed)
+src/Geta.Optimizely.GenericLinks.Web/App_Data
+
 .npm-cache/
 
 ./Publish/*
