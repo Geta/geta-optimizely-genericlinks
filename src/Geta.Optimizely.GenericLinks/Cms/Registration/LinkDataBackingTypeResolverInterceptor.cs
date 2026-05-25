@@ -12,7 +12,7 @@ public class LinkDataBackingTypeResolverInterceptor : IBackingTypeResolver
 {
     private readonly IBackingTypeResolver _interceptedResolver;
     private readonly IPropertyDefinitionTypeRepository _propertyDefinitionRepository;
-    private readonly ConcurrentDictionary<Type, Type> _resolvedTypes;
+    private readonly ConcurrentDictionary<Type, PropertyDefinitionType> _resolvedTypes;
     private readonly Type _baseType;
     private readonly Type _collectionBaseType;
     private readonly Type _propertyBaseType;
@@ -26,7 +26,7 @@ public class LinkDataBackingTypeResolverInterceptor : IBackingTypeResolver
         _collectionBaseType = typeof(LinkDataCollection);
         _propertyBaseType = typeof(PropertyLinkData<>);
         _collectionPropertyBaseType = typeof(PropertyLinkDataCollection<>);
-        _resolvedTypes = new ConcurrentDictionary<Type, Type>();
+        _resolvedTypes = new ConcurrentDictionary<Type, PropertyDefinitionType>();
     }
 
     public virtual PropertyDefinitionTypeResolution Resolve(Type type)
@@ -50,11 +50,8 @@ public class LinkDataBackingTypeResolverInterceptor : IBackingTypeResolver
 
     protected virtual PropertyDefinitionType? TryResolveDefinition(Type type, Type baseType)
     {
-        if (_resolvedTypes.TryGetValue(type, out var resolvedType))
-        {
-            return _propertyDefinitionRepository.List()
-                .FirstOrDefault(d => d.DefinitionType == resolvedType);
-        }
+        if (_resolvedTypes.TryGetValue(type, out var cached))
+            return cached;
 
         var linkDataType = type.GenericTypeArguments.Length > 0 ? type.GenericTypeArguments[0] : type;
         var propertyType = baseType.MakeGenericType(linkDataType);
@@ -66,7 +63,7 @@ public class LinkDataBackingTypeResolverInterceptor : IBackingTypeResolver
             if (!propertyType.IsAssignableFrom(definition.DefinitionType))
                 continue;
 
-            _resolvedTypes.TryAdd(type, definition.DefinitionType);
+            _resolvedTypes.TryAdd(type, definition);
 
             return definition;
         }
