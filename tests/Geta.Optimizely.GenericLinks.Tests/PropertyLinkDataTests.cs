@@ -470,8 +470,7 @@ public class PropertyLinkDataTests
     {
         var urlResolver = new FakeUrlResolver();
         var attributeSanitizer = new DefaultAttributeSanitizer();
-        var virtualPathResolver = new FakeVirtualPathResolver();
-        var linkSerializer = new DefaultLinkHtmlSerializer(virtualPathResolver, urlResolver);
+        var linkSerializer = new DefaultLinkHtmlSerializer(urlResolver);
 
         if (linkData is null)
             return new PropertyTestLinkData(urlResolver, attributeSanitizer, linkSerializer);
@@ -484,9 +483,6 @@ public class PropertyLinkDataTests
         var serviceCollection = new ServiceCollection();
 
         serviceCollection.AddSingleton<IUrlResolver, FakeUrlResolver>();
-        #pragma warning disable CS0618
-        serviceCollection.AddSingleton<IVirtualPathResolver, FakeVirtualPathResolver>();
-        #pragma warning restore CS0618
         serviceCollection.AddSingleton<IAttributeSanitizer, DefaultAttributeSanitizer>();
         serviceCollection.AddSingleton<ILinkHtmlSerializer, DefaultLinkHtmlSerializer>();
 
@@ -504,8 +500,7 @@ public class PropertyLinkDataTests
     {
         var urlResolver = new FakeUrlResolver();
         var attributeSanitizer = new DefaultAttributeSanitizer();
-        var virtualPathResolver = new FakeVirtualPathResolver();
-        var linkSerializer = new DefaultLinkHtmlSerializer(virtualPathResolver, urlResolver);
+        var linkSerializer = new DefaultLinkHtmlSerializer(urlResolver);
         var collection = CreateLinkDataCollection(linkData);
 
         return new PropertyTestCollection(collection, urlResolver, attributeSanitizer, linkSerializer);

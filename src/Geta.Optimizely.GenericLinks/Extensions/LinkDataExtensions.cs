@@ -2,27 +2,23 @@
 // Licensed under Apache-2.0. See the LICENSE file in the project root for more information
 
 using EPiServer.ServiceLocation;
-using EPiServer.Web;
 using EPiServer.Web.Routing;
 using Geta.Optimizely.GenericLinks.Html;
 
-#pragma warning disable CS0618 // IVirtualPathResolver is obsolete in CMS 13
 namespace Geta.Optimizely.GenericLinks.Extensions;
 
 public static class LinkDataExtensions
 {
-    public static string GetMappedHref(this ILinkData linkData, IVirtualPathResolver? virtualPathResolver = null)
+    public static string GetMappedHref(this ILinkData linkData)
     {
-        virtualPathResolver ??= ServiceLocator.Current.GetInstance<IVirtualPathResolver>();
-        return virtualPathResolver.ToAbsoluteOrSame(linkData.Href);
+        return VirtualPathHelper.ToAbsoluteOrSame(linkData.Href);
     }
 
-    public static string? ToMappedLink(this ILinkData linkData, IVirtualPathResolver? virtualPathResolver = null, ILinkHtmlSerializer? linkHtmlSerializer = null)
+    public static string? ToMappedLink(this ILinkData linkData, ILinkHtmlSerializer? linkHtmlSerializer = null)
     {
-        virtualPathResolver ??= ServiceLocator.Current.GetInstance<IVirtualPathResolver>();
         linkHtmlSerializer ??= ServiceLocator.Current.GetInstance<ILinkHtmlSerializer>();
-        
-        var hrefValue = GetMappedHref(linkData, virtualPathResolver);
+
+        var hrefValue = GetMappedHref(linkData);
 
         return linkHtmlSerializer.CreateLink(hrefValue, linkData);
     }

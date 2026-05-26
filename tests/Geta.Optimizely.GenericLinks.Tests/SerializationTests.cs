@@ -353,9 +353,8 @@ public class SerializationTests
     private static DefaultLinkHtmlSerializer CreateLinkHtmlSerializer()
     {
         var urlResolver = new FakeUrlResolver();
-        var virtualPathResolver = new FakeVirtualPathResolver();
 
-        return new DefaultLinkHtmlSerializer(virtualPathResolver, urlResolver);
+        return new DefaultLinkHtmlSerializer(urlResolver);
     }
 
     private static NewtonsoftLinkDataConverter CreateNewtonsoftLinkDataConverter()
@@ -400,11 +399,10 @@ public class SerializationTests
     {
         var attributeConverters = CreateAttributeConverters();
         var urlResolver = new FakeUrlResolver();
-        var virtualPathResolver = new FakeVirtualPathResolver();
         var frameRepository = new InMemoryFrameRepository(CreateSystemFrames());
         var uiDescriptorRepository = CreateUiDescriptorRegistry();
 
-        return new DefaultLinkModelConverter(urlResolver, frameRepository, virtualPathResolver, attributeConverters, uiDescriptorRepository);
+        return new DefaultLinkModelConverter(urlResolver, frameRepository, attributeConverters, uiDescriptorRepository);
     }
 
     private static UIDescriptorRegistry CreateUiDescriptorRegistry()

@@ -39,23 +39,21 @@ public class ExtensionTests
     [Fact]
     public void LinkDataExtensions_GetMappedHref_returns_href()
     {
-        var virtualPathResolver = new FakeVirtualPathResolver();
         var linkData = new TestLinkData()
         {
             Href = "~/localhost/"
         };
 
-        var subject = LinkDataExtensions.GetMappedHref(linkData, virtualPathResolver);
+        var subject = LinkDataExtensions.GetMappedHref(linkData);
 
-        Assert.Equal("localhost/", subject);
+        Assert.Equal("/localhost/", subject);
     }
 
     [Fact]
     public void LinkDataExtensions_ToMappedLink_returns_link()
     {
-        var virtualPathResolver = new FakeVirtualPathResolver();
         var urlResolver = new FakeUrlResolver();
-        var htmlSerializer = new DefaultLinkHtmlSerializer(virtualPathResolver, urlResolver);
+        var htmlSerializer = new DefaultLinkHtmlSerializer(urlResolver);
 
         var linkData = new TestLinkData()
         {
@@ -64,7 +62,7 @@ public class ExtensionTests
             Title = "A test link"
         };
 
-        var subject = LinkDataExtensions.ToMappedLink(linkData, virtualPathResolver, htmlSerializer);
+        var subject = LinkDataExtensions.ToMappedLink(linkData, htmlSerializer);
 
         Assert.NotNull(subject);
 
@@ -83,15 +81,14 @@ public class ExtensionTests
         Assert.Equal(linkData.Title, title);
 
         var href = element.Attribute("href")?.Value;
-        Assert.Equal("localhost/", href);
+        Assert.Equal("/localhost/", href);
     }
 
     [Fact]
     public void LinkDataExtensions_ToPermanent_returns_link()
     {
-        var virtualPathResolver = new FakeVirtualPathResolver();
         var urlResolver = new FakeUrlResolver();
-        var htmlSerializer = new DefaultLinkHtmlSerializer(virtualPathResolver, urlResolver);
+        var htmlSerializer = new DefaultLinkHtmlSerializer(urlResolver);
 
         var linkData = new TestLinkData()
         {

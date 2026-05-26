@@ -3,23 +3,19 @@
 
 using System.Net;
 using System.Text;
-using EPiServer.Web;
 using EPiServer.Web.Routing;
 using System.Collections.Generic;
 using System.Linq;
 using Geta.Optimizely.GenericLinks.Extensions;
 
-#pragma warning disable CS0618 // IVirtualPathResolver is obsolete in CMS 13
 namespace Geta.Optimizely.GenericLinks.Html;
 
 public class DefaultLinkHtmlSerializer : ILinkHtmlSerializer
 {
-    private readonly IVirtualPathResolver _virtualPathResolver;
     private readonly IUrlResolver _urlResolver;
 
-    public DefaultLinkHtmlSerializer(IVirtualPathResolver virtualPathResolver, IUrlResolver urlResolver)
+    public DefaultLinkHtmlSerializer(IUrlResolver urlResolver)
     {
-        _virtualPathResolver = virtualPathResolver;
         _urlResolver = urlResolver;
     }
 
@@ -92,7 +88,7 @@ public class DefaultLinkHtmlSerializer : ILinkHtmlSerializer
 
         if (mode == StringMode.ViewMode)
         {
-            href = _virtualPathResolver.ToAbsoluteOrSame(link.Href);
+            href = VirtualPathHelper.ToAbsoluteOrSame(link.Href);
         }
         else
         {
