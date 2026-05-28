@@ -6,7 +6,9 @@
     <Nullable>enable</Nullable>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <NuGetAudit>false</NuGetAudit>
+    <NuGetAudit>true</NuGetAudit>
+    <NuGetAuditMode>direct</NuGetAuditMode>
+    <NuGetAuditLevel>high</NuGetAuditLevel>
     <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
     <PackageId>Geta.Optimizely.GenericLinks</PackageId>
     <Title>Extensible link items for Optimizely</Title>
@@ -26,8 +28,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="EPiServer.CMS.UI" Version="[13.0.0,14.0)" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="EPiServer.CMS.UI" Version="[13.0.0,13.1.0)" />
   </ItemGroup>
 
   <PropertyGroup>

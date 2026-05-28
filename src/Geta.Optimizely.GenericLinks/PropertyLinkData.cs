@@ -260,6 +260,10 @@ public abstract class PropertyLinkData<TLinkData> : PropertyLinkData, IReference
         {
             _linkItem = ParseToLink(text);
         }
+        else
+        {
+            throw new InvalidOperationException($"Unsupported value type {value.GetType()} for {GetType().Name}.LoadData");
+        }
 
         _hasLoaded = true;
     }

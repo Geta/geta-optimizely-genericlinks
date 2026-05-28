@@ -15,6 +15,8 @@ public abstract class PropertyLinkBase : PropertyLongString
     private static readonly FieldInfo? LazyFactoryField =
         typeof(PropertyLongString).GetField("_lazyValueFactory", BindingFlags.NonPublic | BindingFlags.Instance);
 
+    internal static bool IsLazyValueReflectionAvailable => LazyFactoryField != null;
+
     protected PropertyLinkBase()
     {
     }
@@ -23,9 +25,12 @@ public abstract class PropertyLinkBase : PropertyLongString
     {
     }
 
-    // CMS 13 PropertyLongString.LongString getter casts the lazy value to (string).
-    // When the lazy factory returns a typed object instead of a string, that cast fails.
-    // This method consumes the factory directly, bypassing the base class's string-only path.
+    // CMS 13 workaround: PropertyLongString.LongString getter hard-casts the internal
+    // _lazyValueFactory result to (string), which throws for typed property subclasses.
+    // We consume the Func<object> factory via reflection, bypassing the string-only path.
+    // Startup guard in GenericLinkInitializationModule.Initialize fails fast if the field
+    // is renamed/removed in a future CMS build. When bumping the CMS.UI version range,
+    // verify that PropertyLongString still exposes _lazyValueFactory as Func<object>.
     protected object? ConsumeLazyValue()
     {
         if (LazyFactoryField == null) return null;

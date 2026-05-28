@@ -10,6 +10,6 @@ internal sealed class NullBackingTypeResolver : IBackingTypeResolver
 {
     public PropertyDefinitionTypeResolution Resolve(Type type)
     {
-        return null!;
+        throw new NotImplementedException("NullBackingTypeResolver should not be called directly — the interceptor should resolve link types before falling through.");
     }
 }

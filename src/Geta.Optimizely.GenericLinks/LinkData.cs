@@ -12,8 +12,7 @@ using EPiServer.DataAnnotations;
 using EPiServer.Web;
 using Geta.Optimizely.GenericLinks.Extensions;
 using Geta.Optimizely.GenericLinks.Helpers;
-using NewtonsoftJsonIgnore = Newtonsoft.Json.JsonIgnoreAttribute;
-using SystemTextJsonIgnore = System.Text.Json.Serialization.JsonIgnoreAttribute;
+using System.Text.Json.Serialization;
 
 namespace Geta.Optimizely.GenericLinks;
 
@@ -72,13 +71,11 @@ public abstract class LinkData : ILinkData
     }
 
     [ScaffoldColumn(false)]
-    [SystemTextJsonIgnore]
-    [NewtonsoftJsonIgnore]
+    [JsonIgnore]
     public virtual IDictionary<string, string> Attributes => _attributes;
 
     [Ignore]
-    [SystemTextJsonIgnore]
-    [NewtonsoftJsonIgnore]
+    [JsonIgnore]
     public virtual bool IsModified
     {
         get => _isModified;
@@ -86,8 +83,7 @@ public abstract class LinkData : ILinkData
 
     [Ignore]
     [ScaffoldColumn(false)]
-    [SystemTextJsonIgnore]
-    [NewtonsoftJsonIgnore]
+    [JsonIgnore]
     public virtual IList<Guid> ReferencedPermanentLinkIds
     {
         get
@@ -165,8 +161,7 @@ public abstract class LinkData : ILinkData
     // Value:
     //     true if this property is read only; otherwise, false.
 
-    [SystemTextJsonIgnore]
-    [NewtonsoftJsonIgnore]
+    [JsonIgnore]
     public bool IsReadOnly
     {
         get

@@ -265,6 +265,10 @@ public abstract class PropertyLinkDataCollection<TLinkData> : PropertyLinkDataCo
         {
             _linkItemCollection = ParseToLinkCollection(text);
         }
+        else
+        {
+            throw new InvalidOperationException($"Unsupported value type {value.GetType()} for {GetType().Name}.LoadData");
+        }
     }
 
     public virtual void RemapPermanentLinkReferences(IDictionary<Guid, Guid> idMap)
