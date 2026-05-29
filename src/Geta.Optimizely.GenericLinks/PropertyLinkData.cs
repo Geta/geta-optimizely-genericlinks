@@ -33,6 +33,7 @@ public abstract class PropertyLinkData<TLinkData> : PropertyLinkData, IReference
     private readonly IAttributeSanitizer _attributeSanitizer;
     private readonly ILinkHtmlSerializer _htmlSerializer;
 
+    private readonly object _lazyLock = new();
     private TLinkData? _linkItem;
     private volatile bool _hasLoaded;
 
@@ -131,14 +132,20 @@ public abstract class PropertyLinkData<TLinkData> : PropertyLinkData, IReference
         {
             if (_linkItem == null && !_hasLoaded)
             {
-                if (HasBaseLazyValue())
+                lock (_lazyLock)
                 {
-                    var rawValue = ConsumeLazyValue();
-                    LoadData(rawValue);
-                }
-                else
-                {
-                    LoadData(base.LongString);
+                    if (_linkItem == null && !_hasLoaded)
+                    {
+                        if (HasBaseLazyValue())
+                        {
+                            var rawValue = ConsumeLazyValue();
+                            LoadData(rawValue);
+                        }
+                        else
+                        {
+                            LoadData(base.LongString);
+                        }
+                    }
                 }
             }
 

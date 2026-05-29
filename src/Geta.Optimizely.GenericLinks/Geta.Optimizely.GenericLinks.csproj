@@ -28,7 +28,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="EPiServer.CMS.UI" Version="[13.0.0,13.1.0)" />
+    <PackageReference Include="EPiServer.CMS.UI" Version="[13.0.0,14.0)" />
   </ItemGroup>
 
   <PropertyGroup>

@@ -19,7 +19,6 @@ All notable changes to this project will be documented in this file.
 - `LinkDataExtensions.GetMappedHref()` and `ToMappedLink()` no longer accept `IVirtualPathResolver` parameter (breaking change).
 - `DefaultLinkHtmlSerializer` constructor no longer accepts `IVirtualPathResolver` parameter (breaking change).
 - `DefaultLinkModelConverter` constructor no longer accepts `IVirtualPathResolver` parameter (breaking change).
-- `EPiServer.CMS.UI` dependency pinned to `[13.0.0, 13.1.0)` until each minor is validated.
 
 ### Removed
 
