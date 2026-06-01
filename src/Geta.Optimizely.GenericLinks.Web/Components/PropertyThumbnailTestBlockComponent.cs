@@ -8,8 +8,8 @@ namespace Geta.Optimizely.GenericLinks.Web.Components;
 [TemplateDescriptor]
 public class PropertyThumbnailTestBlockComponent : AsyncBlockComponent<PropertyThumbnailTestBlock>
 {
-    protected override async Task<IViewComponentResult> InvokeComponentAsync(PropertyThumbnailTestBlock currentBlock)
+    protected override Task<IViewComponentResult> InvokeComponentAsync(PropertyThumbnailTestBlock currentBlock)
     {
-        return await Task.FromResult(View("/Views/PropertyThumbnailTestBlock.cshtml", currentBlock));
+        return Task.FromResult<IViewComponentResult>(View("/Views/PropertyThumbnailTestBlock.cshtml", currentBlock));
     }
 }

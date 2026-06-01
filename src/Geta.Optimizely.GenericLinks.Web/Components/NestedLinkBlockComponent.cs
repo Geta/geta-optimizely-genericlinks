@@ -8,8 +8,8 @@ namespace Geta.Optimizely.GenericLinks.Web.Components;
 [TemplateDescriptor]
 public class NestedLinkBlockComponent : AsyncBlockComponent<NestedLinkBlock>
 {
-    protected override async Task<IViewComponentResult> InvokeComponentAsync(NestedLinkBlock currentBlock)
+    protected override Task<IViewComponentResult> InvokeComponentAsync(NestedLinkBlock currentBlock)
     {
-        return await Task.FromResult(View("/Views/NestedLinkBlock.cshtml", currentBlock));
+        return Task.FromResult<IViewComponentResult>(View("/Views/NestedLinkBlock.cshtml", currentBlock));
     }
 }
