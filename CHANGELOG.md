@@ -6,7 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
-- Support for Optimizely CMS 13 and .NET 10.
+- Support for Optimizely CMS 13.1 and .NET 10.
 - Internal `VirtualPathHelper` replacing the obsolete `IVirtualPathResolver`.
 
 ### Changed
