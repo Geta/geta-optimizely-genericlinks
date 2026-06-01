@@ -1,9 +1,7 @@
 # Geta.Optimizely.GenericLinks
 
-![](<http://tc.geta.no/app/rest/builds/buildType:(id:GetaPackages_Genericlinks_00ci),branch:master/statusIcon>)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Geta_geta-optimizely-genericlinks&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Geta_geta-optimizely-genericlinks)
-[![Platform](https://img.shields.io/badge/Platform-.NET%206-blue.svg?style=flat)](https://docs.microsoft.com/en-us/dotnet/)
-[![Platform](https://img.shields.io/badge/Optimizely-%2012-orange.svg?style=flat)](http://world.episerver.com/cms/)
+[![Platform](https://img.shields.io/badge/Platform-.NET%2010-blue.svg?style=flat)](https://docs.microsoft.com/en-us/dotnet/)
+[![Platform](https://img.shields.io/badge/Optimizely-%2013-orange.svg?style=flat)](http://world.episerver.com/cms/)
 
 ## What is does?
 
@@ -11,7 +9,7 @@ Provides a new property type `LinkDataCollection` which is an alternative to `Li
 
 ## How to get started?
 
-Requires using .NET 5.0 or higher and Optimizely 12
+Requires .NET 10 or higher and Optimizely CMS 13
 
 - `dotnet add package Geta.Optimizely.GenericLinks`
 
@@ -28,7 +26,6 @@ Make sure to read the first example about implementation.
 
 ### Documentation
 
-- [Adding support for EPiServer.ContentDeliveryApi](./docs/content-delivery-api.md)
 - [Advanced property handling](./docs/advanced-property-handling.md)
 - [Adding support for additional property types](./docs/adding-support-for-new-properties.md)
 

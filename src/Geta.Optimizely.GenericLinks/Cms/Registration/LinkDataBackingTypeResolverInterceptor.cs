@@ -12,7 +12,7 @@ public class LinkDataBackingTypeResolverInterceptor : IBackingTypeResolver
 {
     private readonly IBackingTypeResolver _interceptedResolver;
     private readonly IPropertyDefinitionTypeRepository _propertyDefinitionRepository;
-    private readonly ConcurrentDictionary<Type, Type> _resolvedTypes;
+    private readonly ConcurrentDictionary<Type, PropertyDefinitionType> _resolvedTypes;
     private readonly Type _baseType;
     private readonly Type _collectionBaseType;
     private readonly Type _propertyBaseType;
@@ -26,47 +26,46 @@ public class LinkDataBackingTypeResolverInterceptor : IBackingTypeResolver
         _collectionBaseType = typeof(LinkDataCollection);
         _propertyBaseType = typeof(PropertyLinkData<>);
         _collectionPropertyBaseType = typeof(PropertyLinkDataCollection<>);
-        _resolvedTypes = new ConcurrentDictionary<Type, Type>();
+        _resolvedTypes = new ConcurrentDictionary<Type, PropertyDefinitionType>();
     }
 
-    public virtual Type Resolve(Type type)
+    public virtual PropertyDefinitionTypeResolution Resolve(Type type)
     {
         if (_baseType.IsAssignableFrom(type))
         {
-            var resolvedType = TryResolveType(type, _propertyBaseType);
-            if (resolvedType is not null)
-                return resolvedType;
+            var resolved = TryResolveDefinition(type, _propertyBaseType);
+            if (resolved is not null)
+                return new PropertyDefinitionTypeResolution(resolved, PropertyDefinitionKind.Value);
         }
 
         if (_collectionBaseType.IsAssignableFrom(type))
         {
-            var resolvedType = TryResolveType(type, _collectionPropertyBaseType);
-            if (resolvedType is not null)
-                return resolvedType;
+            var resolved = TryResolveDefinition(type, _collectionPropertyBaseType);
+            if (resolved is not null)
+                return new PropertyDefinitionTypeResolution(resolved, PropertyDefinitionKind.Value);
         }
 
         return _interceptedResolver.Resolve(type);
     }
 
-    protected virtual Type? TryResolveType(Type type, Type baseType)
+    protected virtual PropertyDefinitionType? TryResolveDefinition(Type type, Type baseType)
     {
-        if (_resolvedTypes.TryGetValue(type, out var resolvedType))
-            return resolvedType;
+        if (_resolvedTypes.TryGetValue(type, out var cached))
+            return cached;
 
         var linkDataType = type.GenericTypeArguments.Length > 0 ? type.GenericTypeArguments[0] : type;
         var propertyType = baseType.MakeGenericType(linkDataType);
 
         var definitions = _propertyDefinitionRepository.List();
-        var definitionTypes = definitions.Select(d => d.DefinitionType);
 
-        foreach (var definitionType in definitionTypes)
+        foreach (var definition in definitions)
         {
-            if (!propertyType.IsAssignableFrom(definitionType))
+            if (!propertyType.IsAssignableFrom(definition.DefinitionType))
                 continue;
 
-            _resolvedTypes.TryAdd(type, definitionType);
+            _resolvedTypes.TryAdd(type, definition);
 
-            return definitionType;
+            return definition;
         }
 
         return null;

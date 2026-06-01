@@ -18,7 +18,6 @@ public class DefaultLinkModelConverter : ILinkModelConverter
 {
     private readonly IUrlResolver _urlResolver;
     private readonly IFrameRepository _frameRepository;
-    private readonly IVirtualPathResolver _virtualPathResolver;
     private readonly IEnumerable<ILinkDataAttibuteConverter> _attibuteConverters;
     private readonly IDictionary<Type, ILinkDataAttibuteConverter> _resolvedAttributeConverters;
     private readonly UIDescriptorRegistry _uiDescriptors;
@@ -26,13 +25,11 @@ public class DefaultLinkModelConverter : ILinkModelConverter
     public DefaultLinkModelConverter(
         IUrlResolver urlResolver,
         IFrameRepository frameRepository,
-        IVirtualPathResolver virtualPathResolver,
         IEnumerable<ILinkDataAttibuteConverter> attibuteConverters,
         UIDescriptorRegistry uiDescriptors)
     {
         _urlResolver = urlResolver;
         _frameRepository = frameRepository;
-        _virtualPathResolver = virtualPathResolver;
         _attibuteConverters = attibuteConverters;
         _resolvedAttributeConverters = new Dictionary<Type, ILinkDataAttibuteConverter>();
         _uiDescriptors = uiDescriptors;
@@ -172,7 +169,7 @@ public class DefaultLinkModelConverter : ILinkModelConverter
 
     protected virtual void ModifyIContentProperties(ILinkData serverModel, LinkModel clientModel)
     {
-        var mappedHref = _virtualPathResolver.ToAbsoluteOrSame(serverModel.Href);
+        var mappedHref = VirtualPathHelper.ToAbsoluteOrSame(serverModel.Href);
         if (!string.IsNullOrEmpty(mappedHref))
         {
             UrlBuilder urlBuilder;
@@ -186,12 +183,12 @@ public class DefaultLinkModelConverter : ILinkModelConverter
                 return;
             }
 
-            var content = _urlResolver.Route(urlBuilder, ContextMode.Preview);
-            if (content is null)
+            var routeData = _urlResolver.Route(urlBuilder, new RouteArguments { ContextMode = ContextMode.Preview });
+            if (routeData?.Content is null)
                 return;
 
-            clientModel.TypeIdentifier = _uiDescriptors.GetTypeIdentifier(content.GetType());
-            clientModel.PublicUrl = _urlResolver.GetUrl(content.ContentLink);
+            clientModel.TypeIdentifier = _uiDescriptors.GetTypeIdentifier(routeData.Content.GetType());
+            clientModel.PublicUrl = _urlResolver.GetUrl(routeData.Content.ContentLink);
         }
     }
 

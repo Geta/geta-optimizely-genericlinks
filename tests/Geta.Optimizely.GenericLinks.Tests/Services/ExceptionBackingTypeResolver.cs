@@ -15,7 +15,7 @@ public class ExceptionBackingTypeResolver : IBackingTypeResolver
         _exception = exception;
     }
 
-    public Type Resolve(Type type)
+    public PropertyDefinitionTypeResolution Resolve(Type type)
     {
         throw _exception;
     }

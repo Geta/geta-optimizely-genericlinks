@@ -1,0 +1,29 @@
+@using EPiServer.Core
+@using EPiServer.Web.Routing
+@using Geta.Optimizely.GenericLinks.Extensions
+@using Geta.Optimizely.GenericLinks.Web.Models
+@inject IUrlResolver UrlResolver
+@model NestedLinkBlock
+
+<div class="nested-link-block p-3 border mb-3">
+    @if (!string.IsNullOrEmpty(Model.Name))
+    {
+        <h4>@Model.Name</h4>
+    }
+
+    @if (Model.ThumbnailLinks != null && Model.ThumbnailLinks.Any())
+    {
+        <ul class="list-unstyled">
+            @foreach (var link in Model.ThumbnailLinks)
+            {
+                <li class="mb-2">
+                    @if (!ContentReference.IsNullOrEmpty(link.Thumbnail))
+                    {
+                        <img src="@UrlResolver.GetUrl(link.Thumbnail)" alt="@link.Text" style="max-height: 50px;" />
+                    }
+                    <a href="@link.GetMappedHref()" target="@link.Target" title="@link.Title">@link.Text</a>
+                </li>
+            }
+        </ul>
+    }
+</div>

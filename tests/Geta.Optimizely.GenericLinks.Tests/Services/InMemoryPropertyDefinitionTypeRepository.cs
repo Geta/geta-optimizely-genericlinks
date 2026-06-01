@@ -72,6 +72,7 @@ public class InMemoryPropertyDefinitionTypeRepository : IPropertyDefinitionTypeR
         throw new InvalidOperationException($"PropertyDefinition with type {type.Name} not found");
     }
 
+    #pragma warning disable CS0618
     public BlockPropertyDefinitionType LoadByBlockType(Guid blockTypeId)
     {
         throw new NotImplementedException();
@@ -81,6 +82,7 @@ public class InMemoryPropertyDefinitionTypeRepository : IPropertyDefinitionTypeR
     {
         throw new NotImplementedException();
     }
+    #pragma warning restore CS0618
 
     public void Save(PropertyDefinitionType propertyDefinitionType)
     {

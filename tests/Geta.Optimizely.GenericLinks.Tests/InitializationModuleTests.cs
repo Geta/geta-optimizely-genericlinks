@@ -8,6 +8,7 @@ using EPiServer.Core;
 using EPiServer.DataAbstraction;
 using EPiServer.Framework.Initialization;
 using EPiServer.Framework.Localization;
+using EPiServer.Framework.TypeScanner;
 using EPiServer.ServiceLocation;
 using EPiServer.Shell.ObjectEditing;
 using EPiServer.Shell.ObjectEditing.EditorDescriptors;
@@ -66,7 +67,7 @@ public class InitializationModuleTests
         
         subject.ConfigureContainer(configurationContext);
 
-        var engine = new InitializationEngine(serviceCollection, HostType.TestFramework);
+        var engine = new InitializationEngine(serviceCollection, new EmptyTypeScannerLookup());
         var provider = serviceCollection.BuildServiceProvider();
 
         ServiceLocator.SetScopedServiceProvider(provider);
@@ -75,7 +76,7 @@ public class InitializationModuleTests
         {
             subject.Initialize(engine);
 
-            var handlerRegistry = engine.Locate.Advanced.GetService<MetadataHandlerRegistry>();
+            var handlerRegistry = engine.Services.GetService<MetadataHandlerRegistry>();
 
             Assert.NotNull(handlerRegistry);
 
@@ -103,8 +104,8 @@ public class InitializationModuleTests
 
         subject.ConfigureContainer(configurationContext);
 
-        var engine = new InitializationEngine(serviceCollection, HostType.TestFramework);
-        
+        var engine = new InitializationEngine(serviceCollection, new EmptyTypeScannerLookup());
+
         subject.Uninitialize(engine);
 
         Assert.NotEmpty(serviceCollection);
@@ -115,7 +116,8 @@ public class InitializationModuleTests
         var editorDescriptors = Enumerable.Empty<EditorDescriptor>();
         var modelAccessorCreators = Enumerable.Empty<IModelAccessorCreator>();
         var editorDefinitionRepository = new NullEditorDefinitionRepository();
-        var metadataHandlerRegistry = new MetadataHandlerRegistry(editorDescriptors, modelAccessorCreators, editorDefinitionRepository);
+        var logger = Microsoft.Extensions.Logging.Abstractions.NullLogger<MetadataHandlerRegistry>.Instance;
+        var metadataHandlerRegistry = new MetadataHandlerRegistry(editorDescriptors, modelAccessorCreators, editorDefinitionRepository, logger);
 
         return metadataHandlerRegistry;
     }

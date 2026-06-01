@@ -34,10 +34,10 @@ public class BackingTypeResolverTests
         var subject = new LinkDataBackingTypeResolverInterceptor(failureResolver, definitionRepository);
 
         var resolvedType = subject.Resolve(typeof(LinkDataCollection<TestLinkData>));
-        Assert.Equal(collectionPropertyType, resolvedType);
+        Assert.Equal(collectionPropertyType, resolvedType.Type.DefinitionType);
 
         resolvedType = subject.Resolve(typeof(TestLinkData));
-        Assert.Equal(singlePropertyType, resolvedType);
+        Assert.Equal(singlePropertyType, resolvedType.Type.DefinitionType);
     }
 
     [Fact]
@@ -52,7 +52,7 @@ public class BackingTypeResolverTests
         var definitionRepository = new InMemoryPropertyDefinitionTypeRepository(definitions);
         var backingResolver = new NullBackingTypeResolver();
         var subject = new LinkDataBackingTypeResolverInterceptor(backingResolver, definitionRepository);
-        var tasks = new List<Task<Type>>();
+        var tasks = new List<Task<PropertyDefinitionTypeResolution>>();
 
         for (var i = 0; i < 50; i++)
         {
@@ -62,8 +62,8 @@ public class BackingTypeResolverTests
 
         await Assert.AllAsync(tasks, async task =>
         {
-            var type = await task;
-            Assert.Equal(collectionPropertyType, type);
+            var resolution = await task;
+            Assert.Equal(collectionPropertyType, resolution.Type.DefinitionType);
         });
     }
 }

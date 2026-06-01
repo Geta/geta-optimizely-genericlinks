@@ -9,7 +9,9 @@ public static class DependencyInjectionExtensions
     public static void AddLinkDataExportTransform<TLinkData>(this IServiceCollection services)
         where TLinkData : LinkData, new()
     {
-        services.AddSingleton<PropertyLinkDataCollectionTransform<TLinkData>>().Forward<PropertyLinkDataCollectionTransform<TLinkData>, IPropertyTransform>();
-        services.AddSingleton<PropertyLinkDataTransform<TLinkData>>().Forward<PropertyLinkDataTransform<TLinkData>, IPropertyTransform>();
+        services.AddSingleton<PropertyLinkDataCollectionTransform<TLinkData>>();
+        services.AddSingleton<IPropertyTransform>(sp => sp.GetRequiredService<PropertyLinkDataCollectionTransform<TLinkData>>());
+        services.AddSingleton<PropertyLinkDataTransform<TLinkData>>();
+        services.AddSingleton<IPropertyTransform>(sp => sp.GetRequiredService<PropertyLinkDataTransform<TLinkData>>());
     }
 }

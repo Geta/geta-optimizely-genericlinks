@@ -24,7 +24,6 @@ using Geta.Optimizely.GenericLinks.Converters.Values;
 using Geta.Optimizely.GenericLinks.Html;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -46,15 +45,12 @@ internal class GenericLinkInitializationModule : IConfigurableModule
         services.AddSingleton<IPropertySoftLinkIndexer, LinkDataCollectionSoftLinkIndexer>();
         services.AddSingleton<IPropertySoftLinkIndexer, LinkDataSoftLinkIndexer>();
         services.TryAddEnumerable(ServiceDescriptor.Singleton<ContentScannerExtension, GenericLinkContentScannerExtension>());
-        services.TryAddEnumerable(ServiceDescriptor.Singleton<JsonConverter, NewtonsoftLinkDataConverter>());
         services.TryAddEnumerable(ServiceDescriptor.Singleton<IJsonConverter, SystemTextLinkDataJsonConverterFactory>());
         services.TryAddTransient<ILinkModelConverter, DefaultLinkModelConverter>();
         services.TryAddTransient<ILinkModelMetadataProvider, DefaultLinkModelMetadataProvider>();
         services.TryAddSingleton<IPropertyReflector, DefaultPropertyReflector>();
         services.TryAddTransient<IAttributeSanitizer, DefaultAttributeSanitizer>();
         services.TryAddTransient<ILinkHtmlSerializer, DefaultLinkHtmlSerializer>();
-        services.TryAddSingleton<INewtonsoftJsonSerializerProvider, DefaultNewtonsoftJsonSerializerProvider>();
-
         TryAddAttributeConverters(services);
         TryAddJsonValueWriters(services);
 
@@ -66,16 +62,51 @@ internal class GenericLinkInitializationModule : IConfigurableModule
             }
         });
 
+        // CMS 13 removed services.Intercept<>() (EPiServer.ServiceLocation).
+        // Manual decorator: resolve the inner IBackingTypeResolver, wrap it.
         context.ConfigurationComplete += (o, e) =>
         {
-            services.Intercept<IBackingTypeResolver>((provider, typeResolver) =>
-                new LinkDataBackingTypeResolverInterceptor(typeResolver, provider.GetRequiredService<IPropertyDefinitionTypeRepository>()));
+            var existingDescriptor = services.FirstOrDefault(d => d.ServiceType == typeof(IBackingTypeResolver))
+                ?? throw new InvalidOperationException(
+                    "IBackingTypeResolver is not registered. A compatible EPiServer.CMS version is required.");
+
+            services.Remove(existingDescriptor);
+            services.AddSingleton<IBackingTypeResolver>(provider =>
+            {
+                IBackingTypeResolver innerResolver;
+                if (existingDescriptor.ImplementationType is not null)
+                {
+                    innerResolver = (IBackingTypeResolver)ActivatorUtilities.CreateInstance(
+                        provider, existingDescriptor.ImplementationType);
+                }
+                else if (existingDescriptor.ImplementationFactory is not null)
+                {
+                    innerResolver = (IBackingTypeResolver)existingDescriptor.ImplementationFactory(provider);
+                }
+                else
+                {
+                    innerResolver = (IBackingTypeResolver)(existingDescriptor.ImplementationInstance
+                        ?? throw new InvalidOperationException(
+                            "IBackingTypeResolver descriptor has no implementation type, factory, or instance."));
+                }
+
+                return new LinkDataBackingTypeResolverInterceptor(innerResolver,
+                    provider.GetRequiredService<IPropertyDefinitionTypeRepository>());
+            });
         };
     }
 
     public void Initialize(InitializationEngine context)
     {
-        var provider = context.Locate.Advanced;
+        if (!PropertyLinkBase.IsLazyValueReflectionAvailable)
+        {
+            var cmsVersion = typeof(EPiServer.Core.PropertyLongString).Assembly.GetName().Version;
+            throw new InvalidOperationException(
+                $"PropertyLongString._lazyValueFactory field not found (EPiServer.CMS {cmsVersion}). " +
+                $"This version of GenericLinks requires a compatible CMS 13.x build.");
+        }
+
+        var provider = context.Services;
         var metadataHandlerRegistry = provider.GetInstance<MetadataHandlerRegistry>();
         var collectionDefinitionLoader = provider.GetInstance<PropertyLinkDataCollectionDefinitionsLoader>();
         var propertyDefinitionLoader = provider.GetInstance<PropertyLinkDataDefinitionsLoader>();

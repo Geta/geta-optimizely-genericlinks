@@ -1,0 +1,49 @@
+@using EPiServer.Core
+@using EPiServer.Web.Routing
+@using Geta.Optimizely.GenericLinks.Extensions
+@using Geta.Optimizely.GenericLinks.Web.Models
+@inject IUrlResolver UrlResolver
+@model PropertyThumbnailTestBlock
+
+<div class="property-thumbnail-test-block p-3 border mb-3">
+    @if (Model.ThumbnailLinks != null && Model.ThumbnailLinks.Any())
+    {
+        <h4>Thumbnail Links</h4>
+        <ul class="list-unstyled">
+            @foreach (var link in Model.ThumbnailLinks)
+            {
+                <li class="mb-2">
+                    @if (!ContentReference.IsNullOrEmpty(link.Thumbnail))
+                    {
+                        <img src="@UrlResolver.GetUrl(link.Thumbnail)" alt="@link.Text" style="max-height: 50px;" />
+                    }
+                    <a href="@link.GetMappedHref()" target="@link.Target" title="@link.Title">@link.Text</a>
+                </li>
+            }
+        </ul>
+    }
+
+    @if (Model.ThumbnailLink != null)
+    {
+        <h4>Single Link</h4>
+        <p>
+            @if (!ContentReference.IsNullOrEmpty(Model.ThumbnailLink.Thumbnail))
+            {
+                <img src="@UrlResolver.GetUrl(Model.ThumbnailLink.Thumbnail)" alt="@Model.ThumbnailLink.Text" style="max-height: 50px;" />
+            }
+            <a href="@Model.ThumbnailLink.GetMappedHref()">@Model.ThumbnailLink.Text</a>
+        </p>
+    }
+
+    @if (Model.RequiredThumbnailLink != null)
+    {
+        <h4>Required Link</h4>
+        <p>
+            @if (!ContentReference.IsNullOrEmpty(Model.RequiredThumbnailLink.Thumbnail))
+            {
+                <img src="@UrlResolver.GetUrl(Model.RequiredThumbnailLink.Thumbnail)" alt="@Model.RequiredThumbnailLink.Text" style="max-height: 50px;" />
+            }
+            <a href="@Model.RequiredThumbnailLink.GetMappedHref()">@Model.RequiredThumbnailLink.Text</a>
+        </p>
+    }
+</div>
