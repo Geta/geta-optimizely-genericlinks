@@ -22,7 +22,6 @@ using Geta.Optimizely.GenericLinks.Html;
 using Geta.Optimizely.GenericLinks.Tests.Models;
 using Geta.Optimizely.GenericLinks.Tests.Services;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
 using Xunit;
 
 namespace Geta.Optimizely.GenericLinks.Tests;
@@ -50,122 +49,6 @@ public class SerializationTests
 
         Assert.True(subject.CanConvert(typeof(DialogContentOptions)));
         Assert.Contains("test", subject.Convert(new DialogContentOptions { BaseClass = "test" }));
-    }
-
-    [Fact]
-    public void NewtonsoftLinkDataConverter_can_Read()
-    {
-        var subject = CreateNewtonsoftLinkDataConverter();
-        var text = "Test 1";
-        var href = "http://localhost/1";
-        var width = 256;
-        var height = 128;
-        var tolerance = 0.0001m;
-        var aspect = 2.0;
-        var caption = "test";
-        var thumbnail = new ContentReference(320);
-        var modfied = new DateTime(2000, 1, 1);
-
-        Assert.True(subject.CanConvert(typeof(TestThumbnailLinkData)));
-
-        var serializer = Newtonsoft.Json.JsonSerializer.CreateDefault();
-        var readableJson = new[]
-        {
-            $"{{ text: \"{text}\", href: \"{href}\", attributes: {{ thumbnail: \"{thumbnail}\", thumbnailWidth: {width}, thumbnailHeight: {height}, thumbnailModified: \"{modfied}\", thumbnailCaption: \"{caption}\", thumbnailAspect:\"{aspect}\", thumbnailTolerance:\"{tolerance.ToString(CultureInfo.InvariantCulture)}\" }} }}",
-            $"[{{ text: \"{text}\", href: \"{href}\", attributes: {{ thumbnail: \"{thumbnail}\", thumbnailWidth: {width}, thumbnailHeight: {height}, thumbnailModified: \"{modfied}\", thumbnailCaption: \"{caption}\", thumbnailAspect:\"{aspect}\", thumbnailTolerance:\"{tolerance.ToString(CultureInfo.InvariantCulture)}\" }} }}]"
-        };
-
-        foreach (var jsonString in readableJson)
-        {
-            using var reader = new StringReader(jsonString);
-            using var jsonReader = new JsonTextReader(reader);
-
-            jsonReader.Read();
-
-            var linkData = subject.ReadJson(jsonReader, typeof(TestThumbnailLinkData), null, serializer) as TestThumbnailLinkData;
-
-            Assert.NotNull(linkData);
-
-            if (linkData is null)
-                throw new InvalidOperationException("linkData cannot be null");
-
-            Assert.Equal(text, linkData.Text);
-            Assert.Equal(href, linkData.Href);
-            Assert.Equal(thumbnail, linkData.Thumbnail);
-            Assert.Equal(modfied, linkData.ThumbnailModified);
-            Assert.Equal(width, linkData.ThumbnailWidth);
-            Assert.Equal(height, linkData.ThumbnailHeight);
-            Assert.Equal(caption, linkData.ThumbnailCaption);
-            Assert.Equal(aspect, linkData.ThumbnailAspect);
-            Assert.Equal(tolerance, linkData.ThumbnailTolerance);
-        }
-    }
-
-    [Fact]
-    public void NewtonsoftLinkDataConverter_can_Write()
-    {
-        var subject = CreateNewtonsoftLinkDataConverter();
-        var serializer = Newtonsoft.Json.JsonSerializer.CreateDefault();
-
-        using var memoryStream = new MemoryStream();
-        using var writer = new StreamWriter(memoryStream);
-        using var jsonWriter = new JsonTextWriter(writer);
-
-        var model = new TestThumbnailLinkData
-        {
-            Text = "1",
-            Href = "http://localhost/1",
-            Thumbnail = new ContentReference(1),
-            ThumbnailModified = new DateTime(2000, 1, 1),
-            ThumbnailWidth = 256,
-            ThumbnailHeight = 256,
-            ThumbnailAspect = 1,
-            ThumbnailTolerance = 1,
-            ThumbnailCaption = "test"
-        };
-
-        subject.WriteJson(jsonWriter, model, serializer);
-
-        jsonWriter.Flush();
-        memoryStream.Flush();
-        memoryStream.Seek(0, SeekOrigin.Begin);
-
-        using var reader = new StreamReader(memoryStream, leaveOpen: true);
-        var json = reader.ReadToEnd();
-
-        Assert.NotNull(json);
-        Assert.Contains(model.Text, json);
-        Assert.Contains(model.Href, json);
-        Assert.Contains(JsonConvert.SerializeObject(model.Thumbnail), json);
-        Assert.Contains(JsonConvert.SerializeObject(model.ThumbnailModified), json);
-        Assert.Contains(JsonConvert.SerializeObject(model.ThumbnailWidth), json);
-    }
-
-    [Fact]
-    public void NewtonsoftLinkDataConverter_can_Read_null()
-    {
-        var subject = CreateNewtonsoftLinkDataConverter();
-        var valueType = typeof(TestLinkData);
-        Assert.True(subject.CanConvert(valueType));
-
-        var serializer = Newtonsoft.Json.JsonSerializer.CreateDefault();
-        var unreadableJson = new[]
-        {
-            $"",
-            $"[]"
-        };
-
-        foreach (var jsonString in unreadableJson)
-        {
-            using var reader = new StringReader(jsonString);
-            using var jsonReader = new JsonTextReader(reader);
-
-            jsonReader.Read();
-
-            var linkData = subject.ReadJson(jsonReader, valueType, null, serializer) as TestLinkData;
-
-            Assert.Null(linkData);
-        }
     }
 
     [Fact]
@@ -353,18 +236,8 @@ public class SerializationTests
     private static DefaultLinkHtmlSerializer CreateLinkHtmlSerializer()
     {
         var urlResolver = new FakeUrlResolver();
-        var virtualPathResolver = new FakeVirtualPathResolver();
 
-        return new DefaultLinkHtmlSerializer(virtualPathResolver, urlResolver);
-    }
-
-    private static NewtonsoftLinkDataConverter CreateNewtonsoftLinkDataConverter()
-    {
-        var propertyReflector = new DefaultPropertyReflector();
-        var linkModelConverter = CreateLinkModelConverter();
-        var serializerProvider = new DefaultNewtonsoftJsonSerializerProvider();
-
-        return new NewtonsoftLinkDataConverter(propertyReflector, linkModelConverter, serializerProvider);
+        return new DefaultLinkHtmlSerializer(urlResolver);
     }
 
     private static SystemTextLinkDataConverter<TLinkData> CreateSystemTextLinkDataConverter<TLinkData>()
@@ -400,22 +273,19 @@ public class SerializationTests
     {
         var attributeConverters = CreateAttributeConverters();
         var urlResolver = new FakeUrlResolver();
-        var virtualPathResolver = new FakeVirtualPathResolver();
         var frameRepository = new InMemoryFrameRepository(CreateSystemFrames());
         var uiDescriptorRepository = CreateUiDescriptorRegistry();
 
-        return new DefaultLinkModelConverter(urlResolver, frameRepository, virtualPathResolver, attributeConverters, uiDescriptorRepository);
+        return new DefaultLinkModelConverter(urlResolver, frameRepository, attributeConverters, uiDescriptorRepository);
     }
 
     private static UIDescriptorRegistry CreateUiDescriptorRegistry()
     {
         var descriptors = Enumerable.Empty<UIDescriptor>();
-#pragma warning disable CS0618 // Type or member is obsolete
-        var initializers = Enumerable.Empty<IUIDescriptorInitializer>();
-#pragma warning restore CS0618 // Type or member is obsolete
         var providers = Enumerable.Empty<UIDescriptorProvider>();
+        var logger = Microsoft.Extensions.Logging.Abstractions.NullLogger<UIDescriptorRegistry>.Instance;
 
-        return new UIDescriptorRegistry(descriptors, initializers, providers);
+        return new UIDescriptorRegistry(descriptors, providers, logger);
     }
 
     private static IEnumerable<Frame> CreateSystemFrames()

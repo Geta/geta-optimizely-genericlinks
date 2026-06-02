@@ -2,7 +2,6 @@
 // Licensed under Apache-2.0. See the LICENSE file in the project root for more information
 
 using EPiServer.Core.Transfer;
-using EPiServer.Data;
 using EPiServer.Data.Entity;
 using System;
 using System.Collections;
@@ -190,7 +189,8 @@ public class LinkDataCollection<TLinkData> : LinkDataCollection, IList<TLinkData
 
     protected virtual void ThrowIfReadOnly()
     {
-        Validator.ValidateNotReadOnly(this);
+        if (IsReadOnly)
+            throw new NotSupportedException("Collection is read-only.");
     }
 
     object IReadOnly.CreateWritableClone() => CreateWritableClone();

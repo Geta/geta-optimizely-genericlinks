@@ -1,8 +1,8 @@
 // Copyright (c) Geta Digital. All rights reserved.
 // Licensed under Apache-2.0. See the LICENSE file in the project root for more information
 
-using Newtonsoft.Json;
 using System;
+using System.Text.Json;
 
 namespace Geta.Optimizely.GenericLinks.Converters.Attributes;
 
@@ -21,6 +21,6 @@ public class JsonAttributeConverter : ILinkDataAttibuteConverter
 
     public string? Convert(object value)
     {
-        return JsonConvert.SerializeObject(value);
+        return JsonSerializer.Serialize(value);
     }
 }

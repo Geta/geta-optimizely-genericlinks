@@ -2,6 +2,32 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.0.0]
+
+### Added
+
+- Support for Optimizely CMS 13.1 and .NET 10.
+- Internal `VirtualPathHelper` replacing the obsolete `IVirtualPathResolver`.
+
+### Changed
+
+- Updated `IUrlResolver.Route()` usage to CMS 13 API (`ContentRouteData` instead of `IContent`).
+- Updated `IBackingTypeResolver.Resolve()` to return `PropertyDefinitionTypeResolution`.
+- Replaced `services.Intercept<>()` and `.Forward<>()` with manual DI registration patterns.
+- Updated `PropertyLinkBase` for CMS 13 lazy value handling.
+- Consolidated JSON serialization on `System.Text.Json`, removed `Newtonsoft.Json` dependency (breaking change).
+- `LinkDataExtensions.GetMappedHref()` and `ToMappedLink()` no longer accept `IVirtualPathResolver` parameter (breaking change).
+- `DefaultLinkHtmlSerializer` constructor no longer accepts `IVirtualPathResolver` parameter (breaking change).
+- `DefaultLinkModelConverter` constructor no longer accepts `IVirtualPathResolver` parameter (breaking change).
+
+### Removed
+
+- Removed `Geta.Optimizely.GenericLinks.ContentDeliveryApi` package (no CMS 13 compatible version exists).
+- Removed `Newtonsoft.Json` dependency and `NewtonsoftLinkDataConverter` (breaking change for consumers using the Newtonsoft pipeline).
+- Removed dependency on `IVirtualPathResolver` (obsolete in CMS 13).
+- Removed support for .NET 6 and .NET 8.
+- Removed Alloy sandbox, replaced with `Geta.Optimizely.GenericLinks.Web` test site.
+
 ## [2.0.5]
 
 - Adjusted LinkData to use `ConcurrentDictionary` internally because of threading problems.

@@ -33,6 +33,7 @@ public abstract class PropertyLinkData<TLinkData> : PropertyLinkData, IReference
     private readonly IAttributeSanitizer _attributeSanitizer;
     private readonly ILinkHtmlSerializer _htmlSerializer;
 
+    private readonly object _lazyLock = new();
     private TLinkData? _linkItem;
     private volatile bool _hasLoaded;
 
@@ -118,7 +119,7 @@ public abstract class PropertyLinkData<TLinkData> : PropertyLinkData, IReference
             if (_linkItem is not null)
                 return false;
 
-            return !((ILazyProperty)this).HasLazyValue;
+            return !HasBaseLazyValue();
         }
     }
 
@@ -131,7 +132,21 @@ public abstract class PropertyLinkData<TLinkData> : PropertyLinkData, IReference
         {
             if (_linkItem == null && !_hasLoaded)
             {
-                LoadData(base.LongString);
+                lock (_lazyLock)
+                {
+                    if (_linkItem == null && !_hasLoaded)
+                    {
+                        if (HasBaseLazyValue())
+                        {
+                            var rawValue = ConsumeLazyValue();
+                            LoadData(rawValue);
+                        }
+                        else
+                        {
+                            LoadData(base.LongString);
+                        }
+                    }
+                }
             }
 
             return _linkItem;
@@ -156,7 +171,7 @@ public abstract class PropertyLinkData<TLinkData> : PropertyLinkData, IReference
             });
         }
     }
-    protected override string LongString
+    public override string LongString
     {
         get => _htmlSerializer.Serialize(_linkItem, StringMode.InternalMode);
         set => base.LongString = value;
@@ -244,13 +259,17 @@ public abstract class PropertyLinkData<TLinkData> : PropertyLinkData, IReference
         {
             _linkItem = null;
         }
-        else if (value is TLinkData)
+        else if (value is TLinkData linkData)
         {
-            Value = value;
+            _linkItem = linkData;
+        }
+        else if (value is string text)
+        {
+            _linkItem = ParseToLink(text);
         }
         else
         {
-            _linkItem = ParseToLink((string)value);
+            throw new InvalidOperationException($"Unsupported value type {value.GetType()} for {GetType().Name}.LoadData");
         }
 
         _hasLoaded = true;

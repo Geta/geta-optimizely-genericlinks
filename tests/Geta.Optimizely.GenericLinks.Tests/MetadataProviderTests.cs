@@ -137,7 +137,8 @@ public class MetadataProviderTests
         var editorDescriptors = Enumerable.Empty<EditorDescriptor>();
         var modelAccessorCreators = Enumerable.Empty<IModelAccessorCreator>();
         var editorDefinitionRepository = new NullEditorDefinitionRepository();
-        var metadataHandlerRegistry = new MetadataHandlerRegistry(editorDescriptors, modelAccessorCreators, editorDefinitionRepository);
+        var logger = Microsoft.Extensions.Logging.Abstractions.NullLogger<MetadataHandlerRegistry>.Instance;
+        var metadataHandlerRegistry = new MetadataHandlerRegistry(editorDescriptors, modelAccessorCreators, editorDefinitionRepository, logger);
 
         return metadataHandlerRegistry;
     }

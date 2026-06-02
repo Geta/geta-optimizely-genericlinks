@@ -1,11 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net8.0;net6.0</TargetFrameworks>
+    <TargetFramework>net10.0</TargetFramework>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <NuGetAudit>true</NuGetAudit>
+    <NuGetAuditMode>direct</NuGetAuditMode>
+    <NuGetAuditLevel>high</NuGetAuditLevel>
     <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
     <PackageId>Geta.Optimizely.GenericLinks</PackageId>
     <Title>Extensible link items for Optimizely</Title>
@@ -24,12 +27,8 @@
     <RepositoryUrl>https://github.com/Geta/geta-optimizely-genericlinks.git</RepositoryUrl>
   </PropertyGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
-    <PackageReference Include="EPiServer.CMS.UI" Version="[12.4.0,13.0)" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
-    <PackageReference Include="EPiServer.CMS.UI" Version="[12.17.0,13.0)" />
+  <ItemGroup>
+    <PackageReference Include="EPiServer.CMS.UI" Version="[13.0.0,14.0)" />
   </ItemGroup>
 
   <PropertyGroup>

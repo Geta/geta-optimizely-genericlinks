@@ -2,14 +2,21 @@
 // Licensed under Apache-2.0. See the LICENSE file in the project root for more information
 
 using EPiServer.Core;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Xml.Linq;
 
 namespace Geta.Optimizely.GenericLinks;
 
 public abstract class PropertyLinkBase : PropertyLongString
 {
+    private static readonly FieldInfo? LazyFactoryField =
+        typeof(PropertyLongString).GetField("_lazyValueFactory", BindingFlags.NonPublic | BindingFlags.Instance);
+
+    internal static bool IsLazyValueReflectionAvailable => LazyFactoryField != null;
+
     protected PropertyLinkBase()
     {
     }
@@ -18,6 +25,33 @@ public abstract class PropertyLinkBase : PropertyLongString
     {
     }
 
+    // CMS 13 workaround: PropertyLongString.LongString getter hard-casts the internal
+    // _lazyValueFactory result to (string), which throws for typed property subclasses.
+    // We consume the Func<object> factory via reflection, bypassing the string-only path.
+    // Startup guard in GenericLinkInitializationModule.Initialize fails fast if the field
+    // is renamed/removed in a future CMS build. When bumping the CMS.UI version range,
+    // verify that PropertyLongString still exposes _lazyValueFactory as Func<object>.
+    protected object? ConsumeLazyValue()
+    {
+        if (LazyFactoryField == null) return null;
+        var factory = LazyFactoryField.GetValue(this) as Func<object>;
+        if (factory == null) return null;
+        LazyFactoryField.SetValue(this, null);
+        return factory();
+    }
+
+    protected bool HasBaseLazyValue()
+    {
+        if (LazyFactoryField == null) return false;
+        return LazyFactoryField.GetValue(this) != null;
+    }
+
+    public override object? SaveData()
+    {
+        return ToLongString();
+    }
+
+    [Obsolete]
     public override object? SaveData(PropertyDataCollection properties)
     {
         return ToLongString();
